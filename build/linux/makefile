@@ -1,9 +1,11 @@
-NAME 		= blast_service
-DIR_SRC = $(DIR_SERVICES_ROOT_SRC)/blast/src
-DIR_INCLUDE = $(DIR_SERVICES_ROOT_SRC)/blast/include
-CC		= g++
-CXX		= g++
-MAKEDEPEND 	= gcc -MM -MF
+NAME 		:= blast_service
+DIR_SRC := ../../src
+DIR_INCLUDE := ../../include
+DIR_BUILD :=  $(realpath .)
+CC		:= gcc
+CXX		:= g++
+MAKEDEPEND 	:= gcc -MM -MF
+
 
 
 
