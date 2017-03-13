@@ -1,30 +1,25 @@
-NAME 		:= blast_service
-DIR_SRC := ../../src
-DIR_INCLUDE := ../../include
-DIR_BUILD :=  $(realpath .)
-CC		:= gcc
+NAME 		:= ensembl_rest_service
+DIR_BUILD :=  $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+DIR_SRC := $(realpath $(DIR_BUILD)/../../src)
+DIR_INCLUDE :=$(realpath $(DIR_BUILD)/../../include)
+CC		:= g++
 CXX		:= g++
 MAKEDEPEND 	:= gcc -MM -MF
 
+VPATH := $(DIR_SRC)
 
+BUILD		:= debug
 
-
-ifeq ($(DIR_ROOT),)
-export DIR_ROOT = $(realpath $(../..))
+ifeq ($(DIR_BUILD_UTILS),)
+export DIR_BUILD_UTILS = $(abspath $(realpath ../../../../build_utils/linux))
 endif
+include $(DIR_BUILD_UTILS)/project.properties
 
-ifneq ($(PROPERTIES_SET),1)
-include $(DIR_BUILD_ROOT)/project.properties
-endif
 
 export DIR_INSTALL=$(DIR_GRASSROOTS_INSTALL)/services
 
 BUILD		= debug
 
-
-VPATH	= \
-	$(DIR_SRC) \
-	
 
 INCLUDES = \
 	-I$(DIR_INCLUDE) \
@@ -65,7 +60,8 @@ SRCS 	= \
 	system_blast_tool_factory.cpp 
 	
 
-CPPFLAGS += -DBLAST_LIBRARY_EXPORTS  -std=c++0x 
+CPPFLAGS += -DBLAST_LIBRARY_EXPORTS
+CXXFLAGS += -std=c++0x 
 
 LDFLAGS += -L$(DIR_JANSSON_LIB) -ljansson \
 	-L$(DIR_GRASSROOTS_UTIL_LIB) -l$(GRASSROOTS_UTIL_LIB_NAME) \
@@ -159,5 +155,5 @@ BLAST_SEARCH_LDFLAGS = \
 
 
 
-include $(DIR_BUILD_ROOT)/generic_makefiles/shared_library.makefile
+include $(DIR_BUILD_UTILS)/generic_makefiles/shared_library.makefile
 
