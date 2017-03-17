@@ -1,27 +1,23 @@
-NAME 		:= ensembl_rest_service
+NAME 		:= blast_service
 DIR_BUILD :=  $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 DIR_SRC := $(realpath $(DIR_BUILD)/../../src)
-DIR_INCLUDE :=$(realpath $(DIR_BUILD)/../../include)
-CC		:= g++
-CXX		:= g++
-MAKEDEPEND 	:= gcc -MM -MF
+DIR_INCLUDE := $(realpath $(DIR_BUILD)/../../include)
 
-VPATH := $(DIR_SRC)
-
-BUILD		:= debug
-
-ifeq ($(DIR_BUILD_UTILS),)
-export DIR_BUILD_UTILS = $(abspath $(realpath ../../../../build_utils/linux))
+ifeq ($(DIR_BUILD_CONFIG),)
+export DIR_BUILD_CONFIG := $(realpath $(DIR_BUILD)/../../../../build-config/linux)
 endif
-include $(DIR_BUILD_UTILS)/project.properties
 
 
-export DIR_INSTALL=$(DIR_GRASSROOTS_INSTALL)/services
+include $(DIR_BUILD_CONFIG)/project.properties
 
-BUILD		= debug
+export DIR_INSTALL := $(DIR_GRASSROOTS_INSTALL)/services
 
+BUILD	:= debug
 
-INCLUDES = \
+VPATH := \
+	$(DIR_SRC)
+
+INCLUDES := \
 	-I$(DIR_INCLUDE) \
 	-I$(DIR_GRASSROOTS_UTIL_INC) \
 	-I$(DIR_GRASSROOTS_UTIL_INC)/containers \
@@ -36,7 +32,7 @@ INCLUDES = \
 	-I$(DIR_BLAST_INC) \
 	-I$(DIR_PCRE_INC)
 	
-SRCS 	= \
+SRCS 	:= \
 	blast_app_parameters.c \
 	blast_service.c \
 	blastn_service.c \
@@ -153,7 +149,6 @@ BLAST_SEARCH_LDFLAGS = \
 	-lm   \
 	-lpthread 	
 
-
-
-include $(DIR_BUILD_UTILS)/generic_makefiles/shared_library.makefile
+export CC := g++
+include $(DIR_BUILD_CONFIG)/generic_makefiles/shared_library.makefile
 

@@ -31,6 +31,11 @@
 #include "blast_service_api.h"
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /**
  * An ArgsProcessor is a class to abstract out how a
  * particular BlastTool stores a value when an argument
@@ -63,6 +68,11 @@ public:
 	 */
 	virtual bool AddArg (const char *arg_s, const bool hyphen_flag) = 0;
 };
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif /* SERVER_SRC_SERVICES_BLAST_INCLUDE_ARGS_PROCESSOR_HPP_ */

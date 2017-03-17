@@ -24,11 +24,9 @@
 #define BLAST_SERVICE_H
 
 
+#include "blast_app_parameters.h"
 #include "blast_service_api.h"
 #include "blast_formatter.h"
-#include "blast_app_parameters.h"
-
-
 #include "parameter_set.h"
 #include "temp_file.hpp"
 

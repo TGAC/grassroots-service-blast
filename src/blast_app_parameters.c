@@ -22,7 +22,8 @@
 
 
 
-#include "blast_app_parameters.h"
+#include <blast_app_parameters.h>
+#include "blast_service.h"
 
 
 bool ParseBlastAppParameters (BlastAppParameters *app_p, const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p)

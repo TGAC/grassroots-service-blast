@@ -31,11 +31,12 @@
 
 #include "blast_service_api.h"
 #include "parameter_set.h"
-#include "args_processor.hpp"
+//#include "args_processor.hpp"
 
 
 /* forward declaration */
 struct BlastServiceData;
+struct ArgsProcessor;
 
 /**
  * This datatype is used to parse a given ParameterSet in a method
@@ -55,7 +56,7 @@ typedef struct BLAST_SERVICE_LOCAL BlastAppParameters
 	 * suitable for the underlying BlastTool.
 	 * @return <code>true</code> if the ParameterSet was parsed successfully, <code>false</code> otherwise.
 	 */
-	bool (*bap_parse_params_fn) (const struct BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
+	bool (*bap_parse_params_fn) (const struct BlastServiceData *data_p, ParameterSet *params_p, struct ArgsProcessor *ap_p);
 } BlastAppParameters;
 
 
@@ -77,7 +78,7 @@ extern "C"
  * @return <code>true</code> if the ParameterSet was parsed successfully, <code>false</code> otherwise.
  * @memberof BlastAppParameters
  */
-BLAST_SERVICE_LOCAL bool ParseBlastAppParameters (BlastAppParameters *app_p, const struct BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
+BLAST_SERVICE_LOCAL bool ParseBlastAppParameters (BlastAppParameters *app_p, const struct BlastServiceData *data_p, ParameterSet *params_p, struct ArgsProcessor *ap_p);
 
 
 #ifdef __cplusplus
