@@ -5,7 +5,29 @@ The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Service allows BLAST querie
 
 ## Installation
 
+To build this service, you need the [grassroots core](https://github.com/TGAC/grassroots-core) and [grassroots build config](https://github.com/TGAC/grassroots-build-config) installed and configured. 
 
+The files to build the BLAST service are in the ```build/<platform>``` directory. 
+
+### Linux
+
+If you enter this directory 
+
+```cd build/linux```
+
+you can then build the service by typing
+
+```make all```
+
+and then 
+
+```make install```
+
+to install the service into the Grassroots system where it will be available for use immediately.
+
+### Linux
+
+If you change directory
 
 
 ## Server Configuration
@@ -30,6 +52,57 @@ The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Service allows BLAST querie
     * **system**: This will be run using the executable specified by *blast_command* to the ANSI-specified *system()* function. This is the default *blast_tool* option.
     * **drmaa**: This will be run by submitting a job to a DRMAA environment.
 
+
+An example configuration file is 
+
+~~~{.json}
+{
+	"blast_command": "/opt/grassroots-0/grassroots/extras/blast/bin/blastn",
+	"blast_formatter": "system",
+	"system_formatter_config": {
+		"command": "/opt/grassroots-0/grassroots/extras/blast/bin/blast_formatter"
+	},
+	"working_directory": "/home/billy/blast_working_dir/apache0",
+	"databases": [{
+		"filename": "/opt/grassroots-0/grassroots/extras/blast/databases/Chinese_spring_TGAC_v1_arm-classified.fasta",
+		"name": "ChineseSpring",
+		"description": "Chinese Spring"
+	}, {
+		"filename": "/opt/grassroots-0/grassroots/extras/blast/databases/TRIUR3.120813.filter150.cds",
+		"name": "Triticum urartu",
+		"description": "Triticum urartu",
+		"active": false
+	}, {
+		"filename": "/opt/grassroots-0/grassroots/extras/blast/databases/TA009XXX.fasta",
+		"name": "TA009XXX",
+		"description": "TA009XXX",
+		"active": false
+	}],
+	"groups": {
+		"General Algorithm Parameters": {
+			"visible": false
+		}
+	},
+	"parameters": {
+		"max_target_sequences": {
+			"default_value": 13
+		}
+	}, 
+	"linked_services": {
+		"service_name": "SamTools service",
+		"parameters": {
+			"mappings": [{
+				"input": "database",
+				"output": "Blast database"
+			}, {
+				"input": "scaffold",
+				"output": "Scaffold"
+			}]
+		}
+	}
+}
+
+~~~
 
 ### Linked %Service keys
 
