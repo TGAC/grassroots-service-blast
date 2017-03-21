@@ -1,7 +1,11 @@
-﻿BLAST Service 
-=============
+﻿BLAST Services 
+==============
 
-The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Service allows BLAST queries to be submitted against a number of databases.
+The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Service allows BLAST queries to be submitted against a number of databases.  This Grassroots service module contains three services: 
+
+ * **BlastN Service** for searching nucleotide databases using nucleotide queries 
+ * **BlastP Service** for searching protein databases using protein queries 
+ * **BlastX Service** for searching protein databases using translated nucleotide queries 
 
 ## Installation
 
@@ -25,13 +29,9 @@ and then
 
 to install the service into the Grassroots system where it will be available for use immediately.
 
-### Linux
-
-If you change directory
-
-
 ## Server Configuration
 
+Each of the three services listed above can be configured by files with the same names in the ```config``` directory in the Grassroots application directory. 
 
  * **working_directory**: This is the directory where are any input, output and log files created by the BLAST Service. This directory must be writeable by the user running the Grassroots Server. For instance, the httpd server is often run as the daemon user.
  * **databases**: This is an array of objects giving the details of the available databases. The objects in this array have the following keys:
@@ -53,7 +53,7 @@ If you change directory
     * **drmaa**: This will be run by submitting a job to a DRMAA environment.
 
 
-An example configuration file is 
+An example configuration file for the BlastN service which would be saved as the ```<Grassroots directory>/ config/BlastN service``` is:
 
 ~~~{.json}
 {
@@ -104,7 +104,11 @@ An example configuration file is
 
 ~~~
 
-### Linked %Service keys
+### Linked Service keys
+
+Each of the BLAST services have the ability to link their results to use as input values for other services using the Grassroots Linked Services architecture. For more information, see the main Grassroots documentation.
+
+The available keys for the BLAST services are:   
 
  * **database**: The database from which each hit comes from.
  * **scaffold**: The list of scaffolds that each hit belongs to 
