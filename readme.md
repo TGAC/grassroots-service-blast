@@ -31,9 +31,9 @@ to install the service into the Grassroots system where it will be available for
 
 ## Server Configuration
 
-Each of the three services listed above can be configured by files with the same names in the ```config``` directory in the Grassroots application directory. 
+Each of the three services listed above can be configured by files with the same names in the ```config``` directory in the Grassroots application directory, *e.g.* ```config/BlastN service```
 
- * **working_directory**: This is the directory where are any input, output and log files created by the BLAST Service. This directory must be writeable by the user running the Grassroots Server. For instance, the httpd server is often run as the daemon user.
+ * **working_directory**: This is the directory where are any input, output and log files created by the BLAST Services. This directory must be writeable by the user running the Grassroots Server. For instance, the httpd server is often run as the daemon user.
  * **databases**: This is an array of objects giving the details of the available databases. The objects in this array have the following keys:
     * **name**:  This is the name to show to the user for this database. 
     * **filename**: This is the database value that the BLAST query will use to search against.
