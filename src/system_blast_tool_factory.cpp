@@ -100,7 +100,26 @@ BlastTool *SystemBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, co
 
 BlastTool *SystemBlastToolFactory :: CreateBlastTool (const json_t *json_p,  BlastServiceJob *blast_job_p, BlastServiceData *service_data_p)
 {
-	BlastTool *tool_p = new SystemBlastTool (blast_job_p, service_data_p, json_p);
+	BlastTool *tool_p = 0;
+	bool async_flag = false;
+
+	GetJSONBoolean (json_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
+
+	try
+		{
+			if (async_flag)
+				{
+					tool_p = new AsyncSystemBlastTool (blast_job_p, service_data_p, json_p);
+				}
+			else
+				{
+					tool_p = new SystemBlastTool (blast_job_p, service_data_p, json_p);
+				}
+		}
+	catch (std :: exception &e_r)
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create new SystemBlastTool, error \"%s\"", e_r.what ());
+		}
 
 	return tool_p;
 }

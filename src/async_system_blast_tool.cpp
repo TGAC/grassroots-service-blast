@@ -32,13 +32,19 @@
 
 
 const char * const AsyncSystemBlastTool :: ASBT_PROCESS_ID_S = "process_id";
+const char * const AsyncSystemBlastTool :: ASBT_LOGFILE_S = "log_filename";
+
+
+static bool UpdateAsyncBlastServiceJob (struct ServiceJob *job_p);
+
 
 
 AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const char *blast_program_name_s)
 : SystemBlastTool (job_p, name_s, factory_s, data_p, blast_program_name_s),
 	asbt_async_logfile_s (0)
 {
-
+	SetServiceJobUpdateFunction (& (job_p -> bsj_job), UpdateAsyncBlastServiceJob);
+	ebt_async_flag = true;
 }
 
 
@@ -50,9 +56,34 @@ AsyncSystemBlastTool :: ~AsyncSystemBlastTool ()
 
 
 AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *root_p)
-: SystemBlastTool (job_p, data_p, root_p), asbt_async_logfile_s (0)
+: SystemBlastTool (job_p, data_p, root_p),
+	asbt_async_logfile_s (0)
 {
-	if (!Init (ebt_blast_s))
+	bool alloc_flag = false;
+
+	if (Init (ebt_blast_s))
+		{
+
+			if (GetJSONInteger (root_p, AsyncSystemBlastTool :: ASBT_PROCESS_ID_S, &asbt_process_id))
+				{
+					const char *value_s = GetJSONString (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S);
+
+					alloc_flag = true;
+
+					if (value_s)
+						{
+							asbt_async_logfile_s = CopyToNewString (value_s, 0, false);
+
+							if (!asbt_async_logfile_s)
+								{
+									alloc_flag = false;
+								}
+						}
+				}
+
+		}
+
+	if (!alloc_flag)
 		{
 			throw std :: bad_alloc ();
 		}
@@ -61,7 +92,6 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 
 OperationStatus AsyncSystemBlastTool :: Run ()
 {
-	int res;
 	OperationStatus status = OS_FAILED_TO_START;
 	const char *command_line_s = sbt_args_processor_p -> GetArgsAsString ();
 
@@ -84,12 +114,12 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 		}
 
 
-	if ((status = OS_ERROR) || (status = OS_FAILED_TO_START) || (status == OS_FAILED))
+	if ((status == OS_ERROR) || (status == OS_FAILED_TO_START) || (status == OS_FAILED))
 		{
 			char *log_s = GetLog ();
 
 			status = OS_FAILED;
-			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "\"%s\" returned %d", command_line_s, res);
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "\"%s\" returned %d", command_line_s, status);
 
 			if (log_s)
 				{
@@ -122,6 +152,15 @@ bool AsyncSystemBlastTool :: AddToJSON (json_t *root_p)
 							success_flag = false;
 						}
 				}
+
+			if (asbt_async_logfile_s)
+				{
+					if (json_object_set_new (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S, json_string (asbt_async_logfile_s)) != 0)
+						{
+							success_flag = false;
+						}
+				}
+
 		}		/* if (success_flag) */
 	else
 		{
@@ -151,6 +190,12 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 }
 
 
+static bool UpdateAsyncBlastServiceJob (struct ServiceJob *job_p)
+{
+	BlastServiceJob *blast_job_p = reinterpret_cast <BlastServiceJob *> (job_p);
+	AsyncSystemBlastTool *tool_p = static_cast <AsyncSystemBlastTool *> (blast_job_p -> bsj_tool_p);
 
+	tool_p -> GetStatus (true);
 
-
+	return true;
+}
