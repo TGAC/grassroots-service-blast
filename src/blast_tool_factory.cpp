@@ -77,12 +77,16 @@ BlastToolFactory *BlastToolFactory :: GetBlastToolFactory (const json_t *service
 }
 
 
+BlastToolFactory :: BlastToolFactory (const json_t *service_config_p)
+{
+	btf_service_config_p = service_config_p;
+}
+
+
 BlastToolFactory :: ~BlastToolFactory ()
 {
 
 }
-
-
 
 
 BlastTool *CreateBlastToolFromFactory (BlastToolFactory *factory_p, BlastServiceJob *job_p, const char *name_s, const BlastServiceData *data_p)
@@ -97,7 +101,7 @@ void FreeBlastToolFactory (BlastToolFactory *factory_p)
 }
 
 
-bool IsBlastToolFactorySynchronous (BlastToolFactory *factory_p)
+bool IsBlastToolFactoryAsynchronous (BlastToolFactory *factory_p)
 {
 	return factory_p -> AreToolsAsynchronous ();
 }

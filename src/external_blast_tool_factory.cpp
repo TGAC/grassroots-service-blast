@@ -27,6 +27,7 @@
 
 
 ExternalBlastToolFactory :: ExternalBlastToolFactory (const json_t *config_p)
+: BlastToolFactory (config_p)
 {
 	ebtf_program_name_s = GetJSONString (config_p, BS_COMMAND_NAME_S);
 

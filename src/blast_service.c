@@ -1328,7 +1328,11 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 										{
 											data_p -> bsd_tool_factory_p = BlastToolFactory :: GetBlastToolFactory (blast_config_p);
 
-											if (! (data_p -> bsd_tool_factory_p))
+											if (data_p -> bsd_tool_factory_p)
+												{
+													data_p -> bsd_base_data.sd_service_p -> se_synchronous_flag = ! (IsBlastToolFactoryAsynchronous (data_p -> bsd_tool_factory_p));
+												}
+											else
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetBlastToolFactory failed");
 													success_flag = false;
@@ -1395,7 +1399,7 @@ void FreeBlastServiceData (BlastServiceData *data_p)
 
 static void InitBlastService (Service *blast_service_p)
 {
-	blast_service_p -> se_synchronous_flag = IsBlastToolFactorySynchronous (((BlastServiceData *) (blast_service_p -> se_data_p)) -> bsd_tool_factory_p);
+	blast_service_p -> se_synchronous_flag = ! (IsBlastToolFactoryAsynchronous (((BlastServiceData *) (blast_service_p -> se_data_p)) -> bsd_tool_factory_p));
 
 	blast_service_p -> se_deserialise_job_json_fn = BuildBlastServiceJob;
 	blast_service_p -> se_serialise_job_json_fn = BuildBlastServiceJobJSON;

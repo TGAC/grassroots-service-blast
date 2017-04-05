@@ -66,32 +66,22 @@ SystemBlastToolFactory :: ~SystemBlastToolFactory ()
 BlastTool *SystemBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, const char *name_s, const BlastServiceData *data_p)
 {
 	BlastTool *tool_p = 0;
-	const json_t *blast_config_p = data_p -> bsd_base_data.sd_config_p;
-	const json_t *blast_tool_config_p = json_object_get (blast_config_p, "system_blast_tool_config");
+	bool async_flag = AreToolsAsynchronous ();
 
-	if (blast_tool_config_p)
+	try
 		{
-			bool async_flag = false;
-
-			GetJSONBoolean (blast_tool_config_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
-
-			try
+			if (async_flag)
 				{
-					if (async_flag)
-						{
-							tool_p = new AsyncSystemBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s);
-						}
-					else
-						{
-							tool_p = new SystemBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s);
-						}
+					tool_p = new AsyncSystemBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s);
 				}
-			catch (std :: exception &e_r)
+			else
 				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create new SystemBlastTool, error \"%s\"", e_r.what ());
+					tool_p = new SystemBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s);
 				}
-
-
+		}
+	catch (std :: exception &e_r)
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create new SystemBlastTool, error \"%s\"", e_r.what ());
 		}
 
 	return tool_p;
@@ -101,9 +91,7 @@ BlastTool *SystemBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, co
 BlastTool *SystemBlastToolFactory :: CreateBlastTool (const json_t *json_p,  BlastServiceJob *blast_job_p, BlastServiceData *service_data_p)
 {
 	BlastTool *tool_p = 0;
-	bool async_flag = false;
-
-	GetJSONBoolean (json_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
+	bool async_flag = AreToolsAsynchronous ();
 
 	try
 		{
@@ -128,7 +116,15 @@ BlastTool *SystemBlastToolFactory :: CreateBlastTool (const json_t *json_p,  Bla
 
 bool SystemBlastToolFactory :: AreToolsAsynchronous () const
 {
-	return false;
+	bool async_flag = false;
+	const json_t *blast_tool_config_p = json_object_get (btf_service_config_p, "system_blast_tool_config");
+
+	if (blast_tool_config_p)
+		{
+			GetJSONBoolean (blast_tool_config_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
+		}
+
+	return async_flag;
 }
 
 

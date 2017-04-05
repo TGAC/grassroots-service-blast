@@ -45,6 +45,9 @@
 class BLAST_SERVICE_LOCAL BlastToolFactory
 {
 public:
+
+	BlastToolFactory (const json_t *service_config_p);
+
 	/**
 	 * Get the BlastToolFactory to use.
 	 *
@@ -99,6 +102,9 @@ public:
 	 */
 	virtual bool AreToolsAsynchronous () const = 0;
 
+protected:
+	const json_t *btf_service_config_p;
+
 };
 
 
@@ -137,7 +143,7 @@ BLAST_SERVICE_LOCAL void FreeBlastToolFactory (BlastToolFactory *factory_p);
  * to run asynchronously, <code>false</code> otherwise.
  * @see BlastToolFactory::AreToolsAsynchronous
  */
-BLAST_SERVICE_LOCAL bool IsBlastToolFactorySynchronous (BlastToolFactory *factory_p);
+BLAST_SERVICE_LOCAL bool IsBlastToolFactoryAsynchronous (BlastToolFactory *factory_p);
 
 
 #ifdef __cplusplus

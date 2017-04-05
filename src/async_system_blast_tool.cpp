@@ -64,7 +64,6 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 
 	if (Init (ebt_blast_s))
 		{
-
 			if (GetJSONInteger (root_p, AsyncSystemBlastTool :: ASBT_PROCESS_ID_S, &asbt_process_id))
 				{
 					const char *value_s = GetJSONString (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S);
