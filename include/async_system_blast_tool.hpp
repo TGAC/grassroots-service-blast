@@ -66,11 +66,11 @@ public:
 	virtual ~AsyncSystemBlastTool ();
 
 	/**
-	 * This method is used to serialise this BlastTool so that
+	 * This method is used to serialise this AsyncSystemBlastTool so that
 	 * it can be recreated from another calling process when required.
-	 * This is used to store the BlastTool in the JobsManager.
+	 * This is used to store the AsyncSystemBlastTool in the JobsManager.
 	 *
-	 * @param root_p The json object to add the serialisation of this BlastTool to.
+	 * @param root_p The json object to add the serialisation of this AsyncSystemBlastTool to.
 	 * @return <code>true</code> if the BlastTool was serialised
 	 * successfully, <code>false</code>
 	 * otherwise.
@@ -78,23 +78,36 @@ public:
 	virtual bool AddToJSON (json_t *root_p);
 
 	/**
-	 * Run this BlastTool
+	 * Run this AsyncSystemBlastTool
 	 *
-	 * @return The OperationStatus of this BlastTool after
+	 * @return The OperationStatus of this AsyncSystemBlastTool after
 	 * it has started running.
 	 */
 	virtual OperationStatus Run ();
 
 
 	/**
-	 * Get the status of a BlastTool
+	 * Get the status of an AsyncSystemBlastTool
 	 *
-	 * @param update_flag if this is <code>true</code> then the BlastTool
+	 * @param update_flag if this is <code>true</code> then the AsyncSystemBlastTool
 	 * will check the status of its running jobs if necessary, if this is
 	 * <code>false</code> it will return the last cached value.
-	 * @return The OperationStatus of this BlastTool.
+	 * @return The OperationStatus of this AsyncSystemBlastTool.
 	 */
 	virtual OperationStatus GetStatus (bool update_flag = true);
+
+
+	/**
+	 * Get the results after the AsyncSystemBlastTool has finished
+	 * running.
+	 *
+	 * @param formatter_p The BlastFormatter to convert the results
+	 * into a different format. If this is 0, then the results will be
+	 * returned without any conversion.
+	 * @return The results as a c-style string or 0 upon error.
+	 */
+	virtual char *GetResults (BlastFormatter *formatter_p);
+
 
 private:
 	static const char * const ASBT_PROCESS_ID_S;

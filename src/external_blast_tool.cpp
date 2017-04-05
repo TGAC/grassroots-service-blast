@@ -124,7 +124,7 @@ ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const char *name
 
 
 ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *root_p)
-	: BlastTool (job_p, data_p, root_p, BS_DEFAULT_OUTPUT_FORMAT)
+	: BlastTool (job_p, data_p, root_p)
 {
 	ebt_async_flag = true;
 	if (!GetJSONBoolean (root_p, EBT_ASYNC_S, &ebt_async_flag))

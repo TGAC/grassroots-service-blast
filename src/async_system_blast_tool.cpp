@@ -28,6 +28,7 @@
 #include "blast_service_job.h"
 
 #include "string_utils.h"
+#include "jobs_manager.h"
 #include "process.h"
 
 
@@ -209,6 +210,26 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 
 	return status;
 }
+
+
+
+
+char *AsyncSystemBlastTool :: GetResults (BlastFormatter *formatter_p)
+{
+	char *results_s = ExternalBlastTool :: GetResults (formatter_p);
+	JobsManager *jobs_manager_p = GetJobsManager ();
+
+	/*
+	 * Remove the ServiceJob from the JobsManager
+	 */
+	RemoveServiceJobFromJobsManager (jobs_manager_p, bt_job_p -> bsj_job.sj_id, false);
+
+
+	return results_s;
+}
+
+
+
 
 
 static bool UpdateAsyncBlastServiceJob (struct ServiceJob *job_p)

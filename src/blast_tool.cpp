@@ -28,6 +28,8 @@
 #include "string_utils.h"
 #include "jansson.h"
 #include "blast_service_job.h"
+#include "json_util.h"
+
 
 const char * const BlastTool :: BT_NAME_S = "name";
 
@@ -83,8 +85,10 @@ BlastTool :: BlastTool (BlastServiceJob *service_job_p, const char *name_s, cons
 
 
 
-BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *root_p, const uint32 output_format)
+BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *root_p)
 {
+	uint32 output_format = BS_DEFAULT_OUTPUT_FORMAT;
+
 	bt_factory_name_s = GetJSONString (root_p, BT_FACTORY_NAME_S);
 	if (!bt_factory_name_s)
 		{
@@ -97,9 +101,12 @@ BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, 
 			throw std :: invalid_argument ("name not set");
 		}
 
+	GetJSONInteger (root_p, BT_OUTPUT_FORMAT_S, (int *) &output_format);
+	bt_output_format = output_format;
+
+
 	bt_job_p = job_p;
 	bt_service_data_p = data_p;
-	bt_output_format = output_format;
 }
 
 

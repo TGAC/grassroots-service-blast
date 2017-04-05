@@ -64,10 +64,9 @@ public:
 	 * @param job_p The ServiceJob to associate with this BlastTool.
 	 * @param data_p The BlastServiceData for the Service that will run this BlastTool.
 	 * @param json_p The JSON fragment representing a serialised version of the BlastTool.
-	 * @param output_format The output format that this BlastTool will produce its results in.
 	 * @see BlastServiceJob
 	 */
-	BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *json_p, const uint32 output_format);
+	BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *json_p);
 
 
 	/**
