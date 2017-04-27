@@ -237,39 +237,39 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 
 
 																									switch (job_p -> bsj_job.sj_status)
-																									{
-																										case OS_SUCCEEDED:
-																										case OS_PARTIALLY_SUCCEEDED:
-																											if (!DetermineBlastResult (service_p, job_p))
-																												{
-																													char job_id_s [UUID_STRING_BUFFER_SIZE];
-
-																													ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-																													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
-																												}
-																											break;
-
-																										case OS_PENDING:
-																										case OS_STARTED:
-																											{
-																												JobsManager *jobs_manager_p = GetJobsManager ();
-
-																												if (jobs_manager_p)
+																										{
+																											case OS_SUCCEEDED:
+																											case OS_PARTIALLY_SUCCEEDED:
+																												if (! (job_p -> bsj_job.sj_result_p))
 																													{
-																														if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> bsj_job.sj_id, (ServiceJob *) job_p))
-																															{
-																																char job_id_s [UUID_STRING_BUFFER_SIZE];
+																														char job_id_s [UUID_STRING_BUFFER_SIZE];
 
-																																ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-																																PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
-																															}
+																														ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
+																														PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
 																													}
-																											}
-																											break;
+																												break;
 
-																										default:
-																											break;
-																									}		/* switch (job_p -> bsj_job.sj_status) */
+																											case OS_PENDING:
+																											case OS_STARTED:
+																												{
+																													JobsManager *jobs_manager_p = GetJobsManager ();
+
+																													if (jobs_manager_p)
+																														{
+																															if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> bsj_job.sj_id, (ServiceJob *) job_p))
+																																{
+																																	char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+																																	ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
+																																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
+																																}
+																														}
+																												}
+																												break;
+
+																											default:
+																												break;
+																										}		/* switch (job_p -> bsj_job.sj_status) */
 
 																								}
 																							else
@@ -995,14 +995,16 @@ OperationStatus GetBlastServiceStatus (Service *service_p, const uuid_t job_id)
 
 
 
-bool DetermineBlastResult (Service *service_p, BlastServiceJob *job_p)
+bool DetermineBlastResult (BlastServiceJob *job_p)
 {
 	bool success_flag = false;
+	Service *service_p = job_p -> bsj_job.sj_service_p;
 	BlastTool *tool_p = job_p -> bsj_tool_p;
-	OperationStatus status = tool_p -> GetStatus ();
 	BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
 	char uuid_s [UUID_STRING_BUFFER_SIZE];
 	json_t *result_json_p = NULL;
+	OperationStatus status = GetServiceJobStatus (& (job_p -> bsj_job));
+
 
 	ConvertUUIDToString (job_p -> bsj_job.sj_id, uuid_s);
 
@@ -1187,12 +1189,15 @@ ServiceJob *BuildBlastServiceJob (struct Service *service_p, const json_t *servi
 						case OS_SUCCEEDED:
 						case OS_PARTIALLY_SUCCEEDED:
 							{
-								if (!DetermineBlastResult (service_p, job_p))
+								if (! (job_p -> bsj_job.sj_result_p))
 									{
-										char job_id_s [UUID_STRING_BUFFER_SIZE];
+										if (!DetermineBlastResult (job_p))
+											{
+												char job_id_s [UUID_STRING_BUFFER_SIZE];
 
-										ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-										PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
+												ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
+												PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
+											}
 									}
 							}
 							break;

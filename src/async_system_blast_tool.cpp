@@ -190,8 +190,13 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 					SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
 
 					/* If the job has finished, remove it from the JobsManager */
-					if ((old_status == OS_SUCCEEDED) || (old_status == OS_PARTIALLY_SUCCEEDED) || (old_status == OS_FINISHED))
+					if ((status == OS_SUCCEEDED) || (status == OS_PARTIALLY_SUCCEEDED) || (status == OS_FINISHED))
 						{
+							if (!DetermineBlastResult (bt_job_p))
+								{
+
+								}
+
 							//JobsManager *jobs_manager_p = GetJobsManager ();
 
 							//RemoveServiceJobFromJobsManager (jobs_manager_p, )

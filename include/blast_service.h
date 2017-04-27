@@ -344,12 +344,11 @@ BLAST_SERVICE_LOCAL void ReleaseBlastServiceParameters (Service *service_p, Para
 /**
  * Get the results of a given BlastServiceJob and store them within it.
  *
- * @param service_p The BlastService of the same type that ran the BlastServiceJob.
  * @param job_p The BlastServiceJob to get the results for.
  * @return <code>true</code> if the results were added successfully, <code>false</code>
  * otherwise.
  */
-BLAST_SERVICE_LOCAL bool DetermineBlastResult (Service *service_p, struct BlastServiceJob *job_p);
+BLAST_SERVICE_LOCAL bool DetermineBlastResult ( struct BlastServiceJob *job_p);
 
 
 /**

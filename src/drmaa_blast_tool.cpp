@@ -254,6 +254,11 @@ OperationStatus DrmaaBlastTool :: GetStatus (bool update_flag)
 			status = GetDrmaaToolStatus (dbt_drmaa_tool_p);
 
 			SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
+
+			if (status == OS_SUCCEEDED || status == OS_PARTIALLY_SUCCEEDED)
+				{
+					DetermineBlastResult (bt_job_p);
+				}
 		}
 	else
 		{

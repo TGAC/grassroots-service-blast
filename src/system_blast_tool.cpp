@@ -133,7 +133,17 @@ OperationStatus SystemBlastTool :: Run ()
 
 	if (res == 0)
 		{
-			status = OS_SUCCEEDED;
+			SetServiceJobStatus (& (bt_job_p -> bsj_job), OS_SUCCEEDED);
+
+			if (!DetermineBlastResult (bt_job_p))
+				{
+					char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+					ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, job_id_s);
+					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add result to service job  \"%s\"", job_id_s);
+
+					status = OS_FAILED;
+				}
 		}
 	else
 		{
@@ -146,7 +156,7 @@ OperationStatus SystemBlastTool :: Run ()
 				{
 					if (!AddErrorToServiceJob (& (bt_job_p -> bsj_job), ERROR_S, log_s))
 						{
-							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add error \"%s\" to service job");
+							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add error \"%s\" to service job", log_s);
 						}
 
 					FreeCopiedString (log_s);
