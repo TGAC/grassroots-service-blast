@@ -32,6 +32,12 @@
 #include "process.h"
 
 
+#ifdef _DEBUG
+	#define ASYNC_SYSTEM_BLAST_TOOL_DEBUG (STM_LEVEL_FINE)
+#else
+	#define ASYNC_SYSTEM_BLAST_TOOL_DEBUG (STM_LEVEL_NONE)
+#endif
+
 const char * const AsyncSystemBlastTool :: ASBT_PROCESS_ID_S = "process_id";
 const char * const AsyncSystemBlastTool :: ASBT_LOGFILE_S = "log_filename";
 
@@ -95,7 +101,7 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 	OperationStatus status = OS_FAILED_TO_START;
 	const char *command_line_s = sbt_args_processor_p -> GetArgsAsString ();
 
-	#if SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
+	#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 	PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
 	#endif
 
@@ -107,7 +113,17 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 			if (copied_cl_s)
 				{
 					asbt_process_id = CreateProcess (copied_cl_s, 0, asbt_async_logfile_s);
-					status = GetProcessStatus (asbt_process_id);
+
+					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
+						{
+							char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+							ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
+							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Created Proccess " INT32_FMT " for uuid %s", asbt_process_id, uuid_s);
+						}
+					#endif
+
+					status = GetStatus ();
 
 					FreeCopiedString (copied_cl_s);
 				}
@@ -184,9 +200,28 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 			 */
 			OperationStatus old_status = GetCachedServiceJobStatus (& (bt_job_p -> bsj_job));
 
+			#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
+				{
+					char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+					ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
+					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Old status " INT32_FMT " for uuid %s", old_status, uuid_s);
+				}
+			#endif
+
 			if ((old_status != OS_SUCCEEDED) && (old_status != OS_PARTIALLY_SUCCEEDED) && (old_status != OS_FINISHED))
 				{
 					status = GetProcessStatus (asbt_process_id);
+
+					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
+						{
+							char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+							ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
+							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Got status " INT32_FMT " for process " INT32_FMT " for uuid %s", status, asbt_process_id, uuid_s);
+						}
+					#endif
+
 					SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
 
 					/* If the job has finished, remove it from the JobsManager */
