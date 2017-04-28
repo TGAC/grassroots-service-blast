@@ -30,6 +30,12 @@
 #include "system_blast_tool_factory.hpp"
 
 
+#ifdef _DEBUG
+	#define BLAST_TOOL_FACTORY_DEBUG (STM_LEVEL_INFO)
+#else
+	#define BLAST_TOOL_FACTORY_DEBUG (STM_LEVEL_NONE)
+#endif
+
 BlastToolFactory *BlastToolFactory :: GetBlastToolFactory (const json_t *service_config_p)
 {
 	BlastToolFactory *factory_p = 0;
@@ -63,7 +69,10 @@ BlastToolFactory *BlastToolFactory :: GetBlastToolFactory (const json_t *service
 
 			if (factory_p)
 				{
+					#if BLAST_TOOL_FACTORY_DEBUG >= STM_LEVEL_FINER
 					PrintLog (STM_LEVEL_FINER, __FILE__, __LINE__, "Using SystemBlastToolFactory");
+					#endif
+
 				}
 			else
 				{
