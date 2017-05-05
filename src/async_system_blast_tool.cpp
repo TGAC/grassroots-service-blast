@@ -29,7 +29,8 @@
 
 #include "string_utils.h"
 #include "jobs_manager.h"
-#include "process.h"
+
+#include "system_async_task.h"
 
 
 #ifdef _DEBUG
@@ -38,9 +39,9 @@
 	#define ASYNC_SYSTEM_BLAST_TOOL_DEBUG (STM_LEVEL_NONE)
 #endif
 
-const char * const AsyncSystemBlastTool :: ASBT_PROCESS_ID_S = "process_id";
-const char * const AsyncSystemBlastTool :: ASBT_LOGFILE_S = "log_filename";
+const char * const AsyncSystemBlastTool :: ASBT_ASYNC_S = "async";
 
+const char * const AsyncSystemBlastTool :: ASBT_LOGFILE_S = "logfile";
 
 static bool UpdateAsyncBlastServiceJob (struct ServiceJob *job_p);
 
@@ -70,7 +71,9 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 
 	if (Init (ebt_blast_s))
 		{
-			if (GetJSONInteger (root_p, AsyncSystemBlastTool :: ASBT_PROCESS_ID_S, &asbt_process_id))
+			bool async_flag = false;
+
+			if (GetJSONBoolean (root_p, AsyncSystemBlastTool :: ASBT_ASYNC_S, &async_flag))
 				{
 					const char *value_s = GetJSONString (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S);
 
@@ -108,24 +111,28 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 
 	if (command_line_s)
 		{
-			char *copied_cl_s = CopyToNewString (command_line_s, 0, false);
+			SystemTaskData *task_data_p = CreateSystemTaskData (& (bt_job_p -> bsj_job), command_line_s);
 
-			if (copied_cl_s)
+			if (task_data_p)
 				{
-					asbt_process_id = CreateProcess (copied_cl_s, 0, asbt_async_logfile_s);
+					if (RunAsyncSystemTask (task_data_p))
+						{
+							status = GetStatus ();
+						}
 
 					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 						{
 							char uuid_s [UUID_STRING_BUFFER_SIZE];
 
 							ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
-							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Created Proccess " INT32_FMT " for uuid %s", asbt_process_id, uuid_s);
+							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Created async task for uuid %s", uuid_s);
 						}
 					#endif
 
-					status = GetStatus ();
+				}		/* if (task_data_p) */
+			else
+				{
 
-					FreeCopiedString (copied_cl_s);
 				}
 		}
 
@@ -161,12 +168,9 @@ bool AsyncSystemBlastTool :: AddToJSON (json_t *root_p)
 
 	if (success_flag)
 		{
-			if (asbt_process_id  != -1)
+			if (json_object_set_new (root_p, AsyncSystemBlastTool :: ASBT_ASYNC_S, json_true ()) != 0)
 				{
-					if (json_object_set_new (root_p, AsyncSystemBlastTool :: ASBT_PROCESS_ID_S, json_integer (asbt_process_id)) != 0)
-						{
-							success_flag = false;
-						}
+					success_flag = false;
 				}
 
 			if (asbt_async_logfile_s)
@@ -211,30 +215,23 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 
 			if ((old_status != OS_SUCCEEDED) && (old_status != OS_PARTIALLY_SUCCEEDED) && (old_status != OS_FINISHED))
 				{
-					status = GetProcessStatus (asbt_process_id);
+					status = GetServiceJobStatus (& (bt_job_p -> bsj_job));
 
 					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 						{
 							char uuid_s [UUID_STRING_BUFFER_SIZE];
 
 							ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
-							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Got status " INT32_FMT " for process " INT32_FMT " for uuid %s", status, asbt_process_id, uuid_s);
+							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Got status " INT32_FMT " for uuid %s", status, uuid_s);
 						}
 					#endif
 
-					SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
-
-					/* If the job has finished, remove it from the JobsManager */
 					if ((status == OS_SUCCEEDED) || (status == OS_PARTIALLY_SUCCEEDED) || (status == OS_FINISHED))
 						{
 							if (!DetermineBlastResult (bt_job_p))
 								{
 
 								}
-
-							//JobsManager *jobs_manager_p = GetJobsManager ();
-
-							//RemoveServiceJobFromJobsManager (jobs_manager_p, )
 						}
 				}
 			else

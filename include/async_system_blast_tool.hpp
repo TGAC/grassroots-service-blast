@@ -110,12 +110,10 @@ public:
 
 
 private:
-	static const char * const ASBT_PROCESS_ID_S;
+	static const char * const ASBT_ASYNC_S;
 	static const char * const ASBT_LOGFILE_S;
 
 	char *asbt_async_logfile_s;
-	int32 asbt_process_id;
-
 };
 
 
