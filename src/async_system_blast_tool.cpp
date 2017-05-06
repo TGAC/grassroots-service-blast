@@ -111,7 +111,7 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 
 	if (command_line_s)
 		{
-			SystemTaskData *task_data_p = CreateSystemTaskData (& (bt_job_p -> bsj_job), command_line_s);
+			SystemTaskData *task_data_p = CreateSystemTaskData (& (bt_job_p -> bsj_job), command_line_s, true);
 
 			if (task_data_p)
 				{
