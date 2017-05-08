@@ -198,45 +198,27 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 
 	if (update_flag)
 		{
-			/*
-			 * If the job has already finished, then
-			 * no need to check for any status updates
-			 */
-			OperationStatus old_status = GetCachedServiceJobStatus (& (bt_job_p -> bsj_job));
+			status = GetServiceJobStatus (& (bt_job_p -> bsj_job));
 
 			#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 				{
 					char uuid_s [UUID_STRING_BUFFER_SIZE];
 
 					ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
-					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Old status " INT32_FMT " for uuid %s", old_status, uuid_s);
+					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Status " INT32_FMT " for uuid %s", status, uuid_s);
 				}
 			#endif
 
-			if ((old_status != OS_SUCCEEDED) && (old_status != OS_PARTIALLY_SUCCEEDED) && (old_status != OS_FINISHED))
+
+			if ((status == OS_SUCCEEDED) || (status == OS_PARTIALLY_SUCCEEDED) || (status == OS_FINISHED))
 				{
-					status = GetServiceJobStatus (& (bt_job_p -> bsj_job));
-
-					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
-						{
-							char uuid_s [UUID_STRING_BUFFER_SIZE];
-
-							ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
-							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Got status " INT32_FMT " for uuid %s", status, uuid_s);
-						}
-					#endif
-
-					if ((status == OS_SUCCEEDED) || (status == OS_PARTIALLY_SUCCEEDED) || (status == OS_FINISHED))
+					if (bt_job_p -> bsj_job.sj_result_p == NULL)
 						{
 							if (!DetermineBlastResult (bt_job_p))
 								{
 
 								}
 						}
-				}
-			else
-				{
-					status = old_status;
 				}
 		}
 	else
@@ -274,6 +256,7 @@ static bool UpdateAsyncBlastServiceJob (struct ServiceJob *job_p)
 	AsyncSystemBlastTool *tool_p = static_cast <AsyncSystemBlastTool *> (blast_job_p -> bsj_tool_p);
 
 	tool_p -> GetStatus (true);
+
 
 	return true;
 }

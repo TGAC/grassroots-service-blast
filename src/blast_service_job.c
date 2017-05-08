@@ -75,7 +75,7 @@ BlastServiceJob *AllocateBlastServiceJob (Service *service_p, const char *job_na
 					return blast_job_p;
 				}		/* if (tool_p) */
 
-			ClearServiceJob (base_service_job_p);
+			DecrementServiceJobReferenceCount (base_service_job_p);
 			FreeMemory (blast_job_p);
 		}		/* if (blast_job_p) */
 
@@ -93,9 +93,28 @@ void FreeBlastServiceJob (ServiceJob *job_p)
 			FreeBlastTool (blast_job_p -> bsj_tool_p);
 		}
 
-	ClearServiceJob (job_p);
+	DecrementServiceJobReferenceCount (job_p);
 
 	FreeMemory (blast_job_p);
+}
+
+
+ServiceJob *CloneBlastServiceJob (const ServiceJob *src_p)
+{
+	ServiceJob *dest_p = (ServiceJob *) AllocMemory (sizeof (ServiceJob));
+
+	if (dest_p)
+		{
+			memset (dest_p, 0, sizeof (ServiceJob));
+
+			if (!CopyServiceJob (src_p, dest_p))
+				{
+					FreeMemory (dest_p);
+					dest_p = NULL;
+				}
+		}
+
+	return dest_p;
 }
 
 
