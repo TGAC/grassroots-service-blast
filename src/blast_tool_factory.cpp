@@ -110,8 +110,8 @@ void FreeBlastToolFactory (BlastToolFactory *factory_p)
 }
 
 
-bool IsBlastToolFactoryAsynchronous (BlastToolFactory *factory_p)
+Synchronicity GetBlastToolFactorySynchronicity (BlastToolFactory *factory_p)
 {
-	return factory_p -> AreToolsAsynchronous ();
+	return factory_p -> GetToolsSynchronicity ();
 }
 

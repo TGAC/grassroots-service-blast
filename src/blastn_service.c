@@ -81,7 +81,7 @@ Service *GetBlastNService ()
 														 CloseBlastService,
 														 CustomiseBlastServiceJob,
 														 true,
-														 true,
+														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p);
 
 

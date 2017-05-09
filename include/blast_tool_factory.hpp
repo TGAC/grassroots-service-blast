@@ -100,7 +100,7 @@ public:
 	 * @return <code>true</code> if the BlastTools are able
 	 * to run asynchronously, <code>false</code> otherwise.
 	 */
-	virtual bool AreToolsAsynchronous () const = 0;
+	virtual Synchronicity GetToolsSynchronicity () const = 0;
 
 protected:
 	const json_t *btf_service_config_p;
@@ -143,7 +143,7 @@ BLAST_SERVICE_LOCAL void FreeBlastToolFactory (BlastToolFactory *factory_p);
  * to run asynchronously, <code>false</code> otherwise.
  * @see BlastToolFactory::AreToolsAsynchronous
  */
-BLAST_SERVICE_LOCAL bool IsBlastToolFactoryAsynchronous (BlastToolFactory *factory_p);
+BLAST_SERVICE_LOCAL Synchronicity GetBlastToolFactorySynchronicity (BlastToolFactory *factory_p);
 
 
 #ifdef __cplusplus

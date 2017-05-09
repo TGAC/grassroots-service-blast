@@ -145,9 +145,9 @@ BlastTool *DrmaaBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, con
 }
 
 
-bool DrmaaBlastToolFactory :: AreToolsAsynchronous () const
+Synchronicity DrmaaBlastToolFactory :: GetToolsSynchronicity () const
 {
-	return true;
+	return SY_ASYNCHRONOUS_DETACHED;
 }
 
 

@@ -66,11 +66,11 @@ SystemBlastToolFactory :: ~SystemBlastToolFactory ()
 BlastTool *SystemBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, const char *name_s, const BlastServiceData *data_p)
 {
 	BlastTool *tool_p = 0;
-	bool async_flag = AreToolsAsynchronous ();
+	Synchronicity sync = GetToolsSynchronicity ();
 
 	try
 		{
-			if (async_flag)
+			if (sync == SY_SYNCHRONOUS)
 				{
 					tool_p = new AsyncSystemBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s);
 				}
@@ -91,11 +91,11 @@ BlastTool *SystemBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, co
 BlastTool *SystemBlastToolFactory :: CreateBlastTool (const json_t *json_p,  BlastServiceJob *blast_job_p, BlastServiceData *service_data_p)
 {
 	BlastTool *tool_p = 0;
-	bool async_flag = AreToolsAsynchronous ();
+	Synchronicity sync = GetToolsSynchronicity ();
 
 	try
 		{
-			if (async_flag)
+			if (sync == SY_SYNCHRONOUS)
 				{
 					tool_p = new AsyncSystemBlastTool (blast_job_p, service_data_p, json_p);
 				}
@@ -114,7 +114,7 @@ BlastTool *SystemBlastToolFactory :: CreateBlastTool (const json_t *json_p,  Bla
 
 
 
-bool SystemBlastToolFactory :: AreToolsAsynchronous () const
+Synchronicity SystemBlastToolFactory :: GetToolsSynchronicity () const
 {
 	bool async_flag = false;
 	const json_t *blast_tool_config_p = json_object_get (btf_service_config_p, "system_blast_tool_config");
@@ -124,7 +124,7 @@ bool SystemBlastToolFactory :: AreToolsAsynchronous () const
 			GetJSONBoolean (blast_tool_config_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
 		}
 
-	return async_flag;
+	return (async_flag ? SY_ASYNCHRONOUS_DETACHED : SY_SYNCHRONOUS);
 }
 
 

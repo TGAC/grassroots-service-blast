@@ -25,7 +25,6 @@
 #include "string_utils.h"
 #include "blast_service_job.h"
 
-#include "../../../core/server/task/include/system_async_task.h"
 
 #ifdef _DEBUG
 	#define SYSTEM_BLAST_TOOL_DEBUG	(STM_LEVEL_FINER)

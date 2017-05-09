@@ -94,7 +94,7 @@ public:
 	 * @return <code>true</code> if the BlastTools are able
 	 * to run asynchronously, <code>false</code> otherwise.
 	 */
-	virtual bool AreToolsAsynchronous () const;
+	virtual Synchronicity GetToolsSynchronicity () const;
 
 protected:
 	/**

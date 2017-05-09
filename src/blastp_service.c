@@ -100,7 +100,7 @@ Service *GetBlastPService ()
 														 CloseBlastService,
 														 CustomiseBlastServiceJob,
 														 true,
-														 true,
+														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p);
 
 					if (GetBlastServiceConfig (data_p))

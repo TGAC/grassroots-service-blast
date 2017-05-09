@@ -25,7 +25,7 @@
 
 #include "blastx_service.h"
 
-#include "../include/blast_app_parameters.h"
+#include "blast_app_parameters.h"
 #include "blastp_service.h"
 
 
@@ -90,7 +90,7 @@ Service *GetBlastXService ()
 														 CloseBlastService,
 														 CustomiseBlastServiceJob,
 														 true,
-														 true,
+														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p);
 
 					if (GetBlastServiceConfig (data_p))
