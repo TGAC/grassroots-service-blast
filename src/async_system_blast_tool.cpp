@@ -51,14 +51,26 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 : SystemBlastTool (job_p, name_s, factory_s, data_p, blast_program_name_s),
 	asbt_async_logfile_s (0)
 {
+	bool alloc_flag = false;
+
 	SetServiceJobUpdateFunction (& (job_p -> bsj_job), UpdateAsyncBlastServiceJob);
-	ebt_async_flag = true;
+
+	asbt_async_producer_p = AllocateCountAsyncTaskProducer (1);
+	if (asbt_async_producer_p)
+		{
+			alloc_flag = true;
+		}
+
+	if (!alloc_flag)
+		{
+			throw std :: bad_alloc ();
+		}
 }
 
 
 AsyncSystemBlastTool :: ~AsyncSystemBlastTool ()
 {
-
+	FreeCountAsyncTaskProducer (asbt_async_producer_p);
 }
 
 
@@ -71,21 +83,30 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 
 	if (Init (ebt_blast_s))
 		{
-			bool async_flag = false;
+			bool async_flag;
 
 			if (GetJSONBoolean (root_p, AsyncSystemBlastTool :: ASBT_ASYNC_S, &async_flag))
 				{
 					const char *value_s = GetJSONString (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S);
 
-					alloc_flag = true;
-
 					if (value_s)
 						{
 							asbt_async_logfile_s = CopyToNewString (value_s, 0, false);
 
-							if (!asbt_async_logfile_s)
+							if (asbt_async_logfile_s)
 								{
-									alloc_flag = false;
+									asbt_async_producer_p = AllocateCountAsyncTaskProducer (1);
+
+									if (asbt_async_producer_p)
+										{
+											alloc_flag = true;
+										}
+
+									if (!alloc_flag)
+										{
+											FreeCopiedString (asbt_async_logfile_s);
+										}
+
 								}
 						}
 				}
@@ -111,7 +132,7 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 
 	if (command_line_s)
 		{
-			SystemTaskData *task_data_p = CreateSystemTaskData (& (bt_job_p -> bsj_job), command_line_s, true);
+			SystemTaskData *task_data_p = CreateSystemTaskData (& (bt_job_p -> bsj_job), bt_job_p -> bsj_job.sj_name_s, command_line_s);
 
 			if (task_data_p)
 				{

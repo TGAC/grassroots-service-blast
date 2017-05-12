@@ -96,6 +96,10 @@ public:
 	 */
 	virtual Synchronicity GetToolsSynchronicity () const;
 
+
+	virtual AsyncTaskConsumer *GetAsyncTaskConsumer ();
+
+
 protected:
 	/**
 	 * The constructor for SystemBlastToolFactory.

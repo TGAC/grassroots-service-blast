@@ -129,6 +129,22 @@ Synchronicity SystemBlastToolFactory :: GetToolsSynchronicity () const
 
 
 
+AsyncTaskConsumer *SystemBlastToolFactory :: GetAsyncTaskConsumer ()
+{
+	Synchronicity syn = GetToolsSynchronicity ();
+
+	if (syn)
+		{
+			return AllocateCountAsyncTaskConsumer ();
+		}
+	else
+		{
+			return 0;
+		}
+}
+
+
+
 const char *SystemBlastToolFactory :: GetName ()
 {
 	return "System Blast Tool Factory";

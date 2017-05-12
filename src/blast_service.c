@@ -193,6 +193,12 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 							 */
 							ServiceJobSetIterator iterator;
 							BlastServiceJob *job_p = NULL;
+							AsyncTaskConsumer *task_consumer_p = NULL;
+
+							if (service_p -> se_synchronous == SY_ASYNCHRONOUS_ATTACHED)
+								{
+									task_consumer_p = blast_data_p -> bsd_tool_factory_p -> GetAsyncTaskConsumer ();
+								}
 
 							InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
 							job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);

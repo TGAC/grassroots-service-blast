@@ -27,8 +27,8 @@
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_ASYNC_SYSTEM_BLAST_TOOL_HPP_
 
 
+#include "count_async_task_producer.h"
 #include "system_blast_tool.hpp"
-#include "count_async_task_resource.h"
 
 
 /**
@@ -116,7 +116,7 @@ private:
 
 	char *asbt_async_logfile_s;
 
-	CountAsyncTaskResource *asbt_async_resource_p
+	CountAsyncTaskProducer *asbt_async_producer_p;
 };
 
 

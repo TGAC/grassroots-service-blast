@@ -98,6 +98,12 @@ BlastToolFactory :: ~BlastToolFactory ()
 }
 
 
+AsyncTaskConsumer *BlastToolFactory :: GetAsyncTaskConsumer ()
+{
+	return 0;
+}
+
+
 BlastTool *CreateBlastToolFromFactory (BlastToolFactory *factory_p, BlastServiceJob *job_p, const char *name_s, const BlastServiceData *data_p)
 {
 	return (factory_p -> CreateBlastTool (job_p, name_s, data_p));

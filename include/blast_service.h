@@ -163,6 +163,8 @@ typedef struct BLAST_SERVICE_LOCAL BlastServiceData
 	/** Specifies whether the databases are nucelotide or protein databases. */
 	DatabaseType bsd_type;
 
+
+
 } BlastServiceData;
 
 
