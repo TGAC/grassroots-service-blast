@@ -28,6 +28,7 @@
 
 
 #include "system_blast_tool.hpp"
+#include "count_async_task_resource.h"
 
 
 /**
@@ -114,6 +115,8 @@ private:
 	static const char * const ASBT_LOGFILE_S;
 
 	char *asbt_async_logfile_s;
+
+	CountAsyncTaskResource *asbt_async_resource_p
 };
 
 

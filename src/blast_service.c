@@ -824,6 +824,7 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 				}		/* while (db_p) */
 
 		}		/* if (db_p) */
+
 }
 
 
