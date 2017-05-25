@@ -129,19 +129,6 @@ Synchronicity SystemBlastToolFactory :: GetToolsSynchronicity () const
 
 
 
-AsyncTaskConsumer *SystemBlastToolFactory :: GetAsyncTaskConsumer ()
-{
-	Synchronicity syn = GetToolsSynchronicity ();
-
-	if (syn)
-		{
-			return AllocateCountAsyncTaskConsumer ();
-		}
-	else
-		{
-			return 0;
-		}
-}
 
 
 

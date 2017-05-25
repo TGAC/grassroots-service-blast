@@ -193,13 +193,6 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 							 */
 							ServiceJobSetIterator iterator;
 							BlastServiceJob *job_p = NULL;
-							AsyncTasksManager *task_manager_p = NULL;
-
-							if (service_p -> se_synchronous == SY_ASYNCHRONOUS_ATTACHED)
-								{
-									task_manager_p = blast_data_p -> bsd_tool_factory_p -> GetAsyncTaskConsumer ();
-								}
-
 
 
 							InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
@@ -797,6 +790,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, ServiceJobSet *jobs_p, BlastServiceData *data_p)
 {
+
 	if (db_p)
 		{
 			while (db_p -> di_name_s)
@@ -1160,7 +1154,7 @@ json_t *BuildBlastServiceJobJSON (Service * UNUSED_PARAM (service_p), ServiceJob
 
 
 
-BlastServiceData *AllocateBlastServiceData (Service * UNUSED_PARAM (blast_service_p), DatabaseType database_type)
+BlastServiceData *AllocateBlastServiceData (Service *blast_service_p, DatabaseType database_type)
 {
 	BlastServiceData *data_p = (BlastServiceData *) AllocMemory (sizeof (BlastServiceData));
 
@@ -1173,6 +1167,7 @@ BlastServiceData *AllocateBlastServiceData (Service * UNUSED_PARAM (blast_servic
 			data_p -> bsd_formatter_p = NULL;
 			data_p -> bsd_tool_factory_p = NULL;
 			data_p -> bsd_type = database_type;
+			data_p -> bsd_task_manager_p = NULL;
 		}
 
 	return data_p;
@@ -1344,7 +1339,21 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 											if (data_p -> bsd_tool_factory_p)
 												{
-													data_p -> bsd_base_data.sd_service_p -> se_synchronous = GetBlastToolFactorySynchronicity (data_p -> bsd_tool_factory_p);
+													Service *service_p = data_p -> bsd_base_data.sd_service_p;
+
+													service_p -> se_synchronous = GetBlastToolFactorySynchronicity (data_p -> bsd_tool_factory_p);
+
+													if (service_p -> se_synchronous == SY_ASYNCHRONOUS_ATTACHED)
+														{
+															data_p -> bsd_task_manager_p = AllocateAsyncTasksManager (GetServiceName (service_p));
+
+															if (! (data_p -> bsd_task_manager_p))
+																{
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "AllocateAsyncTasksManager failed");
+																	success_flag = false;
+																}
+														}
+
 												}
 											else
 												{

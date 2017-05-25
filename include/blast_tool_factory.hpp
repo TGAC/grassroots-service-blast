@@ -33,7 +33,7 @@
 
 #include "blast_tool.hpp"
 #include "blast_service_job.h"
-#include "async_task_consumer.h"
+//#include "async_task_consumer.h"
 
 #include "jansson.h"
 
@@ -104,7 +104,7 @@ public:
 	virtual Synchronicity GetToolsSynchronicity () const = 0;
 
 
-	virtual AsyncTaskConsumer *GetAsyncTaskConsumer ();
+	//virtual AsyncTaskConsumer *GetAsyncTaskConsumer ();
 
 protected:
 	const json_t *btf_service_config_p;

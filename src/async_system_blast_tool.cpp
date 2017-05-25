@@ -55,8 +55,9 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 
 	SetServiceJobUpdateFunction (& (job_p -> bsj_job), UpdateAsyncBlastServiceJob);
 
-	asbt_async_producer_p = AllocateCountAsyncTaskProducer (1);
-	if (asbt_async_producer_p)
+	asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s);
+
+	if (asbt_task_p)
 		{
 			alloc_flag = true;
 		}
@@ -70,9 +71,8 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 
 AsyncSystemBlastTool :: ~AsyncSystemBlastTool ()
 {
-	FreeCountAsyncTaskProducer (asbt_async_producer_p);
+	FreeSystemAsyncTask (asbt_task_p);
 }
-
 
 
 AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *root_p)
@@ -95,9 +95,12 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 
 							if (asbt_async_logfile_s)
 								{
-									asbt_async_producer_p = AllocateCountAsyncTaskProducer (1);
+									char *name_s = NULL;
+									char *blast_program_name_s = NULL;
 
-									if (asbt_async_producer_p)
+									asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s);
+
+									if (asbt_task_p)
 										{
 											alloc_flag = true;
 										}
@@ -132,11 +135,11 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 
 	if (command_line_s)
 		{
-			SystemTaskData *task_data_p = CreateSystemTaskData (& (bt_job_p -> bsj_job), bt_job_p -> bsj_job.sj_name_s, command_line_s);
+			SystemAsyncTask *task_data_p = NULL; //CreateSystemAsyncTask (& (bt_job_p -> bsj_job), bt_job_p -> bsj_job.sj_name_s, command_line_s);
 
 			if (task_data_p)
 				{
-					if (RunAsyncSystemTask (task_data_p))
+					if (RunSystemAsyncTask (task_data_p))
 						{
 							status = GetStatus ();
 						}

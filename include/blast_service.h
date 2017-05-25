@@ -29,6 +29,7 @@
 #include "blast_formatter.h"
 #include "parameter_set.h"
 #include "temp_file.hpp"
+#include "async_tasks_manager.h"
 
 
 /**
@@ -160,9 +161,11 @@ typedef struct BLAST_SERVICE_LOCAL BlastServiceData
 	BlastToolFactory *bsd_tool_factory_p;
 
 
-	/** Specifies whether the databases are nucelotide or protein databases. */
+	/** Specifies whether the databases are nucleotide or protein databases. */
 	DatabaseType bsd_type;
 
+
+	AsyncTasksManager *bsd_task_manager_p;
 
 
 } BlastServiceData;

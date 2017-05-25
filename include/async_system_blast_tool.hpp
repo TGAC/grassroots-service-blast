@@ -27,9 +27,9 @@
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_ASYNC_SYSTEM_BLAST_TOOL_HPP_
 
 
-#include "../../../core/server/task/include/count_async_task.h"
+#include "count_async_task.h"
 #include "system_blast_tool.hpp"
-
+#include "system_async_task.h"
 
 /**
  * A class that will run Blast as an asynchronous system process.
@@ -115,8 +115,7 @@ private:
 	static const char * const ASBT_LOGFILE_S;
 
 	char *asbt_async_logfile_s;
-
-	CountAsyncTaskProducer *asbt_async_producer_p;
+	SystemAsyncTask *asbt_task_p;
 };
 
 
