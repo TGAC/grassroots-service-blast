@@ -70,7 +70,7 @@ BlastTool *SystemBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, co
 
 	try
 		{
-			if (sync == SY_SYNCHRONOUS)
+			if (sync == SY_ASYNCHRONOUS_ATTACHED)
 				{
 					tool_p = new AsyncSystemBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s);
 				}

@@ -121,18 +121,21 @@ OperationStatus SystemBlastTool :: Run ()
 	int res;
 	OperationStatus status = OS_FAILED_TO_START;
 	const char *command_line_s = sbt_args_processor_p -> GetArgsAsString ();
+	OperationStatus cached_status;
 
 	#if SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 	PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
 	#endif
 
-	SetServiceJobStatus (& (bt_job_p -> bsj_job), OS_STARTED);
+	status = OS_STARTED;
 
 	res = system (command_line_s);
 
 	if (res == 0)
 		{
-			SetServiceJobStatus (& (bt_job_p -> bsj_job), OS_SUCCEEDED);
+			status = OS_SUCCEEDED;
+
+			SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
 
 			if (!DetermineBlastResult (bt_job_p))
 				{
@@ -162,7 +165,12 @@ OperationStatus SystemBlastTool :: Run ()
 				}		/* if (log_s) */
 		}
 
-	SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
+	cached_status = GetCachedServiceJobStatus (& (bt_job_p -> bsj_job));
+
+	if (cached_status != status)
+		{
+			SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
+		}
 
 	return status;
 }
