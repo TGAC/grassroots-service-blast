@@ -49,9 +49,9 @@
 
 static void InitBlastService (Service *blast_service_p);
 
-static void RunJobsSynchronously (Service *service_p, ParameterSet *param_set_p, BlastServiceData *blast_data_p, BlastAppParameters *app_params_p);
+static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p);
 
-static void RunJobsAsynchronously (Service *service_p, ParameterSet *param_set_p, BlastServiceData *blast_data_p, BlastAppParameters *app_params_p);
+static bool PreRunJobs (BlastServiceData *blast_data_p);
 
 
 /*
@@ -181,52 +181,64 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 
 					if (GetServiceJobSetSize (service_p -> se_jobs_p) > 0)
 						{
-							TempFile *input_p = GetInputTempFile (param_set_p, blast_data_p -> bsd_working_dir_s, job_p -> bsj_job.sj_id);
+							ServiceJobSetIterator iterator;
+							BlastServiceJob *job_p = NULL;
 
-							if (input_p)
+							InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
+
+							job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
+
+							if (job_p)
 								{
-									const char *input_filename_s = input_p -> GetFilename ();
+									TempFile *input_p = GetInputTempFile (param_set_p, blast_data_p -> bsd_working_dir_s, job_p -> bsj_job.sj_id);
 
-									if (input_filename_s)
+									if (input_p)
 										{
-											Synchronicity sync = GetBlastToolFactorySynchronicity (blast_data_p -> bsd_tool_factory_p);
+											const char *input_filename_s = input_p -> GetFilename ();
 
-											if (sync == SY_ASYNCHRONOUS_ATTACHED)
+											if (input_filename_s)
 												{
-													RunJobsAsynchronously (service_p, param_set_p, input_filename_s, blast_data_p, app_params_p);
-												}
+													if (PreRunJobs (blast_data_p))
+														{
+															if (blast_data_p -> bsd_task_manager_p)
+																{
+																	RunJobs (service_p, param_set_p, input_filename_s, app_params_p);
+																}
+															else
+																{
+
+																}
+														}
+												}		/* if (input_filename_s) */
 											else
 												{
-													RunJobsSynchronously (service_p, param_set_p, input_filename_s, blast_data_p, app_params_p);
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get input filename for blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
 												}
 
-										}		/* if (input_filename_s) */
+											delete input_p;
+										}		/* if (input_p) */
 									else
 										{
-											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get input filename for blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
-										}
+											const char * const error_s = "Failed to create input temp file for blast tool";
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create input temp file for blast tool \"%s\" in \"%s\"", job_p -> bsj_job.sj_name_s, blast_data_p -> bsd_working_dir_s);
 
-									delete input_p;
-								}		/* if (input_p) */
-							else
-								{
-									const char * const error_s = "Failed to create input temp file for blast tool";
-									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create input temp file for blast tool \"%s\" in \"%s\"", job_p -> bsj_job.sj_name_s, blast_data_p -> bsd_working_dir_s);
-
-									/* Since we couldn't save the input sequence, all jobs need to be set to have an error status */
-									if (!AddErrorToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
-										{
-											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add error to job", job_p -> bsj_job.sj_name_s);
-										}
-
-									while ((job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator)) != NULL)
-										{
+											/* Since we couldn't save the input sequence, all jobs need to be set to have an error status */
 											if (!AddErrorToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add error to job", job_p -> bsj_job.sj_name_s);
 												}
+
+											while ((job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator)) != NULL)
+												{
+													if (!AddErrorToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
+														{
+															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add error to job", job_p -> bsj_job.sj_name_s);
+														}
+												}
 										}
+
 								}
+
 
 						}		/* if (GetServiceJobSetSize (service_p -> se_jobs_p) > 0) */
 
@@ -1383,7 +1395,7 @@ const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_
 }
 
 
-static void RunJobsSynchronously (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastServiceData *blast_data_p, BlastAppParameters *app_params_p)
+static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p)
 {
 	/*
 	 * Get the absolute path and filename stem e.g.
@@ -1511,6 +1523,16 @@ static void RunJobsSynchronously (Service *service_p, ParameterSet *param_set_p,
 }
 
 
+static bool PreRunJobs (BlastServiceData *blast_data_p)
+{
+	if (blast_data_p -> bsd_task_manager_p)
+		{
+			PrepareAsyncTasksManager (blast_data_p -> bsd_task_manager_p);
+		}
+
+	return true;
+}
+
 
 static void RunJobsAsynchronously (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastServiceData *blast_data_p, BlastAppParameters *app_params_p)
 {
@@ -1523,7 +1545,7 @@ static void RunJobsAsynchronously (Service *service_p, ParameterSet *param_set_p
 	job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
 
 
-	if (!StartAsyncTasksManagerTasks (tasks_manager_p))
+	if (!RunAsyncTasksManagerTasks (tasks_manager_p))
 		{
 			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run blast jobs asynchronously");
 		}

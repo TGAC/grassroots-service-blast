@@ -130,6 +130,20 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 }
 
 
+
+bool AsyncSystemBlastTool :: PreRun ()
+{
+	bool b = BlastTool :: PreRun ();
+
+	if (b)
+		{
+			SetServiceJobStatus (& (bt_job_p -> bsj_job), OS_STARTED);
+		}
+
+	return b;
+}
+
+
 OperationStatus AsyncSystemBlastTool :: Run ()
 {
 	OperationStatus status = OS_FAILED_TO_START;

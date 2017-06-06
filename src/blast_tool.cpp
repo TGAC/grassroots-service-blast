@@ -49,9 +49,17 @@ OperationStatus RunBlast (BlastTool *tool_p)
 {
 	OperationStatus status = OS_IDLE;
 
-	tool_p -> PreRun  ();
-	status = tool_p -> Run ();
-	tool_p -> PostRun  ();
+	if (tool_p -> PreRun  ())
+		{
+			status = tool_p -> Run ();
+
+			tool_p -> PostRun  ();
+		}
+	else
+		{
+			status = OS_FAILED_TO_START;
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to prepare run of BlastTool %s", tool_p -> GetName ());
+		}
 
 	return status;
 }
@@ -152,9 +160,11 @@ BlastTool :: ~BlastTool ()
 }
 
 
-void BlastTool :: PreRun ()
+bool BlastTool :: PreRun ()
 {
 	SetServiceJobStatus (& (bt_job_p -> bsj_job), OS_STARTED);
+
+	return true;
 }
 
 

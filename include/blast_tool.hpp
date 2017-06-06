@@ -128,7 +128,7 @@ public:
 	/**
 	 * Any custom functionality required before running a BlastTool.
 	 */
-	virtual void PreRun ();
+	virtual bool PreRun ();
 	
 
 	/**

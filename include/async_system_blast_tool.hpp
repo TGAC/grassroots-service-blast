@@ -88,6 +88,12 @@ public:
 
 
 	/**
+	 * Any custom functionality required before running a BlastTool.
+	 */
+	virtual bool PreRun ();
+
+
+	/**
 	 * Get the status of an AsyncSystemBlastTool
 	 *
 	 * @param update_flag if this is <code>true</code> then the AsyncSystemBlastTool
