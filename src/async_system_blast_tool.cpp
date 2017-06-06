@@ -59,7 +59,14 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 
 	if (asbt_task_p)
 		{
-			alloc_flag = true;
+			if (AddAsyncTaskToAsyncTasksManager (data_p -> bsd_task_manager_p, asbt_task_p -> std_async_task_p, MF_SHADOW_USE))
+				{
+					alloc_flag = true;
+				}
+			else
+				{
+					FreeSystemAsyncTask (asbt_task_p);
+				}
 		}
 
 	if (!alloc_flag)
