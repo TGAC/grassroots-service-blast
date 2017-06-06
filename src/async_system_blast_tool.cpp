@@ -157,32 +157,21 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 	if (command_line_s)
 		{
 			char uuid_s [UUID_STRING_BUFFER_SIZE];
-			AsyncTask *task_p = NULL;
 
 			ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
 
-			task_p = GetAsyncTaskFromAsyncTasksManager (bt_service_data_p -> bsd_task_manager_p, uuid_s);
-
-			if (task_p)
+			if (RunSystemAsyncTask (asbt_task_p))
 				{
-					if (RunAsyncTask (task_p))
-						{
-							status = GetStatus ();
-						}
-					else
-						{
-							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run async task for uuid %s", uuid_s);
-						}
-
-					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
-					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Created async task for uuid %s", uuid_s);
-					#endif
-
-				}		/* if (task_data_p) */
+					status = GetStatus ();
+				}
 			else
 				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create async task for uuid %s", uuid_s);
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run async task for uuid %s", uuid_s);
 				}
+
+			#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
+			PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Created async task for uuid %s", uuid_s);
+			#endif
 		}
 
 

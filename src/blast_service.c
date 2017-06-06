@@ -49,7 +49,7 @@
 
 static void InitBlastService (Service *blast_service_p);
 
-static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p);
+static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p, ServiceJobSetIterator *iterator_p);
 
 static bool PreRunJobs (BlastServiceData *blast_data_p);
 
@@ -200,15 +200,13 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 												{
 													if (PreRunJobs (blast_data_p))
 														{
-															if (blast_data_p -> bsd_task_manager_p)
-																{
-																	RunJobs (service_p, param_set_p, input_filename_s, app_params_p);
-																}
-															else
-																{
-
-																}
+															RunJobs (service_p, param_set_p, input_filename_s, app_params_p, &iterator);
 														}
+													else
+														{
+															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "PreRunJobs for Blast Service failed");
+														}
+
 												}		/* if (input_filename_s) */
 											else
 												{
@@ -1395,7 +1393,7 @@ const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_
 }
 
 
-static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p)
+static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p, ServiceJobSetIterator *iterator_p)
 {
 	/*
 	 * Get the absolute path and filename stem e.g.
@@ -1410,12 +1408,7 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 	 *  As each job will have the same input file name it using the first job's id
 	 *
 	 */
-	ServiceJobSetIterator iterator;
-	BlastServiceJob *job_p = NULL;
-
-
-	InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
-	job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
+	BlastServiceJob *job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (iterator_p);
 
 	if (job_p)
 		{
@@ -1513,7 +1506,7 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get blast tool for \"%s\"", job_p -> bsj_job.sj_name_s);
 						}
 
-					job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
+					job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (iterator_p);
 					loop_flag = (job_p != NULL);
 
 				}		/* while (loop_flag) */
@@ -1533,22 +1526,4 @@ static bool PreRunJobs (BlastServiceData *blast_data_p)
 	return true;
 }
 
-
-static void RunJobsAsynchronously (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastServiceData *blast_data_p, BlastAppParameters *app_params_p)
-{
-	AsyncTasksManager *tasks_manager_p = blast_data_p -> bsd_task_manager_p;
-	ServiceJobSetIterator iterator;
-	BlastServiceJob *job_p = NULL;
-
-
-	InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
-	job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
-
-
-	if (!RunAsyncTasksManagerTasks (tasks_manager_p))
-		{
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run blast jobs asynchronously");
-		}
-
-}
 
