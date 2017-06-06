@@ -581,23 +581,6 @@ bool GetAndAddDatabaseDetails (json_t *marked_up_result_p, const DatabaseInfo *d
 }
 
 
-void AddLinkedServiceData  (json_t *root_p, LinkedService *linked_service_p)
-{
-	/*
-	 * navigate to each of the hits arrays
-	 */
-	json_t *markup_reports_p = GetMarkupReports (root_p);
-
-	if (markup_reports_p)
-		{
-			if (json_is_array (markup_reports_p))
-				{
-
-				}
-		}
-}
-
-
 
 json_t *GetHitsFromMarkedUpReport (json_t *report_p)
 {
@@ -884,7 +867,6 @@ LinkedList *GetScaffoldsFromHit (const json_t *hit_p, const DatabaseInfo *db_p)
 									if (value_s)
 										{
 											json_t *data_p = json_object ();
-											bool alloc_flag = false;
 
 											if (data_p)
 												{

@@ -133,8 +133,6 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 	bool success_flag = false;
 	SharedType def;
 	const uint32 NUM_GENETIC_CODES = 20;
-	SharedType param_values [NUM_GENETIC_CODES];
-	uint32 i;
 
 	const char *descriptions_ss [NUM_GENETIC_CODES] =
 		{
@@ -172,6 +170,8 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 
 	if (param_p)
 		{
+			uint32 i;
+
 			success_flag = true;
 
 			for (i = 0; i < NUM_GENETIC_CODES; ++ i)

@@ -112,7 +112,6 @@ char *CreateGroupName (const char *server_s)
 uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, const DatabaseType db_type)
 {
 	uint16 num_added_databases = 0;
-	Parameter *param_p = NULL;
 	SharedType def;
 	size_t num_group_params = GetNumberOfDatabases (data_p, db_type);
 

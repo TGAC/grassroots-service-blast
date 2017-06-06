@@ -164,7 +164,7 @@ bool AddProteinBlastParameters (BlastServiceData *data_p, ParameterSet *param_se
 }
 
 
-bool ParseBlastPParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p)
+bool ParseBlastPParameters (const BlastServiceData * UNUSED_PARAM (data_p), ParameterSet *params_p, ArgsProcessor *ap_p)
 {
 	bool success_flag = false;
 

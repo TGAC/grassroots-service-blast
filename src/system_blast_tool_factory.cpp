@@ -95,7 +95,7 @@ BlastTool *SystemBlastToolFactory :: CreateBlastTool (const json_t *json_p,  Bla
 
 	try
 		{
-			if (sync == SY_SYNCHRONOUS)
+			if (sync == SY_ASYNCHRONOUS_ATTACHED)
 				{
 					tool_p = new AsyncSystemBlastTool (blast_job_p, service_data_p, json_p);
 				}
@@ -124,7 +124,7 @@ Synchronicity SystemBlastToolFactory :: GetToolsSynchronicity () const
 			GetJSONBoolean (blast_tool_config_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
 		}
 
-	return (async_flag ? SY_ASYNCHRONOUS_DETACHED : SY_SYNCHRONOUS);
+	return (async_flag ? SY_ASYNCHRONOUS_ATTACHED : SY_SYNCHRONOUS);
 }
 
 
