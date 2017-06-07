@@ -55,7 +55,7 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 
 	SetServiceJobUpdateFunction (& (job_p -> bsj_job), UpdateAsyncBlastServiceJob);
 
-	asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s);
+	asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s, BlastServiceJobCompleted);
 
 	if (asbt_task_p)
 		{
@@ -105,7 +105,7 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 									char *name_s = NULL;
 									char *blast_program_name_s = NULL;
 
-									asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s);
+									asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s, BlastServiceJobCompleted);
 
 									if (asbt_task_p)
 										{
@@ -148,32 +148,40 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 {
 	OperationStatus status = OS_FAILED_TO_START;
 	const char *command_line_s = sbt_args_processor_p -> GetArgsAsString ();
+	char uuid_s [UUID_STRING_BUFFER_SIZE];
 
-	#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
-	PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
-	#endif
-
+	ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
 
 	if (command_line_s)
 		{
-			char uuid_s [UUID_STRING_BUFFER_SIZE];
-
-			ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
-
-			if (RunSystemAsyncTask (asbt_task_p))
+			if (SetSystemAsyncTaskCommand	(asbt_task_p, command_line_s))
 				{
-					status = GetStatus ();
+					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
+					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
+					#endif
+
+					if (RunSystemAsyncTask (asbt_task_p))
+						{
+							status = OS_STARTED;
+						}
+					else
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run async task for uuid %s", uuid_s);
+						}
+
+					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
+					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Created async task for uuid %s", uuid_s);
+					#endif
 				}
 			else
 				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run async task for uuid %s", uuid_s);
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set command \"%s\" for uuid \"%s\"", command_line_s, uuid_s);
 				}
-
-			#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
-			PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Created async task for uuid %s", uuid_s);
-			#endif
 		}
-
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get command to run for uuid \"%s\"", uuid_s);
+		}
 
 	if ((status == OS_ERROR) || (status == OS_FAILED_TO_START) || (status == OS_FAILED))
 		{
@@ -236,7 +244,14 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 
 	if (update_flag)
 		{
-			status = GetServiceJobStatus (& (bt_job_p -> bsj_job));
+			JobsManager *manager_p = GetJobsManager ();
+			ServiceJob *job_p = GetServiceJobFromJobsManager (manager_p, bt_job_p -> bsj_job.sj_id);
+
+			if (job_p)
+				{
+					status = job_p -> sj_status;
+					bt_job_p -> bsj_job.sj_status = status;
+				}
 
 			#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 				{
@@ -286,15 +301,12 @@ char *AsyncSystemBlastTool :: GetResults (BlastFormatter *formatter_p)
 
 
 
-
-
 static bool UpdateAsyncBlastServiceJob (struct ServiceJob *job_p)
 {
 	BlastServiceJob *blast_job_p = reinterpret_cast <BlastServiceJob *> (job_p);
 	AsyncSystemBlastTool *tool_p = static_cast <AsyncSystemBlastTool *> (blast_job_p -> bsj_tool_p);
 
 	tool_p -> GetStatus (true);
-
 
 	return true;
 }

@@ -209,6 +209,8 @@ BLAST_SERVICE_LOCAL bool ProcessLinkedServicesForBlastServiceJobOutput (Service 
 
 
 
+BLAST_SERVICE_LOCAL void BlastServiceJobCompleted (ServiceJob *job_p);
+
 
 #ifdef __cplusplus
 }

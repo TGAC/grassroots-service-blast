@@ -528,3 +528,22 @@ static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked
 	return success_flag;
 }
 
+
+
+void BlastServiceJobCompleted (ServiceJob *job_p)
+{
+	if (job_p -> sj_result_p == NULL)
+		{
+			BlastServiceJob *blast_job_p = (BlastServiceJob *) job_p;
+
+			if (!DetermineBlastResult (blast_job_p))
+				{
+					char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+					ConvertUUIDToString (job_p -> sj_id, uuid_s);
+
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to get result for \"%s\"", uuid_s);
+				}
+		}
+}
+

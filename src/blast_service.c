@@ -200,6 +200,9 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 												{
 													if (PreRunJobs (blast_data_p))
 														{
+															/* Rewind the ServiceJobIterator */
+															InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
+
 															RunJobs (service_p, param_set_p, input_filename_s, app_params_p, &iterator);
 														}
 													else
