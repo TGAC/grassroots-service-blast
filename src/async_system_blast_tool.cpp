@@ -156,17 +156,29 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 		{
 			if (SetSystemAsyncTaskCommand	(asbt_task_p, command_line_s))
 				{
+					JobsManager *manager_p = GetJobsManager ();
+
 					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
 					#endif
 
-					if (RunSystemAsyncTask (asbt_task_p))
+					status = OS_PENDING;
+					SetServiceJobStatus(& (bt_job_p -> bsj_job), status);
+
+					if (AddServiceJobToJobsManager (manager_p, bt_job_p -> bsj_job.sj_id, (ServiceJob *) bt_job_p))
 						{
-							status = OS_STARTED;
+							if (RunSystemAsyncTask (asbt_task_p))
+								{
+									status = OS_STARTED;
+								}
+							else
+								{
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run async task for uuid %s", uuid_s);
+								}
 						}
 					else
 						{
-							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run async task for uuid %s", uuid_s);
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add Blast Service Job \"%s\" to jobs manager", uuid_s);
 						}
 
 					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
