@@ -94,30 +94,39 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 
 			if (GetJSONBoolean (root_p, AsyncSystemBlastTool :: ASBT_ASYNC_S, &async_flag))
 				{
+					char *name_s = NULL;
+					char *blast_program_name_s = NULL;
+					bool continue_flag = true;
 					const char *value_s = GetJSONString (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S);
 
 					if (value_s)
 						{
 							asbt_async_logfile_s = CopyToNewString (value_s, 0, false);
 
-							if (asbt_async_logfile_s)
+							if (!asbt_async_logfile_s)
 								{
-									char *name_s = NULL;
-									char *blast_program_name_s = NULL;
-
-									asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s, BlastServiceJobCompleted);
-
-									if (asbt_task_p)
-										{
-											alloc_flag = true;
-										}
-
-									if (!alloc_flag)
-										{
-											FreeCopiedString (asbt_async_logfile_s);
-										}
-
+									continue_flag = false;
 								}
+						}
+					else
+						{
+							asbt_async_logfile_s = NULL;
+						}
+
+					if (continue_flag)
+						{
+
+							asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s, BlastServiceJobCompleted);
+
+							if (asbt_task_p)
+								{
+									alloc_flag = true;
+								}
+						}
+
+					if (!alloc_flag)
+						{
+							FreeCopiedString (asbt_async_logfile_s);
 						}
 				}
 
@@ -152,6 +161,8 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 
 	ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
 
+	SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
+
 	if (command_line_s)
 		{
 			if (SetSystemAsyncTaskCommand	(asbt_task_p, command_line_s))
@@ -162,17 +173,21 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
 					#endif
 
-					status = OS_PENDING;
-					SetServiceJobStatus(& (bt_job_p -> bsj_job), status);
-
 					if (AddServiceJobToJobsManager (manager_p, bt_job_p -> bsj_job.sj_id, (ServiceJob *) bt_job_p))
 						{
+							status = OS_PENDING;
+							SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
+
 							if (RunSystemAsyncTask (asbt_task_p))
 								{
+									/*
+									 * The ServiceJob should now only be writeable by the SystemAsyncTask that it is running under.
+									 */
 									status = OS_STARTED;
 								}
 							else
 								{
+									status = OS_FAILED_TO_START;
 									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run async task for uuid %s", uuid_s);
 								}
 						}
@@ -187,6 +202,7 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 				}
 			else
 				{
+					SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
 					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set command \"%s\" for uuid \"%s\"", command_line_s, uuid_s);
 				}
 		}
@@ -199,7 +215,8 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 		{
 			char *log_s = GetLog ();
 
-			status = OS_FAILED;
+			SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
+
 			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "\"%s\" returned %d", command_line_s, status);
 
 			if (log_s)
@@ -212,8 +229,6 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 					FreeCopiedString (log_s);
 				}		/* if (log_s) */
 		}
-
-	SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
 
 	return status;
 }
@@ -242,7 +257,7 @@ bool AsyncSystemBlastTool :: AddToJSON (json_t *root_p)
 		}		/* if (success_flag) */
 	else
 		{
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "SystemBlastTool :: AddToJSON failed");
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "AsyncSystemBlastTool :: AddToJSON failed");
 		}
 
 	return success_flag;
@@ -252,8 +267,9 @@ bool AsyncSystemBlastTool :: AddToJSON (json_t *root_p)
 
 OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 {
-	OperationStatus status = OS_ERROR;
+	OperationStatus status = GetCachedServiceJobStatus (& (bt_job_p -> bsj_job));
 
+/*
 	if (update_flag)
 		{
 			JobsManager *manager_p = GetJobsManager ();
@@ -290,6 +306,7 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 		{
 			status = GetCachedServiceJobStatus (& (bt_job_p -> bsj_job));
 		}
+*/
 
 	return status;
 }
@@ -305,7 +322,7 @@ char *AsyncSystemBlastTool :: GetResults (BlastFormatter *formatter_p)
 	/*
 	 * Remove the ServiceJob from the JobsManager
 	 */
-	RemoveServiceJobFromJobsManager (jobs_manager_p, bt_job_p -> bsj_job.sj_id, false);
+	//RemoveServiceJobFromJobsManager (jobs_manager_p, bt_job_p -> bsj_job.sj_id, false);
 
 
 	return results_s;
