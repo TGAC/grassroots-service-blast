@@ -262,7 +262,7 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 			if (job_p)
 				{
 					status = job_p -> sj_status;
-					bt_job_p -> bsj_job.sj_status = status;
+					SetServiceJobStatus (& (bt_job_p -> bsj_job), status);
 				}
 
 			#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE

@@ -567,6 +567,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 							uuid_t job_id;
 							StringListNode *node_p = (StringListNode *) (ids_p -> ll_head_p);
 							uint32 num_successful_jobs = 0;
+							OperationStatus status;
 
 							while (node_p)
 								{
@@ -575,7 +576,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 									if (uuid_parse (job_id_s, job_id) == 0)
 										{
 											char *result_s = GetBlastResultByUUIDString (blast_data_p, job_id_s, (output_format_code != BOF_GRASSROOTS) ? output_format_code : (uint32) BOF_SINGLE_FILE_JSON_BLAST);
-											job_p -> sj_status = OS_FAILED;
+											SetServiceJobStatus (job_p, OS_FAILED);
 
 											if (result_s)
 												{
@@ -667,17 +668,20 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 							if (num_successful_jobs == ids_p -> ll_size)
 								{
-									job_p -> sj_status = OS_SUCCEEDED;
+									status = OS_SUCCEEDED;
 								}
 							else if (num_successful_jobs == 0)
 								{
-									job_p -> sj_status = OS_FAILED;
+									status = OS_FAILED;
 								}
 							else
 								{
-									job_p -> sj_status = OS_PARTIALLY_SUCCEEDED;
+									status = OS_PARTIALLY_SUCCEEDED;
 								}
-						}
+
+							SetServiceJobStatus (job_p, status);
+
+						}		/* if (AddServiceJobToServiceJobSet (jobs_p, (ServiceJob *) job_p)) */
 
 				}		/* if (job_p) */
 			else
@@ -1421,7 +1425,7 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 				{
 					BlastTool *tool_p = job_p -> bsj_tool_p;
 
-					job_p -> bsj_job.sj_status = OS_FAILED_TO_START;
+					SetServiceJobStatus (& (job_p -> bsj_job), OS_FAILED_TO_START);
 
 					LogServiceJob (& (job_p -> bsj_job));
 
@@ -1438,7 +1442,7 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 															/* If the status needs updating, refresh it */
 															if ((job_p -> bsj_job.sj_status == OS_PENDING) || (job_p -> bsj_job.sj_status == OS_STARTED))
 																{
-																	job_p -> bsj_job.sj_status = tool_p -> GetStatus ();
+																	SetServiceJobStatus (& (job_p -> bsj_job), tool_p -> GetStatus ());
 																}
 
 															LogServiceJob (& (job_p -> bsj_job));
