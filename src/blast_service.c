@@ -1319,6 +1319,11 @@ void FreeBlastServiceData (BlastServiceData *data_p)
 			delete (data_p -> bsd_tool_factory_p);
 		}
 
+	if (data_p -> bsd_task_manager_p)
+		{
+			FreeAsyncTasksManager (data_p -> bsd_task_manager_p);
+		}
+
 	FreeMemory (data_p);
 }
 
