@@ -1526,14 +1526,6 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 
 		}		/* if (job_p) */
 
-	/* If we have asynchronous jobs running then set the "is running" flag for this service */
-	if (service_p -> se_synchronous == SY_ASYNCHRONOUS_DETACHED)
-		{
-			if (service_p -> se_jobs_p -> sjs_jobs_p -> ll_size > 0)
-				{
-					SetServiceRunning (service_p, true);
-				}
-		}
 }
 
 
@@ -1542,6 +1534,9 @@ static bool PreRunJobs (BlastServiceData *blast_data_p)
 	if (blast_data_p -> bsd_task_manager_p)
 		{
 			PrepareAsyncTasksManager (blast_data_p -> bsd_task_manager_p);
+
+			/* If we have asynchronous jobs running then set the "is running" flag for this service */
+			SetServiceRunning (blast_data_p ->  bsd_base_data.sd_service_p, true);
 		}
 
 	return true;
