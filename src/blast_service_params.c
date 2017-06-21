@@ -231,7 +231,7 @@ Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, P
 			if (success_flag)
 				{
 					/* default to grassroots */
-					def.st_string_value_s = (char *) (* (s_output_formats_ss + BOF_GRASSROOTS));
+					def.st_string_value_s = CopyToNewString (* (s_output_formats_ss + BOF_GRASSROOTS), 0, false);
 
 					param_p = CreateAndAddParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_type, false, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", options_p, def, NULL, NULL, PL_ALL, NULL);
 
