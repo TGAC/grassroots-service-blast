@@ -239,6 +239,13 @@ Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, P
 						{
 							return param_p;
 						}
+					else
+						{
+							if (def.st_string_value_s)
+								{
+									FreeCopiedString (def.st_string_value_s);
+								}
+						}
 				}
 
 			FreeLinkedList (options_p);
