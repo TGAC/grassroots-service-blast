@@ -229,7 +229,7 @@ BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, Bla
 }
 
 
-json_t *ConvertBlastServiceJobToJSON (BlastServiceJob *job_p)
+json_t *ConvertBlastServiceJobToJSON (BlastServiceJob *job_p, bool omit_results_flag)
 {
 	json_t *blast_job_json_p = json_object ();
 
@@ -239,7 +239,7 @@ json_t *ConvertBlastServiceJobToJSON (BlastServiceJob *job_p)
 
 			if (json_object_set_new (blast_job_json_p, JOB_SERVICE_S, json_string (service_name_s)) == 0)
 				{
-					json_t *base_job_json_p = GetServiceJobAsJSON (& (job_p -> bsj_job));
+					json_t *base_job_json_p = GetServiceJobAsJSON (& (job_p -> bsj_job), omit_results_flag);
 
 					if (base_job_json_p)
 						{
@@ -345,7 +345,7 @@ unsigned char *SerialiseBlastServiceJob (ServiceJob *base_job_p, unsigned int *v
 {
 	unsigned char *result_p = NULL;
 	BlastServiceJob *blast_job_p = (BlastServiceJob *) base_job_p;
-	json_t *job_json_p = ConvertBlastServiceJobToJSON (blast_job_p);
+	json_t *job_json_p = ConvertBlastServiceJobToJSON (blast_job_p, true);
 
 	if (job_json_p)
 		{

@@ -1055,9 +1055,9 @@ char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *jo
 }
 
 
-json_t *BuildBlastServiceJobJSON (Service * UNUSED_PARAM (service_p), ServiceJob *service_job_p)
+json_t *BuildBlastServiceJobJSON (Service * UNUSED_PARAM (service_p), ServiceJob *service_job_p, bool omit_results_flag)
 {
-	return ConvertBlastServiceJobToJSON ((BlastServiceJob *) service_job_p);
+	return ConvertBlastServiceJobToJSON ((BlastServiceJob *) service_job_p, omit_results_flag);
 }
 
 

@@ -168,7 +168,7 @@ BLAST_SERVICE_LOCAL BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *b
  * @return The newly-created JSON fragment or <code>NULL</code> upon error.
  * @memberof BlastServiceJob
  */
-BLAST_SERVICE_LOCAL json_t *ConvertBlastServiceJobToJSON (BlastServiceJob *job_p);
+BLAST_SERVICE_LOCAL json_t *ConvertBlastServiceJobToJSON (BlastServiceJob *job_p, bool omit_results_flag);
 
 
 /**
