@@ -64,7 +64,7 @@ BlastServiceJob *AllocateBlastServiceJob (Service *service_p, const char *job_na
 			BlastTool *tool_p = NULL;
 			ServiceJob * const base_service_job_p = & (blast_job_p -> bsj_job);
 
-			InitServiceJob (base_service_job_p, service_p, job_name_s, job_description_s, NULL, FreeBlastServiceJob, NULL);
+			InitServiceJob (base_service_job_p, service_p, job_name_s, job_description_s, NULL, NULL, FreeBlastServiceJob, NULL);
 
 			tool_p = CreateBlastToolFromFactory (data_p -> bsd_tool_factory_p, blast_job_p, job_filename_s, data_p);
 

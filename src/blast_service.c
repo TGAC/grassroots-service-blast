@@ -420,7 +420,7 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 
 			if (jobs_p)
 				{
-					ServiceJob *job_p = CreateAndAddServiceJobToServiceJobSet (jobs_p, ids_s, "Failed UUID lookup", NULL, NULL);
+					ServiceJob *job_p = CreateAndAddServiceJobToServiceJobSet (jobs_p, ids_s, "Failed UUID lookup", NULL, NULL, NULL);
 
 					if (job_p)
 						{
