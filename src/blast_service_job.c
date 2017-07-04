@@ -42,7 +42,14 @@ static const char * const BSJ_TOOL_S = "tool";
 static const char * const BSJ_FACTORY_S = "factory";
 static const char * const BSJ_JOB_S = "job";
 
+
 static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked_service_p, ParameterSet *output_params_p);
+
+
+static bool CalculateBlastServiceJobResults (ServiceJob *job_p);
+
+
+static void SetBlastServiceJobCallbacks (BlastServiceJob *blast_job_p);
 
 
 /*
@@ -64,13 +71,15 @@ BlastServiceJob *AllocateBlastServiceJob (Service *service_p, const char *job_na
 			BlastTool *tool_p = NULL;
 			ServiceJob * const base_service_job_p = & (blast_job_p -> bsj_job);
 
-			InitServiceJob (base_service_job_p, service_p, job_name_s, job_description_s, NULL, NULL, FreeBlastServiceJob, NULL);
+			InitServiceJob (base_service_job_p, service_p, job_name_s, job_description_s, NULL, NULL, NULL, NULL);
 
 			tool_p = CreateBlastToolFromFactory (data_p -> bsd_tool_factory_p, blast_job_p, job_filename_s, data_p);
 
 			if (tool_p)
 				{
 					blast_job_p -> bsj_tool_p = tool_p;
+
+					SetBlastServiceJobCallbacks (blast_job_p);
 
 					return blast_job_p;
 				}		/* if (tool_p) */
@@ -153,6 +162,16 @@ char *GetPreviousJobFilename (const BlastServiceData *data_p, const char *job_id
 }
 
 
+static void SetBlastServiceJobCallbacks (BlastServiceJob *blast_job_p)
+{
+	ServiceJob *job_p = & (blast_job_p -> bsj_job);
+
+	job_p -> sj_calculate_result_fn = CalculateBlastServiceJobResults;
+	job_p -> sj_update_fn = NULL;
+	job_p -> sj_free_fn = FreeBlastServiceJob;
+}
+
+
 BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, BlastServiceData *config_p)
 {
 	json_t *job_json_p = json_object_get (blast_job_json_p, BSJ_JOB_S);
@@ -184,6 +203,8 @@ BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, Bla
 													if (tool_p)
 														{
 															blast_job_p -> bsj_tool_p = tool_p;
+
+															SetBlastServiceJobCallbacks (blast_job_p);
 
 															return blast_job_p;
 														}		/* if (tool_p) */
@@ -546,4 +567,11 @@ void BlastServiceJobCompleted (ServiceJob *job_p)
 				}
 		}
 }
+
+
+static bool CalculateBlastServiceJobResults (ServiceJob *job_p)
+{
+	return DetermineBlastResult ((BlastServiceJob *) job_p);
+}
+
 
