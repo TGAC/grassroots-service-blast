@@ -137,7 +137,7 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 
 			group_to_use_s = group_s ? group_s : BS_DATABASE_GROUP_NAME_S;
 
-			group_p = CreateAndAddParameterGroupToParameterSet (group_to_use_s, NULL, & (data_p -> bsd_base_data), param_set_p);
+			group_p = CreateAndAddParameterGroupToParameterSet (group_to_use_s, NULL, false, & (data_p -> bsd_base_data), param_set_p);
 
 			if (db_p)
 				{
@@ -260,7 +260,7 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 	bool success_flag = false;
 	Parameter *param_p = NULL;
 	SharedType def;
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Query Sequence Parameters", NULL, & (data_p -> bsd_base_data), param_set_p);
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Query Sequence Parameters", false, NULL, & (data_p -> bsd_base_data), param_set_p);
 
 	def.st_string_value_s = NULL;
 
@@ -314,7 +314,7 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 	const char *param_name_s = "max_target_seqs";
 	ParameterType pt = PT_UNSIGNED_INT;
 
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("General Algorithm Parameters", NULL, & (data_p -> bsd_base_data), param_set_p);
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("General Algorithm Parameters", NULL, false, & (data_p -> bsd_base_data), param_set_p);
 
 	def.st_ulong_value = 5;
 
@@ -357,7 +357,7 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet *param_set_p, const BlastTask *tasks_p, const size_t num_tasks)
 {
 	bool success_flag = false;
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Program Selection Parameters", NULL, & (blast_data_p -> bsd_base_data), param_set_p);
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Program Selection Parameters", NULL, false, & (blast_data_p -> bsd_base_data), param_set_p);
 	Parameter *param_p = NULL;
 	SharedType def;
 	const ParameterLevel level = PL_INTERMEDIATE | PL_ADVANCED;

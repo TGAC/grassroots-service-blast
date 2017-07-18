@@ -183,7 +183,7 @@ static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_
 	SharedType def;
 	ServiceData *service_data_p = & (data_p -> bsd_base_data);
 
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", NULL, & (data_p -> bsd_base_data), param_set_p);
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", NULL, false, & (data_p -> bsd_base_data), param_set_p);
 
 
 	def.st_long_value = 2;
