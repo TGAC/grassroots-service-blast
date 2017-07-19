@@ -210,7 +210,7 @@ Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, P
 	Parameter *param_p = NULL;
 	SharedType def;
 
-	LinkedList *options_p = CreateProgramOptionsList ();
+	LinkedList *options_p = CreateParameterOptionsList ();
 
 	if (options_p)
 		{
