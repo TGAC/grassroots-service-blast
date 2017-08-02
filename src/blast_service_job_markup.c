@@ -1326,7 +1326,6 @@ bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const js
 }
 
 
-
 bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, const json_t *hit_p, ParameterSet *output_params_p, json_t *request_p)
 {
 	bool success_flag = false;
@@ -1466,6 +1465,15 @@ const json_t *GetScaffoldsForDatabaseHit (const json_t *hit_p)
 }
 
 
+bool GetAndAddSequenceMappedParameter (LinkedService *linked_service_p, const json_t *hit_p, ParameterSet *output_params_p, json_t *request_p)
+{
+	bool success_flag = false;
+
+	return success_flag;
+}
+
+
+
 static const char *GetDatabaseName (const json_t *marked_up_report_p)
 {
 	const char *database_name_s = NULL;
@@ -1482,7 +1490,6 @@ static const char *GetDatabaseName (const json_t *marked_up_report_p)
 
 	return database_name_s;
 }
-
 
 
 static bool AddSequenceOntologyTerms (json_t *context_p)

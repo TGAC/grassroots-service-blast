@@ -131,6 +131,8 @@ BLAST_SERVICE_LOCAL json_t *GetHitsFromMarkedUpReport (json_t *report_p);
 BLAST_SERVICE_LOCAL bool GetAndAddScaffoldsFromHit (const json_t *hit_p, json_t *mark_up_p, const DatabaseInfo *db_p);
 
 
+BLAST_SERVICE_LOCAL bool GetAndAddSequenceMappedParameter (LinkedService *linked_service_p, const json_t *hit_p, ParameterSet *output_params_p, json_t *request_p);
+
 #ifdef __cplusplus
 }
 #endif
