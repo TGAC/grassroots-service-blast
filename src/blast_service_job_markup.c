@@ -1304,16 +1304,17 @@ bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const js
 
 			if (value_s)
 				{
-					Parameter *param_p = GetParameterFromParameterSetByName (output_params_p, mapped_param_p -> mp_output_param_s);
+					SharedType value;
 
-					if (param_p)
+					InitSharedType (&value);
+					value.st_string_value_s = value_s;
+
+					if (SetMappedParameterValue (mapped_param_p, output_params_p, &value))
 						{
-							if (SetParameterValueFromString (param_p, value_s))
-								{
-									*database_ss = value_s;
-									success_flag = true;
-								}
-						}		/* if (param_p) */
+							*database_ss = value_s;
+							success_flag = true;
+						}
+
 				}
 
 		}		/* if (mapped_param_p) */
@@ -1326,7 +1327,7 @@ bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const js
 }
 
 
-bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, const json_t *hit_p, ParameterSet *output_params_p, json_t *request_p)
+bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p, ParameterSet *output_params_p)
 {
 	bool success_flag = false;
 	MappedParameter *mapped_param_p = GetMappedParameterByInputParamName (linked_service_p, "scaffold");
@@ -1356,7 +1357,71 @@ bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, const json_t 
 												{
 													if (SetParameterValueFromString (param_p, scaffold_s))
 														{
-															if (AddLinkedServiceToRequestJSON (request_p, linked_service_p, output_params_p))
+															if (AddLinkedServiceToRequestJSON (hit_p, linked_service_p, output_params_p))
+																{
+																	++ num_added;
+																}
+															else
+																{
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add linked service \%s\" for scaffold \"%s\"", linked_service_p -> ls_output_service_s, scaffold_s);
+																}
+
+														}		/* if (SetParameterValueFromString (param_p, scaffold_s)) */
+
+												}		/* if (scaffold_s) */
+
+										}		/* for (i = 0; i < num_scaffolds; ++ i) */
+
+									success_flag = (num_added == num_scaffolds);
+
+								}		/* if (json_is_array (scaffolds_p)) */
+							else
+								{
+
+								}
+
+						}		/* if (scaffolds_p) */
+
+				}		/* if (param_p) */
+
+		}		/* if (mapped_param_p) */
+
+	return success_flag;
+}
+
+
+bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p, ParameterSet *output_params_p)
+{
+	bool success_flag = false;
+	MappedParameter *mapped_param_p = GetMappedParameterByInputParamName (linked_service_p, "hit_sequences");
+
+	if (mapped_param_p)
+		{
+			Parameter *param_p = GetParameterFromParameterSetByName (output_params_p, mapped_param_p -> mp_output_param_s);
+
+			if (param_p)
+				{
+					const json_t *hit_sequence_p = GetHitSequenceForDatabaseHit (hit_p);
+					const json_t *polymorphisms_p = GetPolymorphismsForDatabaseHit (hit_p);
+
+					if (hit_sequence_p && polymorphisms_p)
+						{
+							if (json_is_array (scaffolds_p))
+								{
+									size_t i;
+									size_t num_added = 0;
+									const size_t num_scaffolds = json_array_size (scaffolds_p);
+
+									for (i = 0; i < num_scaffolds; ++ i)
+										{
+											const json_t *scaffold_p = json_array_get (scaffolds_p, i);
+											const char *scaffold_s = GetJSONString (scaffold_p, "scaffold");
+
+											if (scaffold_s)
+												{
+													if (SetParameterValueFromString (param_p, scaffold_s))
+														{
+															if (AddLinkedServiceToRequestJSON (hit_p, linked_service_p, output_params_p))
 																{
 																	++ num_added;
 																}
@@ -1462,14 +1527,6 @@ const json_t *GetScaffoldsForDatabaseHit (const json_t *hit_p)
 		}
 
 	return scaffolds_p;
-}
-
-
-bool GetAndAddSequenceMappedParameter (LinkedService *linked_service_p, const json_t *hit_p, ParameterSet *output_params_p, json_t *request_p)
-{
-	bool success_flag = false;
-
-	return success_flag;
 }
 
 

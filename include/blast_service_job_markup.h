@@ -91,7 +91,7 @@ BLAST_SERVICE_LOCAL bool GetAndAddDatabaseMappedParameter (LinkedService *linked
 
 
 
-BLAST_SERVICE_LOCAL bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, const json_t *hit_p, ParameterSet *output_params_p, json_t *linked_services_array_p);
+BLAST_SERVICE_LOCAL bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p, ParameterSet *output_params_p);
 
 
 /**

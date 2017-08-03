@@ -531,7 +531,12 @@ static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked
 
 									json_array_foreach (hits_p, l, hit_p)
 										{
-											if (!GetAndAddScaffoldsParameter (linked_service_p, hit_p, output_params_p, hit_p))
+											if (!GetAndAddScaffoldsParameter (linked_service_p, hit_p, output_params_p))
+												{
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
+												}
+
+											if (!GetAndAddSequencesParameter (linked_service_p, hit_p, output_params_p))
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
 												}
