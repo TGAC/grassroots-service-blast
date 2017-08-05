@@ -1307,7 +1307,7 @@ bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const js
 					SharedType value;
 
 					InitSharedType (&value);
-					value.st_string_value_s = value_s;
+					value.st_string_value_s = (char *) value_s;
 
 					if (SetMappedParameterValue (mapped_param_p, output_params_p, &value))
 						{
@@ -1401,21 +1401,21 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 
 			if (param_p)
 				{
-					const json_t *hit_sequence_p = GetHitSequenceForDatabaseHit (hit_p);
-					const json_t *polymorphisms_p = GetPolymorphismsForDatabaseHit (hit_p);
+					const json_t *hit_sequence_p = NULL; //GetHitSequenceForDatabaseHit (hit_p);
+					const json_t *polymorphisms_p = NULL; //GetPolymorphismsForDatabaseHit (hit_p);
 
 					if (hit_sequence_p && polymorphisms_p)
 						{
-							if (json_is_array (scaffolds_p))
+							if (json_is_array (polymorphisms_p))
 								{
 									size_t i;
 									size_t num_added = 0;
-									const size_t num_scaffolds = json_array_size (scaffolds_p);
+									const size_t num_scaffolds = json_array_size (polymorphisms_p);
 
 									for (i = 0; i < num_scaffolds; ++ i)
 										{
-											const json_t *scaffold_p = json_array_get (scaffolds_p, i);
-											const char *scaffold_s = GetJSONString (scaffold_p, "scaffold");
+											const json_t *polymorphism_p = json_array_get (polymorphisms_p, i);
+											const char *scaffold_s = GetJSONString (polymorphism_p, "scaffold");
 
 											if (scaffold_s)
 												{

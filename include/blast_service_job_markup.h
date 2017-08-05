@@ -90,8 +90,10 @@ BLAST_SERVICE_LOCAL bool AddHsp (json_t *marked_up_hit_p, const json_t *hsp_p);
 BLAST_SERVICE_LOCAL bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const json_t *report_p, ParameterSet *output_params_p, const char **database_ss);
 
 
-
 BLAST_SERVICE_LOCAL bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p, ParameterSet *output_params_p);
+
+
+BLAST_SERVICE_LOCAL bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p, ParameterSet *output_params_p);
 
 
 /**
