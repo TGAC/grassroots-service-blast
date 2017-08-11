@@ -84,7 +84,7 @@ BlastServiceJob *AllocateBlastServiceJob (Service *service_p, const char *job_na
 					return blast_job_p;
 				}		/* if (tool_p) */
 
-			DecrementServiceJobReferenceCount (base_service_job_p);
+			FreeServiceJob (base_service_job_p);
 			FreeMemory (blast_job_p);
 		}		/* if (blast_job_p) */
 
@@ -102,7 +102,7 @@ void FreeBlastServiceJob (ServiceJob *job_p)
 			FreeBlastTool (blast_job_p -> bsj_tool_p);
 		}
 
-	DecrementServiceJobReferenceCount (job_p);
+	FreeServiceJob (job_p);
 
 	FreeMemory (blast_job_p);
 }
