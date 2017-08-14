@@ -240,7 +240,7 @@ extern "C"
 /**
  * Get the Services available for running BLAST jobs.
  *
- * @param config_p The service configuration data.
+ * @param user_p The details for the user accessing the BLAST Services.
  * @return The ServicesArray containing all of the BLAST Services or
  * <code>NULL</code> upon error.
  */
@@ -458,6 +458,8 @@ BLAST_SERVICE_LOCAL ServiceJob *BuildBlastServiceJob (struct Service *service_p,
  *
  * @param service_p The Service that ran the BlastServiceJob.
  * @param service_job_p The BlastServiceJob to serialise.
+ * @param omit_results_flag If this is <code>true</code> then just the minimal status information for
+ * the ServiceJob will be returned. If it is <code>false</code> then the job results will be included too if possible.
  * @return The JSON fragment representing the BlastServiceJob or <code>NULL</code>
  * upon error.
  */

@@ -72,8 +72,7 @@ extern "C"
  * Create a BlastServiceJob.
  *
  * @param service_p The Blast service.
- * @param job_name_s The name of the BlastServiceJob.
- * @param job_description_s The description of the BlastServiceJob. This can be <code>NULL</code>.
+ * @param db_p The DatabaseInfo details that the BlastServiceJob will run against.
  * @param data_p The BlastServiceData.
  * @return The newly-allocated BlastServiceJob or <code>NULL</code> upon error.
  */
@@ -86,6 +85,8 @@ BLAST_SERVICE_LOCAL BlastServiceJob *AllocateBlastServiceJobForDatabase (Service
  * @param service_p The Blast service.
  * @param job_name_s The name of the BlastServiceJob.
  * @param job_description_s The description of the BlastServiceJob. This can be <code>NULL</code>.
+ * @param tool_name_s The name to give to the underlying BlastTool for this BlastServiceJob.
+ * This value will be deep-copied.
  * @param data_p The BlastServiceData.
  * @return The newly-allocated BlastServiceJob or <code>NULL</code> upon error.
  */
