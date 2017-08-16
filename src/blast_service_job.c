@@ -102,9 +102,7 @@ void FreeBlastServiceJob (ServiceJob *job_p)
 			FreeBlastTool (blast_job_p -> bsj_tool_p);
 		}
 
-	FreeServiceJob (job_p);
-
-	FreeMemory (blast_job_p);
+	FreeBaseServiceJob (job_p);
 }
 
 
@@ -476,13 +474,17 @@ bool ProcessLinkedServicesForBlastServiceJobOutput (Service * UNUSED_PARAM (serv
 
 															json_array_foreach (data_p, j, data_item_p)
 																{
-																	ProcessResultForLinkedService (data_item_p, linked_service_p, output_params_p);
+																	if (!ProcessResultForLinkedService (data_item_p, linked_service_p, output_params_p))
+																		{
+																			success_flag = false;
+																		}
+
 																}		/* json_array_foreach (data_p, j, data_item_p) */
 
 														}		/* if (json_is_array (data_p)) */
 													else
 														{
-															ProcessResultForLinkedService (data_p, linked_service_p, output_params_p);
+															success_flag = ProcessResultForLinkedService (data_p, linked_service_p, output_params_p);
 														}
 
 												}		/* if (data_p) */

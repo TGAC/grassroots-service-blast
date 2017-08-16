@@ -82,6 +82,10 @@ static bool AddSoftwareDetails (const json_t *blast_report_p, json_t *mark_up_p)
 
 static bool AddSoftwareVersion (const json_t *blast_report_p, json_t *software_mark_up_p);
 
+static const json_t *GetHitSequenceForDatabaseHit (const json_t *hit_p);
+
+static const json_t *GetPolymorphismsForDatabaseHit (const json_t *hit_p);
+
 
 /*
  * FUNCTION DEFINITIONS
@@ -1393,7 +1397,7 @@ bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p
 bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p, ParameterSet *output_params_p)
 {
 	bool success_flag = false;
-	MappedParameter *mapped_param_p = GetMappedParameterByInputParamName (linked_service_p, "hit_sequences");
+	MappedParameter *mapped_param_p = GetMappedParameterByInputParamName (linked_service_p, "hit_data");
 
 	if (mapped_param_p)
 		{
@@ -1401,8 +1405,8 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 
 			if (param_p)
 				{
-					const json_t *hit_sequence_p = NULL; //GetHitSequenceForDatabaseHit (hit_p);
-					const json_t *polymorphisms_p = NULL; //GetPolymorphismsForDatabaseHit (hit_p);
+					const json_t *hit_sequence_p = GetHitSequenceForDatabaseHit (hit_p);
+					const json_t *polymorphisms_p = GetPolymorphismsForDatabaseHit (hit_p);
 
 					if (hit_sequence_p && polymorphisms_p)
 						{
@@ -1410,9 +1414,9 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 								{
 									size_t i;
 									size_t num_added = 0;
-									const size_t num_scaffolds = json_array_size (polymorphisms_p);
+									const size_t num_polymorphisms = json_array_size (polymorphisms_p);
 
-									for (i = 0; i < num_scaffolds; ++ i)
+									for (i = 0; i < num_polymorphisms; ++ i)
 										{
 											const json_t *polymorphism_p = json_array_get (polymorphisms_p, i);
 											const char *scaffold_s = GetJSONString (polymorphism_p, "scaffold");
@@ -1434,9 +1438,9 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 
 												}		/* if (scaffold_s) */
 
-										}		/* for (i = 0; i < num_scaffolds; ++ i) */
+										}		/* for (i = 0; i < num_polymorphisms; ++ i) */
 
-									success_flag = (num_added == num_scaffolds);
+									success_flag = (num_added == num_polymorphisms);
 
 								}		/* if (json_is_array (scaffolds_p)) */
 							else
@@ -1451,6 +1455,22 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 		}		/* if (mapped_param_p) */
 
 	return success_flag;
+}
+
+
+static const json_t *GetHitSequenceForDatabaseHit (const json_t *hit_p)
+{
+	const json_t *hit_sequence_p = NULL;
+
+	return hit_sequence_p;
+}
+
+
+static const json_t *GetPolymorphismsForDatabaseHit (const json_t *hit_p)
+{
+	const json_t *polymorphisms_p = NULL;
+
+	return polymorphisms_p;
 }
 
 
@@ -1528,7 +1548,6 @@ const json_t *GetScaffoldsForDatabaseHit (const json_t *hit_p)
 
 	return scaffolds_p;
 }
-
 
 
 static const char *GetDatabaseName (const json_t *marked_up_report_p)
