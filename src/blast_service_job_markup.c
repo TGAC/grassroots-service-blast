@@ -82,10 +82,6 @@ static bool AddSoftwareDetails (const json_t *blast_report_p, json_t *mark_up_p)
 
 static bool AddSoftwareVersion (const json_t *blast_report_p, json_t *software_mark_up_p);
 
-static const json_t *GetHitSequenceForDatabaseHit (const json_t *hit_p);
-
-static const json_t *GetPolymorphismsForDatabaseHit (const json_t *hit_p);
-
 
 /*
  * FUNCTION DEFINITIONS
@@ -1405,50 +1401,96 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 
 			if (param_p)
 				{
-					const json_t *hit_sequence_p = GetHitSequenceForDatabaseHit (hit_p);
-					const json_t *polymorphisms_p = GetPolymorphismsForDatabaseHit (hit_p);
+					json_t *hsps_p = json_object_get (hit_p, "hsps");
 
-					if (hit_sequence_p && polymorphisms_p)
+					if (hsps_p)
 						{
-							if (json_is_array (polymorphisms_p))
+							json_t *hsp_p;
+							size_t k;
+							size_t num_added = 0;
+
+							json_array_foreach (hsps_p, k, hsp_p)
 								{
-									size_t i;
-									size_t num_added = 0;
-									const size_t num_polymorphisms = json_array_size (polymorphisms_p);
+									const char * const QUERY_SEQUENCE_KEY_S = "query_sequence";
+									const char * const POLYMORPHISMS_KEY_S = "polymorphisms";
 
-									for (i = 0; i < num_polymorphisms; ++ i)
+									const char *query_sequence_s = GetJSONString (hsp_p, QUERY_SEQUENCE_KEY_S);
+
+									if (query_sequence_s)
 										{
-											const json_t *polymorphism_p = json_array_get (polymorphisms_p, i);
-											const char *scaffold_s = GetJSONString (polymorphism_p, "scaffold");
+											json_t *polymorphisms_p = json_object_get (hsp_p, POLYMORPHISMS_KEY_S);
 
-											if (scaffold_s)
+											if (polymorphisms_p)
 												{
-													if (SetParameterValueFromString (param_p, scaffold_s))
+													json_t *hit_data_p = json_object ();
+
+													if (hit_data_p)
 														{
-															if (AddLinkedServiceToRequestJSON (hit_p, linked_service_p, output_params_p))
+															if (json_object_set_new (hit_data_p, QUERY_SEQUENCE_KEY_S, json_string (query_sequence_s)) == 0)
 																{
-																	++ num_added;
-																}
+																	if (json_object_set (hit_data_p, POLYMORPHISMS_KEY_S, polymorphisms_p) == 0)
+																		{
+																			char *sequences_value_s = json_dumps (hit_data_p, 0);
+
+																			if (sequences_value_s)
+																				{
+																					if (SetParameterValueFromString (param_p, sequences_value_s))
+																						{
+																							if (AddLinkedServiceToRequestJSON (hit_p, linked_service_p, output_params_p))
+																								{
+																									++ num_added;
+																								}
+																							else
+																								{
+																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add linked service \%s\" for sequences value \"%s\"", linked_service_p -> ls_output_service_s, sequences_value_s);
+																								}
+																						}		/* if (SetParameterValueFromString (param_p, sequences_value_s)) */
+																					else
+																						{
+																							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set parameter \"%s\" to sequences value \"%s\"", param_p -> pa_name_s, sequences_value_s);
+																						}
+
+																					free (sequences_value_s);
+																				}		/* if (sequences_value_s) */
+																			else
+																				{
+																					PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, hit_data_p, "Failed to dump json for sequences value");
+																				}
+
+																		}		/* if (json_object_set (hit_data_p, POLYMORPHISMS_KEY_S, polymorphisms_p) == 0 */
+																	else
+																		{
+																			PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, polymorphisms_p, "Failed to set \"%s\"", POLYMORPHISMS_KEY_S);
+																		}
+
+																}		/* if (json_object_set_new (hit_data_p, QUERY_SEQUENCE_KEY_S, json_string (query_sequence_s)) == 0) */
 															else
 																{
-																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add linked service \%s\" for scaffold \"%s\"", linked_service_p -> ls_output_service_s, scaffold_s);
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set \"%s\": \"%s\"", QUERY_SEQUENCE_KEY_S, query_sequence_s);
 																}
 
-														}		/* if (SetParameterValueFromString (param_p, scaffold_s)) */
+															json_decref (hit_data_p);
+														}
+													else
+														{
+															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create hit_data object");
+														}
 
-												}		/* if (scaffold_s) */
+												}		/* if (polymorphisms_p) */
+											else
+												{
+													PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, hsp_p, "Failed to get \"%s\"", POLYMORPHISMS_KEY_S);
+												}
 
-										}		/* for (i = 0; i < num_polymorphisms; ++ i) */
+										}		/* if (query_sequence_s) */
+									else
+										{
+											PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, hsp_p, "Failed to get \"%s\"", QUERY_SEQUENCE_KEY_S);
+										}
 
-									success_flag = (num_added == num_polymorphisms);
+								}		/* json_array_foreach (hsps_p, k, hsp_p) */
 
-								}		/* if (json_is_array (scaffolds_p)) */
-							else
-								{
-
-								}
-
-						}		/* if (scaffolds_p) */
+						}		/* if (hsps_p) */
 
 				}		/* if (param_p) */
 
@@ -1457,21 +1499,6 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 	return success_flag;
 }
 
-
-static const json_t *GetHitSequenceForDatabaseHit (const json_t *hit_p)
-{
-	const json_t *hit_sequence_p = NULL;
-
-	return hit_sequence_p;
-}
-
-
-static const json_t *GetPolymorphismsForDatabaseHit (const json_t *hit_p)
-{
-	const json_t *polymorphisms_p = NULL;
-
-	return polymorphisms_p;
-}
 
 
 bool GetAndAddScaffoldsFromHit (const json_t *hit_p, json_t *mark_up_p, const DatabaseInfo *db_p)

@@ -515,10 +515,10 @@ static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked
 
 	if (reports_p)
 		{
-			size_t k;
+			size_t i;
 			json_t *report_p;
 
-			json_array_foreach (reports_p, k, report_p)
+			json_array_foreach (reports_p, i, report_p)
 				{
 					const char *database_s = NULL;
 
@@ -528,20 +528,22 @@ static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked
 
 							if (hits_p)
 								{
-									size_t l;
+									size_t j;
 									json_t *hit_p;
 
-									json_array_foreach (hits_p, l, hit_p)
+									json_array_foreach (hits_p, j, hit_p)
 										{
+											json_t *hsps_p = json_object_get (hit_p, "hsps");
+
 											if (!GetAndAddScaffoldsParameter (linked_service_p, hit_p, output_params_p))
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
 												}
 
-											if (!GetAndAddSequencesParameter (linked_service_p, hit_p, output_params_p))
+											if (hsps_p)
 												{
-													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
-												}
+
+												}		/* if (hsps_p) */
 
 										}		/* json_array_foreach (hits_p, l, hit_p) */
 
