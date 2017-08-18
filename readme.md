@@ -122,3 +122,71 @@ The available keys for the BLAST services are:
 
  * **database**: The database from which each hit comes from.
  * **scaffold**: The list of scaffolds that each hit belongs to 
+ * **hit_data**: This gives the JSON fragment the query sequence and its differences to the hit, This is described in the next section.
+ 
+#### hit_data
+
+The *hit_data* value contains two keys:
+  * **query_sequence**: The genetic sequence that was the input used to run BLAST with.
+  * **polymorphisms**: A JSON fragment that details the differences between the query sequence and the hit sequence found. 
+
+  
+For example consider a BLAST search for the following hit and query sequences where the query sequence in on the first line, the hit sequence on the third and the midline element on line 2 to help as a visual aid in seeing the differences between the two.
+    
+~~~
+TCCAACCCAAAATCTTGTCA-CTCGATCCATTGTAGAGCGCGAGCGCAAGCAGCAGCAGCAGCCATGAACCCGGACAA
+||||||||||||||||||||  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+TCCAACCCAAAATCTTGTCAGTTCGATCCATTGTAGAGCGCGAGCGCAAGCAGCAGCAGCAGCCATGAACCCGGACAA
+~~~
+      
+Gives the following *polymorphisms* JSON fragment:
+ 
+~~~.json
+{
+	"polymorphisms": [{
+		"locus": {
+			"faldo:begin": {
+				"@type": "faldo:ExactPosition",
+				"faldo:position": 21
+			},
+			"faldo:end": {
+				"@type": "faldo:ExactPosition",
+				"faldo:position": 22
+			},
+			"@type": "faldo:Region"
+		},
+		"@type": "mnp",
+		"sequence_difference": {
+			"query": "-C",
+			"hit": "GT"
+		}
+	}]
+}
+~~~
+
+So the complete *hit_data* value would be:
+
+~~~.json
+{
+    "query_sequence": "TCCAACCCAAAATCTTGTCA-CTCGATCCATTGTAGAGCGCGAGCGCAAGCAGCAGCAGCAGCCATGAACCCGGACAA", 
+	"polymorphisms": [{
+		"locus": {
+			"faldo:begin": {
+				"@type": "faldo:ExactPosition",
+				"faldo:position": 21
+			},
+			"faldo:end": {
+				"@type": "faldo:ExactPosition",
+				"faldo:position": 22
+			},
+			"@type": "faldo:Region"
+		},
+		"@type": "mnp",
+		"sequence_difference": {
+			"query": "-C",
+			"hit": "GT"
+		}
+	}]
+}
+~~~
+

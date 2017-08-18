@@ -1385,6 +1385,11 @@ bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p
 				}		/* if (param_p) */
 
 		}		/* if (mapped_param_p) */
+	else
+		{
+			/* parameter isn't needed */
+			success_flag = true;
+		}
 
 	return success_flag;
 }
@@ -1495,6 +1500,11 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 				}		/* if (param_p) */
 
 		}		/* if (mapped_param_p) */
+	else
+		{
+			/* parameter isn't needed */
+			success_flag = true;
+		}
 
 	return success_flag;
 }
