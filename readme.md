@@ -1,6 +1,6 @@
 ﻿# BLAST Services {#blast_services}
 
-The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Service allows BLAST queries to be submitted against a number of databases.  This Grassroots service module contains three services: 
+The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Services module allows BLAST queries to be submitted against a number of databases.  This Grassroots service module contains three Services: 
 
  * **BlastN Service** for searching nucleotide databases using nucleotide queries 
  * **BlastP Service** for searching protein databases using protein queries 
@@ -22,19 +22,15 @@ cd build/linux
 
 you can then build the service by typing
 
-```
-
+~~~
 make all
-
-```
+~~~
 
 and then 
 
-```
-
+~~~
 make install
-
-```
+~~~
 
 to install the service into the Grassroots system where it will be available for use immediately.
 
@@ -55,13 +51,11 @@ Each of the three services listed above can be configured by files with the same
  	* **info_uri**: This is an optional key used to specify a URI where the more information about this database can be found.
  	* **scaffold_key**: 	The key used to get the scaffold name for any hits from BLAST searches from within the ``BlastOutput2.report.results.search.hits.description`` field of the search result in single file JSON format. This defaults to ``id``.
  	* **scaffold_regex**: The regular expression used to get the scaffold name for the value associated with the value retrieved from using the scaffold_key. attribute above. If this key is omitted, then the entire value retrieved using the scffold_key is used as the scaffold name. For instance to get the first string up to any whitespace, the regular expression to use will be `([^\\s]*)`. Note that the backslash character has had to be escaped.  
- 
  * **blast_formatter**: This key determines how the output from the BLAST searches can be converted between the different available output formats. Currently the only available option for this is **system**. 
  * **blast_command**: This is the path to the executable used to perform the searches. 
  * **blast_tool**: This determines how the BLAST search will be run and currently has the following options:
     * **system**: This will be run using the executable specified by *blast_command* to the ANSI-specified *system()* function. This is the default *blast_tool* option.
     * **drmaa**: This will be run by submitting a job to a DRMAA environment.
-
 
 An example configuration file for the BlastN service which would be saved as the ```<Grassroots directory>/ config/BlastN service``` is:
 
@@ -168,7 +162,7 @@ So the complete *hit_data* value would be:
 
 ~~~.json
 {
-    "query_sequence": "TCCAACCCAAAATCTTGTCA-CTCGATCCATTGTAGAGCGCGAGCGCAAGCAGCAGCAGCAGCCATGAACCCGGACAA", 
+  "query_sequence": "TCCAACCCAAAATCTTGTCA-CTCGATCCATTGTAGAGCGCGAGCGCAAGCAGCAGCAGCAGCCATGAACCCGGACAA", 
 	"polymorphisms": [{
 		"locus": {
 			"faldo:begin": {
