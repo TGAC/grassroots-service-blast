@@ -54,6 +54,11 @@ public:
 	 */
 	static const char * const EBT_LOG_SUFFIX_S;
 
+	/**
+	 * This is the string identifier to use to set whether
+	 * the ExternalBlastTool will run synchronously or
+	 * asynchronously.
+	 */
 	static const char * const EBT_ASYNC_S;
 
 
@@ -167,7 +172,12 @@ protected:
 	const char *ebt_blast_s;
 
 
-
+	/**
+	 * If this is <code>true</code>, then the
+	 * ExternalBlastTool will run asynchronously.
+	 * If it is <code>false</code>, then the
+	 * ExternalBlastTool will run synchronously.
+	 */
 	bool ebt_async_flag;
 
 

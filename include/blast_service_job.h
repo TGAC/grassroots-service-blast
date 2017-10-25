@@ -75,6 +75,7 @@ extern "C"
  * @param db_p The DatabaseInfo details that the BlastServiceJob will run against.
  * @param data_p The BlastServiceData.
  * @return The newly-allocated BlastServiceJob or <code>NULL</code> upon error.
+ * @memberof BlastServiceJob
  */
 BLAST_SERVICE_LOCAL BlastServiceJob *AllocateBlastServiceJobForDatabase (Service *service_p, const DatabaseInfo *db_p, struct BlastServiceData *data_p);
 
@@ -89,6 +90,7 @@ BLAST_SERVICE_LOCAL BlastServiceJob *AllocateBlastServiceJobForDatabase (Service
  * This value will be deep-copied.
  * @param data_p The BlastServiceData.
  * @return The newly-allocated BlastServiceJob or <code>NULL</code> upon error.
+ * @memberof BlastServiceJob
  */
 BLAST_SERVICE_LOCAL BlastServiceJob *AllocateBlastServiceJob (Service *service_p, const char *job_name_s, const char *job_description_s, const char *tool_name_s, BlastServiceData *data_p);
 
@@ -166,6 +168,8 @@ BLAST_SERVICE_LOCAL BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *b
  * Serialise a BlastServiceJob into a JSON fragment.
  *
  * @param job_p The BlastServiceJob to serialise
+ * @param omit_results_flag <code>true</code> if the BlastServiceJob is to exclude
+ * any results from the created JSON fragment, <code>false</code> to include them.
  * @return The newly-created JSON fragment or <code>NULL</code> upon error.
  * @memberof BlastServiceJob
  */

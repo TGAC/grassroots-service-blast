@@ -42,8 +42,6 @@ class BLAST_SERVICE_LOCAL ByteBufferArgsProcessor : public ArgsProcessor
 public:
 	/**
 	 * Construct a new ByteBufferArgsProcessor.
-	 *
-	 * @param buffer_p The ByteBuffer to add all arguments to.
 	 */
 	ByteBufferArgsProcessor ();
 
@@ -65,6 +63,11 @@ public:
 	 */
 	virtual bool AddArg (const char *arg_s, const bool hyphen_flag);
 
+	/**
+	 * Get the complete set of arguments as a string.
+	 *
+	 * @return The arguments as a string
+	 */
 	const char *GetArgsAsString ();
 
 private:
