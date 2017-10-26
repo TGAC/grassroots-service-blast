@@ -63,7 +63,9 @@ public:
 	 */
 	AsyncSystemBlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *json_p);
 
-
+	/**
+	 * The AsyncSystemBlastTool destructor.
+	 */
 	virtual ~AsyncSystemBlastTool ();
 
 	/**

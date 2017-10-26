@@ -18,12 +18,15 @@
 
 #include "jansson.h"
 
-
+/**
+ * Which strand is being used to for
+ * positioning purposes.
+ */
 typedef enum Strand
 {
-	ST_NONE,
-	ST_FORWARD,
-	ST_REVERSE
+	ST_NONE,   //!< ST_NONE
+	ST_FORWARD,//!< ST_FORWARD
+	ST_REVERSE //!< ST_REVERSE
 } Strand;
 
 
@@ -77,6 +80,16 @@ BLAST_SERVICE_LOCAL bool GetAndAddNucleotidePolymorphisms (json_t *marked_up_hsp
 
 BLAST_SERVICE_LOCAL bool AddPolymorphism (json_t *marked_up_hsp_p, const char *hit_gap_start_p, const char *reference_gap_start_p, const uint32 start_of_region, const uint32 end_of_region);
 
+/**
+ * Add the marked-up data for a High-scoring Segment Pair (HSP) to a
+ * marked-up hit.
+ *
+ * @param marked_up_hit_p The marked-up hit that the HSP will be added to.
+ * @param hsp_p The HSP to add.
+ * @return <code>true</code> if the HSP was added successfully, <code>
+ * false</code> otherwise.
+ * @memberof BlastServiceJob
+ */
 BLAST_SERVICE_LOCAL bool AddHsp (json_t *marked_up_hit_p, const json_t *hsp_p);
 
 

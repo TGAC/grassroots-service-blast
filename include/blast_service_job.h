@@ -213,7 +213,13 @@ BLAST_SERVICE_LOCAL bool UpdateBlastServiceJob (ServiceJob *job_p);
 BLAST_SERVICE_LOCAL bool ProcessLinkedServicesForBlastServiceJobOutput (Service *service_p, ServiceJob *job_p, LinkedService *linked_service_p);
 
 
-
+/**
+ * This is the callback function used by an AsyncTask that is called when a BlastServiceJob has
+ * completed running. This is used when by AsyncSystemBlastTool objects.
+ *
+ * @param job_p The BlastServiceJob that has completed running.
+ * @memberof BlastServiceJob
+ */
 BLAST_SERVICE_LOCAL void BlastServiceJobCompleted (ServiceJob *job_p);
 
 

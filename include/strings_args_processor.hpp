@@ -61,6 +61,12 @@ public:
 	 */
 	virtual bool AddArg (const char *arg_s, const bool hyphen_flag);
 
+	/**
+	 * Get the complete set of arguments as an array of strings.
+	 * The final element in the array will be <code>NULL</code>
+	 *
+	 * @return The arguments as a string
+	 */
 	char **GetArgsAsStrings ();
 
 private:
