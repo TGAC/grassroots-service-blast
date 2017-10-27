@@ -47,6 +47,11 @@ class BLAST_SERVICE_LOCAL BlastToolFactory
 {
 public:
 
+	/**
+	 * The BlastToolFactory constructor.
+	 *
+	 * @param service_config_p The JSON fragment containing the configuration data for this BlastToolFactory.
+	 */
 	BlastToolFactory (const json_t *service_config_p);
 
 	/**
@@ -104,9 +109,10 @@ public:
 	virtual Synchronicity GetToolsSynchronicity () const = 0;
 
 
-	//virtual AsyncTaskConsumer *GetAsyncTaskConsumer ();
-
 protected:
+	/**
+	 * The JSON fragment containing the configuration data for this BlastToolFactory
+	 */
 	const json_t *btf_service_config_p;
 
 };

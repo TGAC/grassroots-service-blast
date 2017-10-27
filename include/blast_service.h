@@ -243,6 +243,7 @@ extern "C"
  * @param user_p The details for the user accessing the BLAST Services.
  * @return The ServicesArray containing all of the BLAST Services or
  * <code>NULL</code> upon error.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_API ServicesArray *GetServices (UserDetails *user_p);
 
@@ -251,6 +252,7 @@ BLAST_SERVICE_API ServicesArray *GetServices (UserDetails *user_p);
  * Free the ServicesArray and its associated BLAST Services.
  *
  * @param services_p The ServicesArray to free.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_API void ReleaseServices (ServicesArray *services_p);
 
@@ -264,6 +266,7 @@ BLAST_SERVICE_API void ReleaseServices (ServicesArray *services_p);
  * @param providers_p The details of ExternalServers for any paired or external Blast Services.
  * @param app_params_p The parser used for the current type of BlastTool.
  * @return The ServiceJobSet with the BlastServiceJobs or <code>NULL</code> upon error.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p, BlastAppParameters *app_params_p);
 
@@ -275,7 +278,7 @@ BLAST_SERVICE_LOCAL ServiceJobSet *RunBlastService (Service *service_p, Paramete
  * @param data_p The BlastServcieData to check.
  * @return <code>true</code> if the configuration details are sufficient,
  * <code>false</code> otherwise.
- * @memberof BlastServiceData
+ * @memberof BlastServiceData * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL bool GetBlastServiceConfig (BlastServiceData *data_p);
 
@@ -306,6 +309,7 @@ BLAST_SERVICE_LOCAL void FreeBlastServiceData (BlastServiceData *data_p);
  * @param service_p The Blast Service to close.
  * @return <code>true</code> if the Blast Service was closed successfully, <code>
  * false</code> otherwise.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL bool CloseBlastService (Service *service_p);
 
@@ -319,6 +323,7 @@ BLAST_SERVICE_LOCAL bool CloseBlastService (Service *service_p);
  * @param handler_p The appropriate Handler for accessing the given Resource.
  * @return The partially-completed ParameterSet if the Resource is an appropriate one
  * or <code>NULL</code> if it is not valid for running a Blast search against.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_p, Handler *handler_p);
 
@@ -333,6 +338,7 @@ BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p,
  * this optional callback function can be used.
  * @return <code>true</code> if the Parameters were added successfully, <code>false</code>
  * otherwise.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, bool (*add_additional_params_fn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p));
 
@@ -342,6 +348,7 @@ BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p
  *
  * @param service_p The BlastService of the same type that allocated the given ParameterSet.
  * @param params_p The ParameterSet to free.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL void ReleaseBlastServiceParameters (Service *service_p, ParameterSet *params_p);
 
@@ -352,6 +359,7 @@ BLAST_SERVICE_LOCAL void ReleaseBlastServiceParameters (Service *service_p, Para
  * @param job_p The BlastServiceJob to get the results for.
  * @return <code>true</code> if the results were added successfully, <code>false</code>
  * otherwise.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL bool DetermineBlastResult ( struct BlastServiceJob *job_p);
 
@@ -362,6 +370,7 @@ BLAST_SERVICE_LOCAL bool DetermineBlastResult ( struct BlastServiceJob *job_p);
  * @param service_p The Blast Service of the type which ran the BlastServiceJob.
  * @param service_id The UUID for the given BlastServiceJob.
  * @return The OperationStatus for the given BlastServiceJob.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL OperationStatus GetBlastServiceStatus (Service *service_p, const uuid_t service_id);
 
@@ -374,6 +383,7 @@ BLAST_SERVICE_LOCAL OperationStatus GetBlastServiceStatus (Service *service_p, c
  * @param job_id The UUID of the BlastServiceJob to check.
  * @return A newly-allocated TempFile with the relevant values or <code>NULL</code>
  * upon error.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_directory_s, const uuid_t job_id);
 
@@ -387,6 +397,7 @@ BLAST_SERVICE_LOCAL TempFile *GetInputTempFile (const ParameterSet *params_p, co
  * @return A newly-allocated string containing the results in the requested format
  * or <code>NULL</code> upon error.
  * @see GetBlastResultByUUIDString
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL char *GetBlastResultByUUID (const BlastServiceData *data_p, const uuid_t job_id, const uint32 output_format_code);
 
@@ -400,6 +411,7 @@ BLAST_SERVICE_LOCAL char *GetBlastResultByUUID (const BlastServiceData *data_p, 
  * @return A newly-allocated string containing the results in the requested format
  * or <code>NULL</code> upon error.
  * @see GetBlastResultByUUID
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *job_id_s, const uint32 output_format_code);
 
@@ -415,6 +427,7 @@ BLAST_SERVICE_LOCAL char *GetBlastResultByUUIDString (const BlastServiceData *da
  * or <code>NULL</code> upon error.
  * @see GetBlastResultByUUIDString
  * @see CreateJobsForPreviousResults
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast_data_p, const uint32 output_format_code);
 
@@ -428,6 +441,7 @@ BLAST_SERVICE_LOCAL ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, Bla
  * @return The ServiceJobSet containing the results in the requested output format
  * or <code>NULL</code> upon error.
  * @see GetPreviousJobResults
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char *ids_s, BlastServiceData *blast_data_p);
 
@@ -439,6 +453,7 @@ BLAST_SERVICE_LOCAL ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *p
  * @param param_set_p The ParameterSet for specifying the configuration of the BlastServiceJobs.
  * @param jobs_p The ServiceJobSet containing the BlastServiceJobs.
  * @param data_p The Blast Service configuration data.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, ServiceJobSet *jobs_p, BlastServiceData *data_p);
 
@@ -449,6 +464,7 @@ BLAST_SERVICE_LOCAL void PrepareBlastServiceJobs (const DatabaseInfo *db_p, cons
  * @param service_p The type of Blast Service that previously created the BlastServiceJob.
  * @param service_job_json_p The JSON fragment representing the BlastServiceJob.
  * @return The BlastServiceJob or <code>NULL</code> upon error.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL ServiceJob *BuildBlastServiceJob (struct Service *service_p, const json_t *service_job_json_p);
 
@@ -462,6 +478,7 @@ BLAST_SERVICE_LOCAL ServiceJob *BuildBlastServiceJob (struct Service *service_p,
  * the ServiceJob will be returned. If it is <code>false</code> then the job results will be included too if possible.
  * @return The JSON fragment representing the BlastServiceJob or <code>NULL</code>
  * upon error.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL json_t *BuildBlastServiceJobJSON (Service * UNUSED_PARAM (service_p), ServiceJob *service_job_p, bool omit_results_flag);
 
@@ -484,6 +501,7 @@ BLAST_SERVICE_LOCAL void CustomiseBlastServiceJob (Service *service_p, ServiceJo
  * @param name_s The service-configured name.
  * @return The corresponding BLAST database filename or <code>NULL</code> if it could
  * not be found.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL const char *GetMatchingDatabaseFilename (const BlastServiceData *data_p, const char *name_s);
 
@@ -495,6 +513,7 @@ BLAST_SERVICE_LOCAL const char *GetMatchingDatabaseFilename (const BlastServiceD
  * @param filename_s The BLAST database filename.
  * @return The corresponding service-configured name or <code>NULL</code> if it could
  * not be found.
+ * @ingroup blast_service
  */
 BLAST_SERVICE_LOCAL const char *GetMatchingDatabaseName (const BlastServiceData *data_p, const char *filename_s);
 
@@ -508,6 +527,7 @@ BLAST_SERVICE_LOCAL const char *GetMatchingDatabaseName (const BlastServiceData 
  * @param filename_s The BLAST database filename.
  * @return The corresponding DatabaseInfo object or <code>NULL</code> if it could
  * not be found.
+ * @ingroup blast_service
  */
 const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_p, const char *filename_s);
 

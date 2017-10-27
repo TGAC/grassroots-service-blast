@@ -67,10 +67,15 @@ BLAST_SERVICE_LOCAL bool AddPairedServiceParameters (Service *service_p, Paramet
 BLAST_SERVICE_LOCAL char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32 output_format_code, const BlastServiceData *blast_data_p);
 
 
-
-BLAST_SERVICE_LOCAL int32 AddRemoteResultsToBlastServiceJobs (const json_t *server_response_p, ServiceJobSet *jobs_p, const char * const remote_service_s, const char * const remote_uri_s, const ServiceData *service_data_p);
-
-
+/**
+ * Save the results of a RemoteServiceJob to a local file for ease of access
+ *
+ * @param job_p The RemoteServiceJob whose results will be saved.
+ * @param blast_data_p The Service configuration data.
+ * @return <code>true</code> if the results were saved successfully, <code>
+ * false</code> otherwise.
+ * @ingroup blast_service
+ */
 BLAST_SERVICE_LOCAL bool SaveRemoteBlastJobDetails (RemoteServiceJob *job_p, const ServiceData *blast_data_p);
 
 
