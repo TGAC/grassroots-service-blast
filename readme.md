@@ -57,7 +57,7 @@ Each of the three services listed above can be configured by files with the same
     * **system**: This will be run using the executable specified by *blast_command* to the ANSI-specified *system()* function. This is the default *blast_tool* option.
     * **drmaa**: This will be run by submitting a job to a DRMAA environment.
 
-An example configuration file for the BlastN service which would be saved as the ```<Grassroots directory>/ config/BlastN service``` is:
+An example configuration file for the BlastN service which would be saved as the ```<Grassroots directory>/config/BlastN service``` is:
 
 ~~~{.json}
 {
