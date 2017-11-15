@@ -519,6 +519,8 @@ BLAST_SERVICE_LOCAL const char *GetMatchingDatabaseName (const BlastServiceData 
 
 
 
+BLAST_SERVICE_LOCAL ServiceMetadata *GetGeneralBlastServiceMetadata (Service *service_p);
+
 
 /**
  * For a given BLAST database filename, find the corresponding DatabaseInfo object.
@@ -529,7 +531,7 @@ BLAST_SERVICE_LOCAL const char *GetMatchingDatabaseName (const BlastServiceData 
  * not be found.
  * @ingroup blast_service
  */
-const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_p, const char *filename_s);
+BLAST_SERVICE_LOCAL const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_p, const char *filename_s);
 
 
 #ifdef __cplusplus

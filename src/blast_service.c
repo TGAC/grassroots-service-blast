@@ -1240,6 +1240,53 @@ void FreeBlastServiceData (BlastServiceData *data_p)
 }
 
 
+ServiceMetadata *GetGeneralBlastServiceMetadata (Service *service_p)
+{
+	const char *term_url_s = "http://edamontology.org/operation_0491";
+	SchemaTerm *category_p = AllocateSchemaTerm (term_url_s, "Pairwise sequence alignment", "Methods might perform one-to-one, one-to-many or many-to-many comparisons. Align exactly two molecular sequences.");
+
+	if (category_p)
+		{
+			ServiceMetadata *metadata_p = AllocateServiceMetadata (category_p, NULL);
+
+			if (metadata_p)
+				{
+					SchemaTerm *output_p;
+
+					term_url_s = "http://edamontology.org/format_1333";
+					output_p = AllocateSchemaTerm (term_url_s, "BLAST results", "Format of results of a sequence database search using some variant of BLAST. This includes score data, alignment data and summary table.");
+
+					if (output_p)
+						{
+							if (AddSchemaTermToServiceMetadataOutput (metadata_p, output_p))
+								{
+									return metadata_p;
+								}
+							else
+								{
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add output term %s to service metadata", term_url_s);
+									FreeSchemaTerm (output_p);
+								}
+
+						}		/* if (output_p) */
+					else
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate output term %s for service metadata", term_url_s);
+						}
+
+				}		/* if (metadata_p) */
+
+		}		/* if (category_p) */
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate category term %s for service metadata", term_url_s);
+		}
+
+	return NULL;
+}
+
+
+
 /*
  * STATIC FUNCTIONS 
  */

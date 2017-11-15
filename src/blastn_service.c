@@ -117,7 +117,39 @@ static const char *GetBlastNServiceDescription (Service * UNUSED_PARAM (service_
 
 static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p)
 {
-	ServiceMetadata *metadata_p = AllocateServiceMetadata ();
+	ServiceMetadata *metadata_p = GetGeneralBlastServiceMetadata (service_p);
+
+	if (metadata_p)
+		{
+			const char *term_url_s = "http://edamontology.org/data_2977";
+			SchemaTerm *input_p = AllocateSchemaTerm (term_url_s, "Nucleic acid sequence", "One or more nucleic acid sequences, possibly with associated annotation.");
+
+			if (input_p)
+				{
+					if (AddSchemaTermToServiceMetadataInput (metadata_p, input_p))
+						{
+							return metadata_p;
+						}		/* if (AddSchemaTermToServiceMetadataInput (metadata_p, input_p)) */
+					else
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add input term %s to service metadata", term_url_s);
+							FreeSchemaTerm (input_p);
+						}
+
+				}		/* if (input_p) */
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate input term %s for service metadata", term_url_s);
+				}
+
+			FreeServiceMetadata (metadata_p);
+		}		/* if (metadata_p) */
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate base service metadata");
+		}
+
+	return NULL;
 }
 
 

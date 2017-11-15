@@ -72,6 +72,7 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 
 static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
+static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p);
 
 
 /*******************************/
@@ -89,7 +90,7 @@ Service *GetBlastPService ()
 
 			if (data_p)
 				{
-					InitialiseService (protein_blast_service_p,
+					if (InitialiseService (protein_blast_service_p,
 														 GetProteinBlastServiceName,
 														 GetProteinBlastServiceDescription,
 														 NULL,
@@ -101,11 +102,13 @@ Service *GetBlastPService ()
 														 CustomiseBlastServiceJob,
 														 true,
 														 SY_SYNCHRONOUS,
-														 (ServiceData *) data_p);
-
-					if (GetBlastServiceConfig (data_p))
+														 (ServiceData *) data_p,
+														 GetBlastPServiceMetadata))
 						{
-							return protein_blast_service_p;
+							if (GetBlastServiceConfig (data_p))
+								{
+									return protein_blast_service_p;
+								}
 						}
 				}
 
@@ -360,3 +363,40 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 }
 
 
+
+static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p)
+{
+	ServiceMetadata *metadata_p = GetGeneralBlastServiceMetadata (service_p);
+
+	if (metadata_p)
+		{
+			const char *term_url_s = "http://edamontology.org/data_2976";
+			SchemaTerm *input_p = AllocateSchemaTerm (term_url_s, "Protein sequence", "One or more protein sequences, possibly with associated annotation.");
+
+			if (input_p)
+				{
+					if (AddSchemaTermToServiceMetadataInput (metadata_p, input_p))
+						{
+							return metadata_p;
+						}		/* if (AddSchemaTermToServiceMetadataInput (metadata_p, input_p)) */
+					else
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add input term %s to service metadata", term_url_s);
+							FreeSchemaTerm (input_p);
+						}
+
+				}		/* if (input_p) */
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate input term %s for service metadata", term_url_s);
+				}
+
+			FreeServiceMetadata (metadata_p);
+		}		/* if (metadata_p) */
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate base service metadata");
+		}
+
+	return NULL;
+}
