@@ -46,6 +46,9 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *r
 
 static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
+static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p);
+
+
 static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p);
 
 static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p);
@@ -70,7 +73,7 @@ Service *GetBlastNService ()
 
 			if (data_p)
 				{
-					InitialiseService (nucleotide_blast_service_p,
+					if (InitialiseService (nucleotide_blast_service_p,
 														 GetBlastNServiceName,
 														 GetBlastNServiceDescription,
 														 NULL,
@@ -82,12 +85,13 @@ Service *GetBlastNService ()
 														 CustomiseBlastServiceJob,
 														 true,
 														 SY_SYNCHRONOUS,
-														 (ServiceData *) data_p);
-
-
-					if (GetBlastServiceConfig (data_p))
+														 (ServiceData *) data_p,
+														 GetBlastNServiceMetadata))
 						{
-							return nucleotide_blast_service_p;
+							if (GetBlastServiceConfig (data_p))
+								{
+									return nucleotide_blast_service_p;
+								}
 						}
 				}
 
@@ -108,6 +112,12 @@ static const char *GetBlastNServiceName (Service * UNUSED_PARAM (service_p))
 static const char *GetBlastNServiceDescription (Service * UNUSED_PARAM (service_p))
 {
 	return "A service to search nucleotide databases with nucleotide queries";
+}
+
+
+static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p)
+{
+	ServiceMetadata *metadata_p = AllocateServiceMetadata ();
 }
 
 
