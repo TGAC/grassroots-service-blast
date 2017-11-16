@@ -370,7 +370,7 @@ static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p)
 
 	if (metadata_p)
 		{
-			const char *term_url_s = "http://edamontology.org/data_2976";
+			const char *term_url_s = CONTEXT_PREFIX_EDAM_ONTOLOGY_S "data_2976";
 			SchemaTerm *input_p = AllocateSchemaTerm (term_url_s, "Protein sequence", "One or more protein sequences, possibly with associated annotation.");
 
 			if (input_p)

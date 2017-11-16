@@ -121,7 +121,7 @@ static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p)
 
 	if (metadata_p)
 		{
-			const char *term_url_s = "http://edamontology.org/data_2977";
+			const char *term_url_s = CONTEXT_PREFIX_EDAM_ONTOLOGY_S  "data_2977";
 			SchemaTerm *input_p = AllocateSchemaTerm (term_url_s, "Nucleic acid sequence", "One or more nucleic acid sequences, possibly with associated annotation.");
 
 			if (input_p)
