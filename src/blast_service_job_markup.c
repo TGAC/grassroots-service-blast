@@ -866,65 +866,58 @@ LinkedList *GetScaffoldsFromHit (const json_t *hit_p, const DatabaseInfo *db_p)
 
 									if (value_s)
 										{
-											json_t *data_p = json_object ();
+											StringListNode *node_p = NULL;
 
-											if (data_p)
+											if (db_p -> di_scaffold_regex_s)
 												{
-													StringListNode *node_p = NULL;
+													RegExp *reg_ex_p = AllocateRegExp (32);
 
-													if (db_p -> di_scaffold_regex_s)
+													if (reg_ex_p)
 														{
-															RegExp *reg_ex_p = AllocateRegExp (32);
-
-															if (reg_ex_p)
+															if (SetPattern (reg_ex_p, db_p -> di_scaffold_regex_s, 0))
 																{
-																	if (SetPattern (reg_ex_p, db_p -> di_scaffold_regex_s, 0))
+																	if (MatchPattern (reg_ex_p, value_s))
 																		{
-																			if (MatchPattern (reg_ex_p, value_s))
+																			/*
+																			 * We only want the first match for the scaffold name
+																			 */
+																			char *match_s = GetNextMatch (reg_ex_p);
+
+																			if (match_s)
 																				{
-																					/*
-																					 * We only want the first match for the scaffold name
-																					 */
-																					char *match_s = GetNextMatch (reg_ex_p);
+																					node_p = AllocateStringListNode (match_s, MF_SHALLOW_COPY);
 
-																					if (match_s)
+																					if (!node_p)
 																						{
-																							node_p = AllocateStringListNode (match_s, MF_SHALLOW_COPY);
-
-																							if (!node_p)
-																								{
-																									FreeCopiedString (match_s);
-																									PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add \"%s\" to list of scaffold names", match_s);
-																								}
+																							FreeCopiedString (match_s);
+																							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add \"%s\" to list of scaffold names", match_s);
 																						}
-
 																				}
+
 																		}
-
-
-																	FreeRegExp (reg_ex_p);
 																}
 
-														}
-													else
-														{
-															node_p = AllocateStringListNode (value_s, MF_DEEP_COPY);
 
-															if (!node_p)
-																{
-																	PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add \"%s\" to list of scaffold names", value_s);
-																}
-
+															FreeRegExp (reg_ex_p);
 														}
 
+												}
+											else
+												{
+													node_p = AllocateStringListNode (value_s, MF_DEEP_COPY);
 
-													if (node_p)
+													if (!node_p)
 														{
-															LinkedListAddTail (scaffolds_p, (ListItem *) node_p);
-														}		/* if (node_p) */
+															PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add \"%s\" to list of scaffold names", value_s);
+														}
+
+												}
 
 
-												}		/* if (data_p) */
+											if (node_p)
+												{
+													LinkedListAddTail (scaffolds_p, (ListItem *) node_p);
+												}		/* if (node_p) */
 
 										}
 
@@ -1567,6 +1560,7 @@ bool GetAndAddScaffoldsFromHit (const json_t *hit_p, json_t *mark_up_p, const Da
 
 				}		/* if (scaffolds_array_p) */
 
+			FreeLinkedList (scaffolds_p);
 		}		/* if (scaffolds_p) */
 
 	return success_flag;
@@ -2104,10 +2098,11 @@ static bool AddSoftwareVersion (const json_t *blast_report_p, json_t *software_m
 					if (*end_p != '\0')
 						{
 							const size_t l = end_p - start_p;
+							char *copied_value_s = CopyToNewString (start_p, l, false);
 
-							if ((value_s = CopyToNewString (start_p, l, false)) != NULL)
+							if (copied_value_s)
 								{
-									if (json_object_set_new (software_mark_up_p, "softwareVersion", json_string (value_s)) == 0)
+									if (json_object_set_new (software_mark_up_p, "softwareVersion", json_string (copied_value_s)) == 0)
 										{
 											success_flag = true;
 										}
@@ -2115,6 +2110,8 @@ static bool AddSoftwareVersion (const json_t *blast_report_p, json_t *software_m
 										{
 											PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, software_mark_up_p, "Failed to add \"softwareVersion\": \"%s\"", value_s);
 										}
+
+									FreeCopiedString (copied_value_s);
 								}
 							else
 								{

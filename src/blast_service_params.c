@@ -235,16 +235,15 @@ Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, P
 
 					param_p = CreateAndAddParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_type, false, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", options_p, def, NULL, NULL, PL_ALL, NULL);
 
+					if (def.st_string_value_s)
+						{
+							FreeCopiedString (def.st_string_value_s);
+						}
+
+
 					if (param_p)
 						{
 							return param_p;
-						}
-					else
-						{
-							if (def.st_string_value_s)
-								{
-									FreeCopiedString (def.st_string_value_s);
-								}
 						}
 				}
 
