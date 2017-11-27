@@ -180,7 +180,7 @@ BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, Bla
 
 			if (blast_job_p)
 				{
-					blast_job_p -> bsj_tool_p = NULL;
+					memset (blast_job_p, 0, sizeof (BlastServiceJob));
 
 					if (InitServiceJobFromJSON (& (blast_job_p -> bsj_job), job_json_p))
 						{
@@ -218,6 +218,10 @@ BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, Bla
 												}
 
 										}		/* if (strcmp (factory_name_s, config_factory_name_s) == 0) */
+									else
+										{
+											PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, job_json_p, "job factory name \"%s\" does't match config factory name \"%s\"", factory_name_s, config_factory_name_s);
+										}
 
 								}		/* if (factory_name_s) */
 							else
