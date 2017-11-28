@@ -218,7 +218,7 @@ char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32
 
 																							if (res_p)
 																								{
-																									int32 num_added = AddRemoteResultsToServiceJobs (res_p, service_p -> se_jobs_p, service_name_s, uri_s, service_p -> se_data_p, SaveRemoteBlastJobDetails);
+																									int32 num_added = AddRemoteResultsToServiceJobs (res_p, service_p, service_name_s, uri_s, service_p -> se_data_p, SaveRemoteBlastJobDetails);
 
 																									#if PAIRED_BLAST_SERVICE_DEBUG >= STM_LEVEL_FINE
 																									PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Added " INT32_FMT " jobs from remote results");

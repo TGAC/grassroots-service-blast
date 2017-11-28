@@ -451,12 +451,11 @@ BLAST_SERVICE_LOCAL ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *p
  *
  * @param db_p The list of available databases terminated by <code>NULL</code>.
  * @param param_set_p The ParameterSet for specifying the configuration of the BlastServiceJobs.
- * @param jobs_p The ServiceJobSet containing the BlastServiceJobs.
+ * @param jobs_p The BlastService.
  * @param data_p The Blast Service configuration data.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, ServiceJobSet *jobs_p, BlastServiceData *data_p);
-
+BLAST_SERVICE_LOCAL void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, Service *service_p, BlastServiceData *data_p);
 
 /**
  * Create a BlastServiceJob from a JSON-based serialisation.

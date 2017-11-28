@@ -566,6 +566,8 @@ static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked
 
 void BlastServiceJobCompleted (ServiceJob *job_p)
 {
+	Service *service_p = job_p -> sj_service_p;
+
 	if (job_p -> sj_result_p == NULL)
 		{
 			BlastServiceJob *blast_job_p = (BlastServiceJob *) job_p;
@@ -579,6 +581,27 @@ void BlastServiceJobCompleted (ServiceJob *job_p)
 					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to get result for \"%s\"", uuid_s);
 				}
 		}
+
+	/*
+	if (RemoveServiceJobFromService (service_p, job_p))
+		{
+			FreeBlastServiceJob (job_p);
+
+			if (!IsServiceLive (service_p))
+				{
+					FreeService (service_p);
+				}
+
+		}
+	else
+		{
+			char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+			ConvertUUIDToString (job_p -> sj_id, uuid_s);
+
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "failed to remove blast job \"%s\" (%s) from \"%s\"", job_p -> sj_name_s, uuid_s, GetServiceName (job_p -> sj_service_p));
+		}
+	*/
 }
 
 

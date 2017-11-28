@@ -38,7 +38,11 @@
 SystemBlastTool :: SystemBlastTool (BlastServiceJob *job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const char *blast_program_name_s)
 : ExternalBlastTool (job_p, name_s, factory_s, data_p, blast_program_name_s, false)
 {
-	if (!Init (blast_program_name_s))
+	#if SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINER
+	PrintLog (STM_LEVEL_FINER, __FILE__, __LINE__, "Creating SystemBlastTool %.16X for job \"%s\" at %.16X", this, job_p -> bsj_job.sj_name_s, job_p);
+	#endif
+
+if (!Init (blast_program_name_s))
 		{
 			throw std :: bad_alloc ();
 		}
@@ -48,6 +52,10 @@ SystemBlastTool :: SystemBlastTool (BlastServiceJob *job_p, const char *name_s, 
 SystemBlastTool :: SystemBlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *root_p)
 	: ExternalBlastTool (job_p, data_p, root_p),  sbt_args_processor_p (0)
 {
+	#if SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINER
+	PrintLog (STM_LEVEL_FINER, __FILE__, __LINE__, "Creating SystemBlastTool %.16X for job \"%s\" at %.16X", this, job_p -> bsj_job.sj_name_s, job_p);
+	#endif
+
 	if (!Init (ebt_blast_s))
 		{
 			throw std :: bad_alloc ();
@@ -73,6 +81,10 @@ bool SystemBlastTool :: Init (const char *prog_s)
 
 SystemBlastTool :: ~SystemBlastTool ()
 {
+	#if SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINER
+	PrintLog (STM_LEVEL_FINER, __FILE__, __LINE__, "Destroying SystemBlastTool at %.16X", this);
+	#endif
+
 	if (sbt_args_processor_p)
 		{
 			delete sbt_args_processor_p;

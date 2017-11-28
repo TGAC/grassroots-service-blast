@@ -53,6 +53,8 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 
 static bool PreRunJobs (BlastServiceData *blast_data_p);
 
+static bool CleanupAsyncBlastService (void *data_p);
+
 
 /*
  * API FUNCTIONS
@@ -177,7 +179,7 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 			if (service_p -> se_jobs_p)
 				{
 					/* Get all of the selected databases and create a BlastServiceJob for each one */
-					PrepareBlastServiceJobs (blast_data_p -> bsd_databases_p, param_set_p, service_p -> se_jobs_p, blast_data_p);
+					PrepareBlastServiceJobs (blast_data_p -> bsd_databases_p, param_set_p, service_p, blast_data_p);
 
 					if (GetServiceJobSetSize (service_p -> se_jobs_p) > 0)
 						{
@@ -326,13 +328,14 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 		}		/* if (ids_p) */
 	else
 		{
-			jobs_p = AllocateServiceJobSet (blast_data_p -> bsd_base_data.sd_service_p);
+			Service *service_p = blast_data_p -> bsd_base_data.sd_service_p;
+			jobs_p = AllocateServiceJobSet (service_p);
 
 			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to parse \"%s\" to get uuids", ids_s);
 
 			if (jobs_p)
 				{
-					ServiceJob *job_p = CreateAndAddServiceJobToServiceJobSet (jobs_p, ids_s, "Failed UUID lookup", NULL, NULL, NULL);
+					ServiceJob *job_p = CreateAndAddServiceJobToService (service_p, ids_s, "Failed UUID lookup", NULL, NULL, NULL, false);
 
 					if (job_p)
 						{
@@ -474,7 +477,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 				{
 					ServiceJob *job_p = (ServiceJob *) blast_job_p;
 
-					if (AddServiceJobToServiceJobSet (jobs_p, (ServiceJob *) job_p))
+					if (AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
 						{
 							uuid_t job_id;
 							StringListNode *node_p = (StringListNode *) (ids_p -> ll_head_p);
@@ -593,7 +596,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 							SetServiceJobStatus (job_p, status);
 
-						}		/* if (AddServiceJobToServiceJobSet (jobs_p, (ServiceJob *) job_p)) */
+						}		/* if (AddServiceJobToService (jservice_p, (ServiceJob *) job_p)) */
 
 				}		/* if (job_p) */
 			else
@@ -608,7 +611,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 
 
-void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, ServiceJobSet *jobs_p, BlastServiceData *data_p)
+void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, Service *service_p, BlastServiceData *data_p)
 {
 
 	if (db_p)
@@ -623,11 +626,11 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 							/* Is the database selected to search against? */
 							if (param_p -> pa_current_value.st_boolean_value)
 								{
-									BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (jobs_p -> sjs_service_p, db_p, data_p);
+									BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (service_p, db_p, data_p);
 
 									if (job_p)
 										{
-											if (!AddServiceJobToServiceJobSet (jobs_p, (ServiceJob *) job_p))
+											if (!AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add ServiceJob to the ServiceJobSet for \"%s\"", db_p -> di_name_s);
 													FreeBlastServiceJob (& (job_p -> bsj_job));
@@ -1165,7 +1168,7 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 													if (service_p -> se_synchronous == SY_ASYNCHRONOUS_ATTACHED)
 														{
-															data_p -> bsd_task_manager_p = AllocateAsyncTasksManager (GetServiceName (service_p));
+															data_p -> bsd_task_manager_p = AllocateAsyncTasksManager (GetServiceName (service_p), CleanupAsyncBlastService, service_p);
 
 															if (! (data_p -> bsd_task_manager_p))
 																{
@@ -1490,15 +1493,50 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 
 static bool PreRunJobs (BlastServiceData *blast_data_p)
 {
+	bool success_flag = true;
+
 	if (blast_data_p -> bsd_task_manager_p)
 		{
+			Service *blast_service_p = blast_data_p -> bsd_base_data.sd_service_p;
+
 			PrepareAsyncTasksManager (blast_data_p -> bsd_task_manager_p);
 
 			/* If we have asynchronous jobs running then set the "is running" flag for this service */
-			SetServiceRunning (blast_data_p ->  bsd_base_data.sd_service_p, true);
+			SetServiceRunning (blast_service_p, true);
+
 		}
 
-	return true;
+	return success_flag;
+}
+
+
+static bool CleanupAsyncBlastService (void *data_p)
+{
+	bool success_flag = false;
+	Service *blast_service_p = (Service *) data_p;
+
+	if (LockService (blast_service_p))
+		{
+			/*
+			 * Since we could lock the Service, it means that the main program
+			 * thread has finished using it, so we're safe to delete it.
+			 */
+			if (UnlockService (blast_service_p))
+				{
+					FreeService (blast_service_p);
+					success_flag = true;
+				}
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to unlock service \"%s\"", GetServiceName (blast_service_p));
+				}
+		}
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to lock service \"%s\"", GetServiceName (blast_service_p));
+		}
+
+	return success_flag;
 }
 
 
