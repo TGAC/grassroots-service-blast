@@ -51,25 +51,11 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 : SystemBlastTool (job_p, name_s, factory_s, data_p, blast_program_name_s),
 	asbt_async_logfile_s (0)
 {
-	bool alloc_flag = false;
-
 	SetServiceJobUpdateFunction (& (job_p -> bsj_job), UpdateAsyncBlastServiceJob);
 
-	asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s, BlastServiceJobCompleted);
+	asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, data_p -> bsd_task_manager_p, true, blast_program_name_s, BlastServiceJobCompleted);
 
-	if (asbt_task_p)
-		{
-			if (AddAsyncTaskToAsyncTasksManager (data_p -> bsd_task_manager_p, asbt_task_p -> std_async_task_p, MF_SHADOW_USE))
-				{
-					alloc_flag = true;
-				}
-			else
-				{
-					FreeSystemAsyncTask (asbt_task_p);
-				}
-		}
-
-	if (!alloc_flag)
+	if (!asbt_task_p)
 		{
 			throw std :: bad_alloc ();
 		}
@@ -115,8 +101,7 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 
 					if (continue_flag)
 						{
-
-							asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, blast_program_name_s, BlastServiceJobCompleted);
+							asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, data_p -> bsd_task_manager_p, true, blast_program_name_s, BlastServiceJobCompleted);
 
 							if (asbt_task_p)
 								{

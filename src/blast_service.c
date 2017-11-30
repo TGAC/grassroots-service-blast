@@ -1236,7 +1236,10 @@ void FreeBlastServiceData (BlastServiceData *data_p)
 
 	if (data_p -> bsd_task_manager_p)
 		{
-			FreeAsyncTasksManager (data_p -> bsd_task_manager_p);
+			if (!IsAsyncTaskManagerRunning (data_p -> bsd_task_manager_p))
+				{
+					FreeAsyncTasksManager (data_p -> bsd_task_manager_p);
+				}
 		}
 
 	FreeMemory (data_p);
