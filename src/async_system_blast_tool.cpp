@@ -64,6 +64,11 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 
 AsyncSystemBlastTool :: ~AsyncSystemBlastTool ()
 {
+	if (asbt_async_logfile_s)
+		{
+			FreeCopiedString (asbt_async_logfile_s);
+		}
+
 	FreeSystemAsyncTask (asbt_task_p);
 }
 
