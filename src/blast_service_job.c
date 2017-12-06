@@ -34,6 +34,13 @@
 #include "json_util.h"
 
 
+
+#ifdef _DEBUG
+	#define BLAST_SERVICE_JOB_DEBUG	(STM_LEVEL_FINEST)
+#else
+	#define BLAST_SERVICE_JOB_DEBUG	(STM_LEVEL_NONE)
+#endif
+
 /*
  * STATIC DECLARATIONS
  */
@@ -97,9 +104,19 @@ void FreeBlastServiceJob (ServiceJob *job_p)
 {
 	BlastServiceJob *blast_job_p = (BlastServiceJob *) job_p;
 
+	#if BLAST_SERVICE_JOB_DEBUG >= STM_LEVEL_FINEST
+		{
+			char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+			ConvertUUIDToString (job_p -> sj_id, uuid_s);
+			PrintLog (BLAST_SERVICE_JOB_DEBUG, __FILE__, __LINE__, "FreeBlastServiceJob for \"%s\" at 0x%.16X", uuid_s, job_p);
+		}
+	#endif
+
 	if (blast_job_p -> bsj_tool_p)
 		{
 			FreeBlastTool (blast_job_p -> bsj_tool_p);
+			blast_job_p -> bsj_tool_p = NULL;
 		}
 
 	FreeBaseServiceJob (job_p);
@@ -145,6 +162,11 @@ char *GetPreviousJobFilename (const BlastServiceData *data_p, const char *job_id
 							job_output_filename_s = DetachByteBufferData (buffer_p);
 						}		/* if (AppendStringsToByteBuffer (buffer_p, data_p -> bsd_working_dir_s, sep, job_id_s, NULL)) */
 					else
+#ifdef _DEBUG
+	#define JSON_UTIL_DEBUG	(STM_LEVEL_FINE)
+#else
+	#define JSON_UTIL_DEBUG	(STM_LEVEL_NONE)
+#endif
 						{
 							FreeByteBuffer (buffer_p);
 							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Couldn't create full path to job file \"%s\"", job_id_s);
@@ -203,6 +225,16 @@ BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, Bla
 															blast_job_p -> bsj_tool_p = tool_p;
 
 															SetBlastServiceJobCallbacks (blast_job_p);
+
+															#if BLAST_SERVICE_JOB_DEBUG >= STM_LEVEL_FINEST
+																{
+																	char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+																	ConvertUUIDToString (blast_job_p -> bsj_job.sj_id, uuid_s);
+																	PrintLog (BLAST_SERVICE_JOB_DEBUG, __FILE__, __LINE__, "GetBlastServiceJobFromJSON for \"%s\" at 0X%.16X", uuid_s, blast_job_p);
+																}
+															#endif
+
 
 															return blast_job_p;
 														}		/* if (tool_p) */

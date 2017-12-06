@@ -39,6 +39,15 @@ const char * const BlastTool :: BT_OUTPUT_FORMAT_S = "output_format";
 
 
 
+
+#ifdef _DEBUG
+	#define BLAST_TOOL_DEBUG	(STM_LEVEL_FINEST)
+#else
+	#define BLAST_TOOL_DEBUG	(STM_LEVEL_NONE)
+#endif
+
+
+
 void FreeBlastTool (BlastTool *tool_p)
 {
 	delete tool_p;
@@ -89,6 +98,11 @@ BlastTool :: BlastTool (BlastServiceJob *service_job_p, const char *name_s, cons
 			SetServiceJobName (& (bt_job_p -> bsj_job), name_s);
 		}
 */
+
+	#if BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
+	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "BlastTool constructor at 0x%.16X for job 0x.16X", this, service_job_p);
+	#endif
+
 }
 
 
@@ -115,6 +129,11 @@ BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, 
 
 	bt_job_p = job_p;
 	bt_service_data_p = data_p;
+
+
+	#if BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
+	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "BlastTool constructor at 0x%.16X for job 0x.16X", this, job_p);
+	#endif
 }
 
 
@@ -156,7 +175,9 @@ const char *BlastTool :: GetFactoryName () const
 
 BlastTool :: ~BlastTool ()
 {
-
+	#if BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
+	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "BlastTool destructor for 0x%.16X", this);
+	#endif
 }
 
 
