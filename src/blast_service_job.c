@@ -162,11 +162,6 @@ char *GetPreviousJobFilename (const BlastServiceData *data_p, const char *job_id
 							job_output_filename_s = DetachByteBufferData (buffer_p);
 						}		/* if (AppendStringsToByteBuffer (buffer_p, data_p -> bsd_working_dir_s, sep, job_id_s, NULL)) */
 					else
-#ifdef _DEBUG
-	#define JSON_UTIL_DEBUG	(STM_LEVEL_FINE)
-#else
-	#define JSON_UTIL_DEBUG	(STM_LEVEL_NONE)
-#endif
 						{
 							FreeByteBuffer (buffer_p);
 							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Couldn't create full path to job file \"%s\"", job_id_s);
