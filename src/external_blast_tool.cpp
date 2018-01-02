@@ -115,9 +115,14 @@ char *ExternalBlastTool :: GetJobFilename (const char * const prefix_s, const ch
 ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const char * const blast_program_name_s, const bool async_flag)
 : BlastTool (job_p, name_s, factory_s, data_p, BS_DEFAULT_OUTPUT_FORMAT)
 {
+	ebt_blast_s = EasyCopyToNewString (blast_program_name_s);
+	if (!ebt_blast_s)
+		{
+			throw std :: invalid_argument ("blast executable name not set");
+		}
+
 	ebt_results_filename_s = 0;
 	ebt_working_directory_s = data_p -> bsd_working_dir_s;
-	ebt_blast_s = blast_program_name_s;
 	ebt_async_flag = async_flag;
 }
 
@@ -134,18 +139,19 @@ ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const BlastServi
 
 
 
-	ebt_blast_s = GetJSONString (root_p, EBT_COMMAND_LINE_EXECUTABLE_S);
+	ebt_blast_s = GetCopiedJSONString (root_p, EBT_COMMAND_LINE_EXECUTABLE_S);
 	if (!ebt_blast_s)
 		{
 			throw std :: invalid_argument ("blast executable name not set");
 		}
 
-	ebt_working_directory_s = GetJSONString (root_p, EBT_WORKING_DIR_S);
+	ebt_working_directory_s = GetCopiedJSONString (root_p, EBT_WORKING_DIR_S);
 	if (!ebt_working_directory_s)
 		{
 			throw std :: invalid_argument ("working directory not set");
 		}
 
+	ebt_results_filename_s = 0;
 	const char *result_s = GetJSONString (root_p, EBT_RESULTS_FILE_S);
 	if (result_s)
 		{
@@ -169,6 +175,12 @@ ExternalBlastTool :: ~ExternalBlastTool ()
 		{
 			FreeCopiedString (ebt_results_filename_s);
 		}
+
+	if (ebt_blast_s)
+		{
+			FreeCopiedString (ebt_blast_s);
+		}
+
 }
 
 

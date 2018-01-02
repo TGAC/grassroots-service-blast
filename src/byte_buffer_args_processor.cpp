@@ -24,6 +24,14 @@
 #include "byte_buffer_args_processor.hpp"
 #include "string_utils.h"
 #include "alloc_failure.hpp"
+#include "streams.h"
+
+
+#ifdef _DEBUG
+	#define BYTE_BUFFER_ARGS_PROCESSSOR_DEBUG	(STM_LEVEL_FINEST)
+#else
+	#define BYTE_BUFFER_ARGS_PROCESSSOR_DEBUG	(STM_LEVEL_NONE)
+#endif
 
 
 ByteBufferArgsProcessor :: ByteBufferArgsProcessor ()
@@ -34,11 +42,19 @@ ByteBufferArgsProcessor :: ByteBufferArgsProcessor ()
 		{
 			throw AllocFailure ("Failed to create data for ByteBufferArgsProcessor");
 		}
+
+	#if BYTE_BUFFER_ARGS_PROCESSSOR_DEBUG >= STM_LEVEL_FINEST
+	PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Allocated buffer at %.16X");
+	#endif
 }
 
 
 ByteBufferArgsProcessor :: ~ByteBufferArgsProcessor ()
 {
+	#if BYTE_BUFFER_ARGS_PROCESSSOR_DEBUG >= STM_LEVEL_FINEST
+	PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Freeing buffer at %.16X");
+	#endif
+
 	FreeByteBuffer (bbap_buffer_p);
 }
 

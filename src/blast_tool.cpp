@@ -87,10 +87,22 @@ OperationStatus GetBlastStatus (BlastTool *tool_p)
 BlastTool :: BlastTool (BlastServiceJob *service_job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const uint32 output_format)
 {
 	bt_job_p = service_job_p;
-	bt_name_s = name_s;
+
 	bt_service_data_p = data_p;
-	bt_factory_name_s = factory_s;
 	bt_output_format = output_format;
+
+
+	bt_factory_name_s = CopyToNewString (factory_s, 0, false);
+	if (!bt_factory_name_s)
+		{
+			throw std :: invalid_argument ("factory name not set");
+		}
+
+	bt_name_s = CopyToNewString (name_s, 0, false);
+	if (!bt_name_s)
+		{
+			throw std :: invalid_argument ("name not set");
+		}
 
 /*
 	if (service_job_p)
@@ -111,13 +123,13 @@ BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, 
 {
 	uint32 output_format = BS_DEFAULT_OUTPUT_FORMAT;
 
-	bt_factory_name_s = GetJSONString (root_p, BT_FACTORY_NAME_S);
+	bt_factory_name_s = GetCopiedJSONString (root_p, BT_FACTORY_NAME_S);
 	if (!bt_factory_name_s)
 		{
 			throw std :: invalid_argument ("factory name not set");
 		}
 
-	bt_name_s = GetJSONString (root_p, BT_NAME_S);
+	bt_name_s = GetCopiedJSONString (root_p, BT_NAME_S);
 	if (!bt_name_s)
 		{
 			throw std :: invalid_argument ("name not set");
@@ -132,7 +144,7 @@ BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, 
 
 
 	#if BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
-	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "BlastTool constructor at 0x%.16X for job 0x.16X", this, job_p);
+	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "BlastTool constructor at 0x%.16X for job 0x%.16X", this, job_p);
 	#endif
 }
 
@@ -178,6 +190,16 @@ BlastTool :: ~BlastTool ()
 	#if BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
 	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "BlastTool destructor for 0x%.16X", this);
 	#endif
+
+	if (bt_factory_name_s)
+		{
+			FreeCopiedString (bt_factory_name_s);
+		}
+
+	if (bt_name_s)
+		{
+			FreeCopiedString (bt_name_s);
+		}
 }
 
 

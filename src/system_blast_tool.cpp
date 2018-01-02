@@ -69,6 +69,10 @@ bool SystemBlastTool :: Init (const char *prog_s)
 
 	sbt_args_processor_p = new ByteBufferArgsProcessor ();
 
+	#if SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINER
+	PrintLog (STM_LEVEL_FINER, __FILE__, __LINE__, "SystemBlastTool at %.16X has sbt_args_processor_p at %.16X", this, sbt_args_processor_p);
+	#endif
+
 	if (AddBlastArg (prog_s, false))
 		{
 			success_flag = true;
@@ -82,7 +86,7 @@ bool SystemBlastTool :: Init (const char *prog_s)
 SystemBlastTool :: ~SystemBlastTool ()
 {
 	#if SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINER
-	PrintLog (STM_LEVEL_FINER, __FILE__, __LINE__, "Destroying SystemBlastTool at %.16X", this);
+	PrintLog (STM_LEVEL_FINER, __FILE__, __LINE__, "Destroying SystemBlastTool at %.16X that has sbt_args_processor_p at %.16X", this, sbt_args_processor_p);
 	#endif
 
 	if (sbt_args_processor_p)

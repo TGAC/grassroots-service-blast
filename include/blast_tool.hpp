@@ -208,14 +208,14 @@ protected:
 	 *
 	 * The name of this BlastTool.
 	 */
-	const char *bt_name_s;
+	char *bt_name_s;
 
 	/**
 	 * @private
 	 *
 	 * The name of the BlastToolFactpry that created this BlastTool.
 	 */
-	const char *bt_factory_name_s;
+	char *bt_factory_name_s;
 
 
 	/**

@@ -78,48 +78,43 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const Blas
 	asbt_async_logfile_s (0)
 {
 	bool alloc_flag = false;
+	bool async_flag;
 
-	if (Init (ebt_blast_s))
+	if (GetJSONBoolean (root_p, AsyncSystemBlastTool :: ASBT_ASYNC_S, &async_flag))
 		{
-			bool async_flag;
+			char *name_s = NULL;
+			char *blast_program_name_s = NULL;
+			bool continue_flag = true;
+			const char *value_s = GetJSONString (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S);
 
-			if (GetJSONBoolean (root_p, AsyncSystemBlastTool :: ASBT_ASYNC_S, &async_flag))
+			if (value_s)
 				{
-					char *name_s = NULL;
-					char *blast_program_name_s = NULL;
-					bool continue_flag = true;
-					const char *value_s = GetJSONString (root_p, AsyncSystemBlastTool :: ASBT_LOGFILE_S);
+					asbt_async_logfile_s = CopyToNewString (value_s, 0, false);
 
-					if (value_s)
+					if (!asbt_async_logfile_s)
 						{
-							asbt_async_logfile_s = CopyToNewString (value_s, 0, false);
-
-							if (!asbt_async_logfile_s)
-								{
-									continue_flag = false;
-								}
+							continue_flag = false;
 						}
-					else
-						{
-							asbt_async_logfile_s = NULL;
-						}
+				}
+			else
+				{
+					asbt_async_logfile_s = NULL;
+				}
 
-					if (continue_flag)
-						{
-							asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, data_p -> bsd_task_manager_p, true, blast_program_name_s, BlastServiceJobCompleted);
+			if (continue_flag)
+				{
+					asbt_task_p = AllocateSystemAsyncTask (& (job_p -> bsj_job), name_s, data_p -> bsd_task_manager_p, true, blast_program_name_s, BlastServiceJobCompleted);
 
-							if (asbt_task_p)
-								{
-									alloc_flag = true;
-								}
-						}
-
-					if (!alloc_flag)
+					if (asbt_task_p)
 						{
-							FreeCopiedString (asbt_async_logfile_s);
+							alloc_flag = true;
 						}
 				}
 
+			if (!alloc_flag)
+				{
+					FreeCopiedString (asbt_async_logfile_s);
+				}
 		}
 
 	if (!alloc_flag)

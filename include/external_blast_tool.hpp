@@ -169,7 +169,7 @@ protected:
 	 * The name of the blast command line
 	 * executable to use.
 	 */
-	const char *ebt_blast_s;
+	char *ebt_blast_s;
 
 
 	/**
