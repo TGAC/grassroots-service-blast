@@ -41,7 +41,7 @@ const char * const BlastTool :: BT_OUTPUT_FORMAT_S = "output_format";
 
 
 #ifdef _DEBUG
-	#define BLAST_TOOL_DEBUG	(STM_LEVEL_FINEST)
+	#define BLAST_TOOL_DEBUG	(STM_LEVEL_INFO)
 #else
 	#define BLAST_TOOL_DEBUG	(STM_LEVEL_NONE)
 #endif

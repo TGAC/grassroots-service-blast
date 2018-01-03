@@ -122,7 +122,12 @@ ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const char *name
 		}
 
 	ebt_results_filename_s = 0;
-	ebt_working_directory_s = data_p -> bsd_working_dir_s;
+	ebt_working_directory_s = EasyCopyToNewString (data_p -> bsd_working_dir_s);
+	if (!ebt_working_directory_s)
+		{
+			throw std :: invalid_argument ("working directory not set");
+		}
+
 	ebt_async_flag = async_flag;
 }
 
@@ -181,6 +186,10 @@ ExternalBlastTool :: ~ExternalBlastTool ()
 			FreeCopiedString (ebt_blast_s);
 		}
 
+	if (ebt_working_directory_s)
+		{
+			FreeCopiedString (ebt_working_directory_s);
+		}
 }
 
 
