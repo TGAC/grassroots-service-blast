@@ -162,7 +162,7 @@ protected:
 	 * input, output and log files will be
 	 * created.
 	 */
-	const char *ebt_working_directory_s;
+	char *ebt_working_directory_s;
 
 	/**
 	 *
