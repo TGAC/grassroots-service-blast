@@ -706,7 +706,7 @@ ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_
 					 */
 					if (db_p)
 						{
-							params_p = NULL; //GetBaseBlastServiceParameters (service_p, NULL, NULL);
+							params_p = GetServiceParameters (service_p, resource_p, NULL);
 
 							if (params_p)
 								{
@@ -753,6 +753,7 @@ ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_
 									if (!matched_db_flag)
 										{
 											ReleaseServiceParameters (service_p, params_p);
+											params_p = NULL;
 										}
 
 								}		/* if (params_p) */
