@@ -66,10 +66,22 @@ LDFLAGS += -L$(DIR_JANSSON_LIB) -ljansson \
 	-L$(DIR_GRASSROOTS_SERVER_LIB) -l$(GRASSROOTS_SERVER_LIB_NAME) \
 	-L$(DIR_GRASSROOTS_PARAMS_LIB) -l$(GRASSROOTS_PARAMS_LIB_NAME) \
 	-L$(DIR_GRASSROOTS_NETWORK_LIB) -l$(GRASSROOTS_NETWORK_LIB_NAME) \
-	-L$(DIR_TASk_SERVICES_LIB) -l$(GRASSROOTS_TASK_LIB_NAME) 
+	-L$(DIR_TASK_SERVICES_LIB) -l$(GRASSROOTS_TASK_LIB_NAME) 
 
 
-ifeq ($(DRMAA_ENABLED),1)
+add_drmaa = 0
+ifeq ($(SLURM_DRMAA_ENABLED), 1)
+    add_drmaa = 1
+endif
+ifeq ($(HTCONDOR_DRMAA_ENABLED), 1)
+    add_drmaa = 1
+endif
+ifeq ($(LSF_DRMAA_ENABLED), 1)
+    add_drmaa = 1
+endif
+
+
+ifeq ($(add_drmaa),1)
 SRCS += \
 	drmaa_blast_tool.cpp \
 	drmaa_blast_tool_factory.cpp \
