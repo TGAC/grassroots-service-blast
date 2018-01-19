@@ -91,7 +91,7 @@ BlastServiceJob *AllocateBlastServiceJob (Service *service_p, const char *job_na
 					return blast_job_p;
 				}		/* if (tool_p) */
 
-			FreeServiceJob (base_service_job_p);
+			ClearServiceJob (base_service_job_p);
 			FreeMemory (blast_job_p);
 		}		/* if (blast_job_p) */
 
