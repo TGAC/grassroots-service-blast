@@ -178,6 +178,9 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 
 			if (service_p -> se_jobs_p)
 				{
+					RunPairedServices (service_p, param_set_p, providers_p, SaveRemoteBlastJobDetails);
+
+
 					/* Get all of the selected databases and create a BlastServiceJob for each one */
 					PrepareBlastServiceJobs (blast_data_p -> bsd_databases_p, param_set_p, service_p, blast_data_p);
 
@@ -244,9 +247,6 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 
 
 						}		/* if (GetServiceJobSetSize (service_p -> se_jobs_p) > 0) */
-
-
-					RunPairedServices (service_p, param_set_p, providers_p, SaveRemoteBlastJobDetails);
 
 					if (GetServiceJobSetSize (service_p -> se_jobs_p) == 0)
 						{
@@ -1171,7 +1171,11 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 														{
 															data_p -> bsd_task_manager_p = AllocateAsyncTasksManager (GetServiceName (service_p), CleanupAsyncBlastService, service_p);
 
-															if (! (data_p -> bsd_task_manager_p))
+															if (data_p -> bsd_task_manager_p)
+																{
+																	SetServiceReleaseFunction (service_p, ReleaseBlastService);
+																}
+															else
 																{
 																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "AllocateAsyncTasksManager failed");
 																	success_flag = false;
@@ -1294,6 +1298,17 @@ ServiceMetadata *GetGeneralBlastServiceMetadata (Service *service_p)
 
 
 
+void ReleaseBlastService (Service *service_p)
+{
+	BlastServiceData *data_p = (BlastServiceData *) service_p -> se_data_p;
+
+	if (data_p -> bsd_task_manager_p)
+		{
+			IncrementAsyncTaskManagerCount (data_p -> bsd_task_manager_p);
+		}		/* if (data_p -> bsd_task_manager_p) */
+}
+
+
 /*
  * STATIC FUNCTIONS 
  */
@@ -1308,7 +1323,6 @@ static void InitBlastService (Service *blast_service_p)
 
 	blast_service_p -> se_process_linked_services_fn = ProcessLinkedServicesForBlastServiceJobOutput;
 }
-
 
 
 const char *GetMatchingDatabaseFilename (const BlastServiceData *data_p, const char *name_s)
@@ -1503,11 +1517,17 @@ static bool PreRunJobs (BlastServiceData *blast_data_p)
 		{
 			Service *blast_service_p = blast_data_p -> bsd_base_data.sd_service_p;
 
-			PrepareAsyncTasksManager (blast_data_p -> bsd_task_manager_p);
+			/*
+			 * Set the initial counter value to 1 which will take the system's call
+			 * to ReleaseService () into account once it has finished with this
+			 * Service. This is to make sure that the Service doesn't delete itself
+			 * after it has finished running all of its jobs asynchronously before
+			 * the system has finished with it and then accessing freed memory.
+			 */
+			PrepareAsyncTasksManager (blast_data_p -> bsd_task_manager_p, 1);
 
 			/* If we have asynchronous jobs running then set the "is running" flag for this service */
 			SetServiceRunning (blast_service_p, true);
-
 		}
 
 	return success_flag;

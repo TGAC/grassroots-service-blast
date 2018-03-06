@@ -533,6 +533,8 @@ BLAST_SERVICE_LOCAL ServiceMetadata *GetGeneralBlastServiceMetadata (Service *se
 BLAST_SERVICE_LOCAL const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_p, const char *filename_s);
 
 
+BLAST_SERVICE_LOCAL void ReleaseBlastService (Service *service_p);
+
 #ifdef __cplusplus
 }
 #endif
