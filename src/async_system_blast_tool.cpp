@@ -34,7 +34,7 @@
 
 
 #ifdef _DEBUG
-	#define ASYNC_SYSTEM_BLAST_TOOL_DEBUG (STM_LEVEL_FINE)
+	#define ASYNC_SYSTEM_BLAST_TOOL_DEBUG (STM_LEVEL_FINER)
 #else
 	#define ASYNC_SYSTEM_BLAST_TOOL_DEBUG (STM_LEVEL_NONE)
 #endif
@@ -59,6 +59,10 @@ AsyncSystemBlastTool :: AsyncSystemBlastTool (BlastServiceJob *job_p, const char
 		{
 			throw std :: bad_alloc ();
 		}
+
+	#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
+	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "Created AsyncSystemBlastTool at " %.16X " with task " %.16X " for job " %.16X " for service " %.16X " with name ", this, asbt_task_p, job_p, job_p -> bsj_job.sj_service_p, name_s);
+	#endif
 }
 
 
@@ -70,6 +74,10 @@ AsyncSystemBlastTool :: ~AsyncSystemBlastTool ()
 		}
 
 	FreeSystemAsyncTask (asbt_task_p);
+
+	#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
+	PrintLog (STM_LEVEL_FINEST, __FILE__, __LINE__, "Freed AsyncSystemBlastTool at " %.16X " with task " %.16X " for job " %.16X " for service " %.16X, this, asbt_task_p, job_p, job_p -> bsj_job.sj_service_p);
+	#endif
 }
 
 
