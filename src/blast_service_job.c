@@ -590,10 +590,9 @@ static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked
 }
 
 
-
 void BlastServiceJobCompleted (ServiceJob *job_p)
 {
-	Service *service_p = job_p -> sj_service_p;
+	JobsManager *manager_p = GetJobsManager ();
 
 	if (job_p -> sj_result_p == NULL)
 		{
@@ -609,26 +608,26 @@ void BlastServiceJobCompleted (ServiceJob *job_p)
 				}
 		}
 
-	/*
-	if (RemoveServiceJobFromService (service_p, job_p))
+	if (manager_p)
 		{
-			FreeBlastServiceJob (job_p);
-
-			if (!IsServiceLive (service_p))
+			if (!AddServiceJobToJobsManager (manager_p, job_p -> sj_id, job_p))
 				{
-					FreeService (service_p);
-				}
+					char uuid_s [UUID_STRING_BUFFER_SIZE];
+					const char *status_s = GetOperationStatusAsString (job_p -> sj_status);
 
-		}
+					ConvertUUIDToString (job_p -> sj_id, uuid_s);
+
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "AddServiceJobToJobsManager failed storing ServiceJob \"%s\" with status \"%s\"", uuid_s, status_s);
+				}		/* if (!AddServiceJobToJobsManager (manager_p, job_p -> sj_id, job_p) */
+
+		}		/* if (manager_p) */
 	else
 		{
 			char uuid_s [UUID_STRING_BUFFER_SIZE];
 
 			ConvertUUIDToString (job_p -> sj_id, uuid_s);
-
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "failed to remove blast job \"%s\" (%s) from \"%s\"", job_p -> sj_name_s, uuid_s, GetServiceName (job_p -> sj_service_p));
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "GetJobsManager failed storing completed ServiceJob \"%s\"", uuid_s);
 		}
-	*/
 }
 
 
