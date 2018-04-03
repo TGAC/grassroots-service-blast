@@ -664,6 +664,10 @@ json_t *ConvertBlastResultToGrassrootsMarkUp (const json_t *blast_job_output_p, 
 																				}		/* if (json_is_array (blast_hits_p)) */
 
 																		}		/* if (blast_hits_p) */
+																	else
+																		{
+
+																		}
 
 																}		/* if (marked_up_report_p) */
 
