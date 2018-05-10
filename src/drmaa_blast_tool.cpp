@@ -64,7 +64,7 @@ DrmaaBlastTool :: DrmaaBlastTool (BlastServiceJob *job_p, const char *name_s, co
 
 	if (drmaa_tool_p)
 		{
-			if (SetDrmaaToolQueueName (drmaa_tool_p, queue_name_s))
+			if ((queue_name_s == NULL) || (SetDrmaaToolQueueName (drmaa_tool_p, queue_name_s)))
 				{
 					if (SetDrmaaToolJobName (drmaa_tool_p, name_s))
 						{

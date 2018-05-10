@@ -72,67 +72,59 @@ BlastTool *DrmaaBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, con
 			/* Set the queue to use */
 			const char *queue_s = GetJSONString (drmaa_blast_tool_config_p, "queue");
 
-			if (queue_s)
+			const char *output_path_s = GetJSONString (blast_config_p, "working_directory");
+
+			if (output_path_s)
 				{
-					const char *output_path_s = GetJSONString (blast_config_p, "working_directory");
+					GetJSONBoolean (drmaa_blast_tool_config_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
 
-					if (output_path_s)
+
+					try
 						{
-							GetJSONBoolean (drmaa_blast_tool_config_p, ExternalBlastTool :: EBT_ASYNC_S, &async_flag);
-
-
-							try
-								{
-									drmaa_tool_p = new DrmaaBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s, queue_s, output_path_s, async_flag);
-								}
-							catch (std :: exception &ex_r)
-								{
-									PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to create drmaa blast tool, error \"%s\"", ex_r.what ());
-								}
-
-							if (drmaa_tool_p)
-								{
-									int i = 0;
-									const char *value_s = NULL;
-
-									/* Set the number of cores per job */
-									if (GetJSONInteger (drmaa_blast_tool_config_p, "drmaa_cores_per_search", &i))
-										{
-											drmaa_tool_p -> SetCoresPerSearch ((uint32) i);
-										}
-
-									/* Set up any email notifications */
-									value_s = GetJSONString (drmaa_blast_tool_config_p, "email_notifications");
-
-									if (value_s)
-										{
-											const char **addresses_ss = (const char **) AllocMemoryArray (2, sizeof (const char *));
-
-											if (addresses_ss)
-												{
-													*addresses_ss = value_s;
-												}
-
-											if (! (drmaa_tool_p -> SetEmailNotifications (addresses_ss)))
-												{
-													PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to set email notifications for drmaa tool");
-												}
-
-											FreeMemory (addresses_ss);
-										}		/* if (json_p) */
-
-								}		/* if (drmaa_tool_p) */
-
-						}		/* if (output_path_s) */
-					else
+							drmaa_tool_p = new DrmaaBlastTool (job_p, name_s, GetName (), data_p, ebtf_program_name_s, queue_s, output_path_s, async_flag);
+						}
+					catch (std :: exception &ex_r)
 						{
-							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to get working_directory from config");
+							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to create drmaa blast tool, error \"%s\"", ex_r.what ());
 						}
 
-				}		/* if (queue_s) */
+					if (drmaa_tool_p)
+						{
+							int i = 0;
+							const char *value_s = NULL;
+
+							/* Set the number of cores per job */
+							if (GetJSONInteger (drmaa_blast_tool_config_p, "drmaa_cores_per_search", &i))
+								{
+									drmaa_tool_p -> SetCoresPerSearch ((uint32) i);
+								}
+
+							/* Set up any email notifications */
+							value_s = GetJSONString (drmaa_blast_tool_config_p, "email_notifications");
+
+							if (value_s)
+								{
+									const char **addresses_ss = (const char **) AllocMemoryArray (2, sizeof (const char *));
+
+									if (addresses_ss)
+										{
+											*addresses_ss = value_s;
+										}
+
+									if (! (drmaa_tool_p -> SetEmailNotifications (addresses_ss)))
+										{
+											PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to set email notifications for drmaa tool");
+										}
+
+									FreeMemory (addresses_ss);
+								}		/* if (json_p) */
+
+						}		/* if (drmaa_tool_p) */
+
+				}		/* if (output_path_s) */
 			else
 				{
-					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to get queue name from config");
+					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to get working_directory from config");
 				}
 		}		/* if (drmaa_blast_tool_config_p) */
 	else
