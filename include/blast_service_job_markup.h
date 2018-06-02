@@ -47,9 +47,6 @@ BLAST_SERVICE_LOCAL bool MarkUpHit (const json_t *hit_p, json_t *mark_up_p, cons
 BLAST_SERVICE_LOCAL json_t *GetInitialisedProcessedRequest (void);
 
 
-BLAST_SERVICE_LOCAL bool AddTerm (json_t *root_p, const char *key_s, const char *term_s, const bool add_id_flag);
-
-
 
 BLAST_SERVICE_LOCAL bool AddSequence (json_t *root_p, const char *key_s, const char *query_sequence_s);
 

@@ -1247,47 +1247,6 @@ bool AddSubsequenceMarkup (json_t *parent_p, const char *key_s, const char *subs
 }
 
 
-bool AddTerm (json_t *root_p, const char *key_s, const char *term_s, const bool add_id_flag)
-{
-	json_t *term_p = json_object ();
-
-	if (term_p)
-		{
-			if (json_object_set_new (term_p, "@context", json_string (term_s)) == 0)
-				{
-					if ((!add_id_flag) || (json_object_set_new (term_p, "@type", json_string ("@id")) == 0))
-						{
-							if (json_object_set_new (root_p, key_s, term_p) == 0)
-								{
-									return true;
-								}
-							else
-								{
-									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add json object to root object with context \"%s\" with key \"%s", term_s, key_s);
-								}
-						}
-					else
-						{
-							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add json object type for context \"%s\" with key \"%s", term_s, key_s);
-						}
-				}
-			else
-				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add json object context \"%s\" with key \"%s", term_s, key_s);
-				}
-
-			json_decref (term_p);
-		}
-	else
-		{
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create json object for context \"%s\" with key \"%s", term_s, key_s);
-		}
-
-
-	return false;
-}
-
-
 
 
 bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const json_t *report_p, ParameterSet *output_params_p, const char **database_ss)
@@ -1607,31 +1566,31 @@ static bool AddSequenceOntologyTerms (json_t *context_p)
 {
 	bool success_flag = false;
 
-	if (AddTerm (context_p, "scaffold", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000148", true))
+	if (AddOntologyContextTerm (context_p, "scaffold", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000148", true))
 		{
-			if (AddTerm (context_p, "query_sequence", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000149", true))
+			if (AddOntologyContextTerm (context_p, "query_sequence", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000149", true))
 				{
-					if (AddTerm (context_p, "hit_sequence", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000149", true))
+					if (AddOntologyContextTerm (context_p, "hit_sequence", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000149", true))
 						{
-							if (AddTerm (context_p, "evalue", "http://www.sequenceontology.org/browser/current_svn/term/SO:0001686", true))
+							if (AddOntologyContextTerm (context_p, "evalue", "http://www.sequenceontology.org/browser/current_svn/term/SO:0001686", true))
 								{
-									if (AddTerm (context_p, "bit_score", "http://www.sequenceontology.org/browser/current_svn/term/SO:0001685", true))
+									if (AddOntologyContextTerm (context_p, "bit_score", "http://www.sequenceontology.org/browser/current_svn/term/SO:0001685", true))
 										{
-											if (AddTerm (context_p, "contained_by", "http://www.sequenceontology.org/browser/current_svn/term/contained_by", true))
+											if (AddOntologyContextTerm (context_p, "contained_by", "http://www.sequenceontology.org/browser/current_svn/term/contained_by", true))
 												{
-													if (AddTerm (context_p, "snp", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000694", false))
+													if (AddOntologyContextTerm (context_p, "snp", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000694", false))
 														{
-															if (AddTerm (context_p, "mnp", "http://www.sequenceontology.org/browser/current_svn/term/SO:0001013", false))
+															if (AddOntologyContextTerm (context_p, "mnp", "http://www.sequenceontology.org/browser/current_svn/term/SO:0001013", false))
 																{
-																	if (AddTerm (context_p, "match", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000039", false))
+																	if (AddOntologyContextTerm (context_p, "match", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000039", false))
 																		{
-																			if (AddTerm (context_p, "nucleotide_match", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000347", false))
+																			if (AddOntologyContextTerm (context_p, "nucleotide_match", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000347", false))
 																				{
-																					if (AddTerm (context_p, "protein_match", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000349", false))
+																					if (AddOntologyContextTerm (context_p, "protein_match", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000349", false))
 																						{
-																							if (AddTerm (context_p, "sequence_difference", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000413", true))
+																							if (AddOntologyContextTerm (context_p, "sequence_difference", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000413", true))
 																								{
-																									if (AddTerm (context_p, "gap", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000730", false))
+																									if (AddOntologyContextTerm (context_p, "gap", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000730", false))
 																										{
 																											success_flag = true;
 																										}
@@ -1656,15 +1615,15 @@ static bool AddEdamOntologyTerms (json_t *context_p)
 {
 	bool success_flag = false;
 
-	if (AddTerm (context_p, "sequence_length", "http://edamontology.org/data_1249", false))
+	if (AddOntologyContextTerm (context_p, "sequence_length", "http://edamontology.org/data_1249", false))
 		{
-			if (AddTerm (context_p, S_RESULTS_S, "http://edamontology.org/data_0857", true))
+			if (AddOntologyContextTerm (context_p, S_RESULTS_S, "http://edamontology.org/data_0857", true))
 				{
-					if (AddTerm (context_p, "database_metadata", "http://edamontology.org/data_0957", true))
+					if (AddOntologyContextTerm (context_p, "database_metadata", "http://edamontology.org/data_0957", true))
 						{
-							if (AddTerm (context_p, "database_name", "http://edamontology.org/data_1056", true))
+							if (AddOntologyContextTerm (context_p, "database_name", "http://edamontology.org/data_1056", true))
 								{
-									if (AddTerm (context_p, "query_masks", "http://edamontology.org/operation_0368", false))
+									if (AddOntologyContextTerm (context_p, "query_masks", "http://edamontology.org/operation_0368", false))
 										{
 											success_flag = true;
 										}
@@ -1681,7 +1640,7 @@ static bool AddGenomicFeatureAndVariationOntologyTerms (json_t *context_p)
 {
 	bool success_flag = false;
 
-	if (AddTerm (context_p, "locus", "http://www.biointerchange.org/gfvo#Locus", true))
+	if (AddOntologyContextTerm (context_p, "locus", "http://www.biointerchange.org/gfvo#Locus", true))
 		{
 			success_flag = true;
 		}
@@ -1709,7 +1668,7 @@ static bool AddSchemaOrgTerms (json_t *context_p)
 {
 	bool success_flag = false;
 
-	if (AddTerm (context_p, "software", "http://schema.org/SoftwareApplication", false))
+	if (AddOntologyContextTerm (context_p, "software", "http://schema.org/SoftwareApplication", false))
 		{
 			success_flag = true;
 		}
