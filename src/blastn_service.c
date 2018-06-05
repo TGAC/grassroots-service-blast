@@ -63,7 +63,7 @@ static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, Para
 /*******************************/
 
 
-Service *GetBlastNService ()
+Service *GetBlastNService (void)
 {
 	Service *nucleotide_blast_service_p = (Service *) AllocMemory (sizeof (Service));
 

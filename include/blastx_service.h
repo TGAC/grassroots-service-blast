@@ -46,7 +46,7 @@ extern "C"
  * @ingroup blast_service
  */
 
-BLAST_SERVICE_LOCAL Service *GetBlastXService ();
+BLAST_SERVICE_LOCAL Service *GetBlastXService (void);
 
 
 #ifdef __cplusplus

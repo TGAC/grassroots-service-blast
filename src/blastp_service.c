@@ -80,7 +80,7 @@ static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p);
 /*******************************/
 
 
-Service *GetBlastPService ()
+Service *GetBlastPService (void)
 {
 	Service *protein_blast_service_p = (Service *) AllocMemory (sizeof (Service));
 

@@ -70,7 +70,7 @@ static ServiceMetadata *GetBlastXServiceMetadata (Service *service_p);
 /*******************************/
 
 
-Service *GetBlastXService ()
+Service *GetBlastXService (void)
 {
 	Service *blastx_service_p = (Service *) AllocMemory (sizeof (Service));
 

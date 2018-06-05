@@ -25,7 +25,7 @@ extern "C"
  * @return The BlastN Service or <code>NULL</code> upon error.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL Service *GetBlastNService ();
+BLAST_SERVICE_LOCAL Service *GetBlastNService (void);
 
 #ifdef __cplusplus
 }
