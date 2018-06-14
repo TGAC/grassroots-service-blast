@@ -386,7 +386,7 @@ bool SaveRemoteBlastJobDetails (RemoteServiceJob *job_p, const ServiceData *serv
 			json_error_t error;
 			json_t *remote_p = NULL;
 
-			ConvertUUIDToString (job_p -> rsj_job_id, uuid_s);
+			ConvertUUIDToString (job_p -> rsj_remote_job_id, uuid_s);
 
 			remote_p = json_pack_ex (&error, 0, "{s:s,s:s,s:s}", JOB_REMOTE_URI_S, job_p -> rsj_uri_s, JOB_REMOTE_UUID_S, uuid_s, JOB_SERVICE_S, job_p -> rsj_service_name_s);
 

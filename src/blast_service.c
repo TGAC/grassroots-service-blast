@@ -1000,52 +1000,70 @@ BlastServiceData *AllocateBlastServiceData (Service * UNUSED_PARAM (blast_servic
 
 ServiceJob *BuildBlastServiceJob (struct Service *service_p, const json_t *service_job_json_p)
 {
+	ServiceJob *job_p = NULL;
 	BlastServiceData *config_p = (BlastServiceData*) (service_p -> se_data_p);
-	BlastServiceJob *job_p = GetBlastServiceJobFromJSON (service_job_json_p, config_p);
 
-	if (job_p)
+	if (IsRemoteServiceJobJSON (service_job_json_p))
 		{
-			BlastTool *tool_p = job_p -> bsj_tool_p;
+			RemoteServiceJob *remote_job_p = GetRemoteServiceJobFromJSON (service_job_json_p);
 
-			OperationStatus old_status = GetCachedServiceJobStatus (& (job_p -> bsj_job));
-			OperationStatus current_status = tool_p -> GetStatus ();
-
-			if (old_status != current_status)
+			if (remote_job_p)
 				{
-					switch (current_status)
-					{
-						case OS_SUCCEEDED:
-						case OS_PARTIALLY_SUCCEEDED:
-							{
-								if (! (job_p -> bsj_job.sj_result_p))
-									{
-										if (!DetermineBlastResult (job_p))
-											{
-												char job_id_s [UUID_STRING_BUFFER_SIZE];
 
-												ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-												PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
+					job_p = & (remote_job_p -> rsj_job);
+				}		/* if (remote_job_p) */
+
+		}		/* if (IsRemoteServiceJobJSON (service_job_json_p)) */
+	else
+		{
+			BlastServiceJob *blast_job_p = GetBlastServiceJobFromJSON (service_job_json_p, config_p);
+
+			if (blast_job_p)
+				{
+					BlastTool *tool_p = blast_job_p -> bsj_tool_p;
+
+					OperationStatus old_status = GetCachedServiceJobStatus (& (blast_job_p -> bsj_job));
+					OperationStatus current_status = tool_p -> GetStatus ();
+
+					if (old_status != current_status)
+						{
+							switch (current_status)
+							{
+								case OS_SUCCEEDED:
+								case OS_PARTIALLY_SUCCEEDED:
+									{
+										if (! (blast_job_p -> bsj_job.sj_result_p))
+											{
+												if (!DetermineBlastResult (blast_job_p))
+													{
+														char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+														ConvertUUIDToString (blast_job_p -> bsj_job.sj_id, job_id_s);
+														PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
+													}
 											}
 									}
+									break;
+
+								case OS_FAILED:
+								case OS_FAILED_TO_START:
+									{
+										AddErrorToBlastServiceJob (blast_job_p);
+									}
+									break;
+
+								default:
+									break;
 							}
-							break;
+						}
 
-						case OS_FAILED:
-						case OS_FAILED_TO_START:
-							{
-								AddErrorToBlastServiceJob (job_p);
-							}
-							break;
+					job_p = & (blast_job_p -> bsj_job);
+				}		/* if (blast_job_p) */
 
-						default:
-							break;
-					}
-				}
+		}
 
-			return & (job_p -> bsj_job);
-		}		/* if (job_p) */
 
-	return NULL;
+	return job_p;
 }
 
 

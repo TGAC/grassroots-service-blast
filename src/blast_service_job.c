@@ -371,57 +371,57 @@ json_t *ConvertBlastServiceJobToJSON (BlastServiceJob *job_p, bool omit_results_
 }
 
 
-ServiceJob *DeserialiseBlastServiceJob (unsigned char *data_p, void *config_p)
-{
-	BlastServiceJob *blast_job_p = NULL;
-	json_error_t err;
-	json_t *blast_job_json_p = json_loads ((char *) data_p, 0, &err);
-
-	if (blast_job_json_p)
-		{
-			blast_job_p = GetBlastServiceJobFromJSON (blast_job_json_p, (BlastServiceData *) config_p);
-			json_decref (blast_job_json_p);
-		}		/* if (blast_job_json_p) */
-	else
-		{
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to convert \"%s\" to json, err \"%s\" at line %d, column %d", data_p, err.text, err.line, err.column);
-		}
-
-	return (ServiceJob *) blast_job_p;
-}
-
-
-unsigned char *SerialiseBlastServiceJob (ServiceJob *base_job_p, unsigned int *value_length_p)
-{
-	unsigned char *result_p = NULL;
-	BlastServiceJob *blast_job_p = (BlastServiceJob *) base_job_p;
-	json_t *job_json_p = ConvertBlastServiceJobToJSON (blast_job_p, true);
-
-	if (job_json_p)
-		{
-			char *job_s = json_dumps (job_json_p, JSON_INDENT (2));
-
-			if (job_s)
-				{
-					/*
-					 * include the terminating \0 to make sure
-					 * the value as a valid c-style string
-					 */
-					*value_length_p = strlen (job_s) + 1;
-					result_p = (unsigned char *) job_s;
-				}		/* if (job_s) */
-			else
-				{
-					char uuid_s [UUID_STRING_BUFFER_SIZE];
-
-					ConvertUUIDToString (base_job_p -> sj_id, uuid_s);
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "json_dumps failed for \"%s\"", uuid_s);
-				}
-		}		/* if (json_p) */
-
-
-	return result_p;
-}
+//ServiceJob *DeserialiseBlastServiceJob (unsigned char *data_p, void *config_p)
+//{
+//	BlastServiceJob *blast_job_p = NULL;
+//	json_error_t err;
+//	json_t *blast_job_json_p = json_loads ((char *) data_p, 0, &err);
+//
+//	if (blast_job_json_p)
+//		{
+//			blast_job_p = GetBlastServiceJobFromJSON (blast_job_json_p, (BlastServiceData *) config_p);
+//			json_decref (blast_job_json_p);
+//		}		/* if (blast_job_json_p) */
+//	else
+//		{
+//			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to convert \"%s\" to json, err \"%s\" at line %d, column %d", data_p, err.text, err.line, err.column);
+//		}
+//
+//	return (ServiceJob *) blast_job_p;
+//}
+//
+//
+//unsigned char *SerialiseBlastServiceJob (ServiceJob *base_job_p, unsigned int *value_length_p)
+//{
+//	unsigned char *result_p = NULL;
+//	BlastServiceJob *blast_job_p = (BlastServiceJob *) base_job_p;
+//	json_t *job_json_p = ConvertBlastServiceJobToJSON (blast_job_p, true);
+//
+//	if (job_json_p)
+//		{
+//			char *job_s = json_dumps (job_json_p, JSON_INDENT (2));
+//
+//			if (job_s)
+//				{
+//					/*
+//					 * include the terminating \0 to make sure
+//					 * the value as a valid c-style string
+//					 */
+//					*value_length_p = strlen (job_s) + 1;
+//					result_p = (unsigned char *) job_s;
+//				}		/* if (job_s) */
+//			else
+//				{
+//					char uuid_s [UUID_STRING_BUFFER_SIZE];
+//
+//					ConvertUUIDToString (base_job_p -> sj_id, uuid_s);
+//					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "json_dumps failed for \"%s\"", uuid_s);
+//				}
+//		}		/* if (json_p) */
+//
+//
+//	return result_p;
+//}
 
 
 

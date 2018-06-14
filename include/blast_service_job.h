@@ -134,7 +134,7 @@ BLAST_SERVICE_LOCAL char *GetPreviousJobFilename (const BlastServiceData *data_p
  * @see DeserialiseBlastServiceJobFromJSON
  * @memberof BlastServiceJob
  */
-BLAST_SERVICE_LOCAL unsigned char *SerialiseBlastServiceJob (ServiceJob *base_job_p, unsigned int *value_length_p);
+//BLAST_SERVICE_LOCAL unsigned char *SerialiseBlastServiceJob (ServiceJob *base_job_p, unsigned int *value_length_p);
 
 
 /**
@@ -150,7 +150,7 @@ BLAST_SERVICE_LOCAL unsigned char *SerialiseBlastServiceJob (ServiceJob *base_jo
  * @see DeserialiseServiceJobFromJSON
  * @memberof BlastServiceJob
  */
-BLAST_SERVICE_LOCAL ServiceJob *DeserialiseBlastServiceJob (unsigned char *data_p, void *config_p);
+//BLAST_SERVICE_LOCAL ServiceJob *DeserialiseBlastServiceJob (unsigned char *data_p, void *config_p);
 
 
 /**
