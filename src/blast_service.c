@@ -180,7 +180,6 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 				{
 					RunPairedServices (service_p, param_set_p, providers_p, SaveRemoteBlastJobDetails);
 
-
 					/* Get all of the selected databases and create a BlastServiceJob for each one */
 					PrepareBlastServiceJobs (blast_data_p -> bsd_databases_p, param_set_p, service_p, blast_data_p);
 
@@ -1418,106 +1417,121 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 	 *  As each job will have the same input file name it using the first job's id
 	 *
 	 */
-	BlastServiceJob *job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (iterator_p);
+	ServiceJob *base_job_p = GetNextServiceJobFromServiceJobSetIterator (iterator_p);
 
-	if (job_p)
+	if (base_job_p)
 		{
 			bool loop_flag = true;
 
+			/*
+			 * Iterate over all the jobs and run them if need be
+			 */
 			while (loop_flag)
 				{
-					BlastTool *tool_p = job_p -> bsj_tool_p;
-
-					SetServiceJobStatus (& (job_p -> bsj_job), OS_FAILED_TO_START);
-
-					LogServiceJob (& (job_p -> bsj_job));
-
-					if (tool_p)
+					/*
+					 * Check that it is a BlastServiceJob as we may also have
+					 * RemoteServiceJobs on this list
+					 */
+					if (strcmp (base_job_p -> sj_type_s, BSJ_TYPE_S) == 0)
 						{
-							if (tool_p -> SetInputFilename (input_filename_s))
+							BlastServiceJob *job_p = (BlastServiceJob *) base_job_p;
+							BlastTool *tool_p = job_p -> bsj_tool_p;
+
+							/*
+							 * Assume the job has failed unless proved otherwise
+							 */
+							SetServiceJobStatus (& (job_p -> bsj_job), OS_FAILED_TO_START);
+
+							LogServiceJob (& (job_p -> bsj_job));
+
+							if (tool_p)
 								{
-									if (tool_p -> SetUpOutputFile ())
+									if (tool_p -> SetInputFilename (input_filename_s))
 										{
-											if (tool_p -> ParseParameters (param_set_p, app_params_p))
+											if (tool_p -> SetUpOutputFile ())
 												{
-													if (RunBlast (tool_p))
+													if (tool_p -> ParseParameters (param_set_p, app_params_p))
 														{
-															/* If the status needs updating, refresh it */
-															if ((job_p -> bsj_job.sj_status == OS_PENDING) || (job_p -> bsj_job.sj_status == OS_STARTED))
+															if (RunBlast (tool_p))
 																{
-																	SetServiceJobStatus (& (job_p -> bsj_job), tool_p -> GetStatus ());
-																}
-
-															LogServiceJob (& (job_p -> bsj_job));
-
-
-															switch (job_p -> bsj_job.sj_status)
-																{
-																	case OS_SUCCEEDED:
-																	case OS_PARTIALLY_SUCCEEDED:
-																		if (! (job_p -> bsj_job.sj_result_p))
-																			{
-																				char job_id_s [UUID_STRING_BUFFER_SIZE];
-
-																				ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-																				PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
-																			}
-																		break;
-
-																	case OS_PENDING:
-																	case OS_STARTED:
+																	/* If the status needs updating, refresh it */
+																	if ((job_p -> bsj_job.sj_status == OS_PENDING) || (job_p -> bsj_job.sj_status == OS_STARTED))
 																		{
-																			JobsManager *jobs_manager_p = GetJobsManager ();
+																			SetServiceJobStatus (& (job_p -> bsj_job), tool_p -> GetStatus ());
+																		}
 
-																			if (jobs_manager_p)
+																	LogServiceJob (& (job_p -> bsj_job));
+
+
+																	switch (job_p -> bsj_job.sj_status)
+																		{
+																			case OS_SUCCEEDED:
+																			case OS_PARTIALLY_SUCCEEDED:
+																				if (! (job_p -> bsj_job.sj_result_p))
+																					{
+																						char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+																						ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
+																						PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
+																					}
+																				break;
+
+																			case OS_PENDING:
+																			case OS_STARTED:
 																				{
-																					if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> bsj_job.sj_id, (ServiceJob *) job_p))
-																						{
-																							char job_id_s [UUID_STRING_BUFFER_SIZE];
+																					JobsManager *jobs_manager_p = GetJobsManager ();
 
-																							ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-																							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
+																					if (jobs_manager_p)
+																						{
+																							if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> bsj_job.sj_id, (ServiceJob *) job_p))
+																								{
+																									char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+																									ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
+																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
+																								}
 																						}
 																				}
-																		}
-																		break;
+																				break;
 
-																	default:
-																		break;
-																}		/* switch (job_p -> bsj_job.sj_status) */
+																			default:
+																				break;
+																		}		/* switch (job_p -> bsj_job.sj_status) */
 
-														}
+																}
+															else
+																{
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
+																}
+
+														}		/* if (tool_p -> ParseParameters (param_set_p, input_filename_s)) */
 													else
 														{
-															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to run blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
+															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to parse parameters for blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
 														}
 
-												}		/* if (tool_p -> ParseParameters (param_set_p, input_filename_s)) */
+												}		/* if (tool_p -> SetOutputFilename ()) */
 											else
 												{
-													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to parse parameters for blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set output filename for blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
 												}
 
-										}		/* if (tool_p -> SetOutputFilename ()) */
+										}		/* if (tool_p -> SetInputFilename (input_filename_s)) */
 									else
 										{
-											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set output filename for blast tool \"%s\"", job_p -> bsj_job.sj_name_s);
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set input filename for blast tool \"%s\" to \"%s\"", job_p -> bsj_job.sj_name_s, input_filename_s);
 										}
 
-								}		/* if (tool_p -> SetInputFilename (input_filename_s)) */
+								}		/* if (tool_p) */
 							else
 								{
-									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set input filename for blast tool \"%s\" to \"%s\"", job_p -> bsj_job.sj_name_s, input_filename_s);
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get blast tool for \"%s\"", job_p -> bsj_job.sj_name_s);
 								}
 
-						}		/* if (tool_p) */
-					else
-						{
-							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get blast tool for \"%s\"", job_p -> bsj_job.sj_name_s);
-						}
+						}		/* if (strcmp (base_job_p -> sj_type_s, BSJ_TYPE_S) == 0) */
 
-					job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (iterator_p);
-					loop_flag = (job_p != NULL);
+					base_job_p = GetNextServiceJobFromServiceJobSetIterator (iterator_p);
+					loop_flag = (base_job_p != NULL);
 
 				}		/* while (loop_flag) */
 

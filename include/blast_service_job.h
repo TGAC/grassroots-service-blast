@@ -36,6 +36,23 @@
 
 class BlastTool;
 
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+#ifdef ALLOCATE_BLAST_SERVICE_JOB_TAGS
+	#define BLAST_SERVICE_JOB_PREFIX GRASSROOTS_SERVICE_API
+	#define BLAST_SERVICE_JOB_VAL(x)	= x
+#else
+	#define BLAST_SERVICE_JOB_PREFIX extern
+	#define BLAST_SERVICE_JOB_VAL(x)
+#endif
+
+#endif
+
+
+BLAST_SERVICE_JOB_PREFIX const char *BSJ_TYPE_S BLAST_SERVICE_JOB_VAL ("blast_service_job");
+
+
 /**
  * This datatype stores the ServiceJob and its associated BlastTool.
  *
