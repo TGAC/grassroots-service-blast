@@ -1422,12 +1422,15 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 	if (base_job_p)
 		{
 			bool loop_flag = true;
+			bool job_ran_flag;
 
 			/*
 			 * Iterate over all the jobs and run them if need be
 			 */
 			while (loop_flag)
 				{
+					job_ran_flag = false;
+
 					/*
 					 * Check that it is a BlastServiceJob as we may also have
 					 * RemoteServiceJobs on this list
@@ -1440,9 +1443,9 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 							/*
 							 * Assume the job has failed unless proved otherwise
 							 */
-							SetServiceJobStatus (& (job_p -> bsj_job), OS_FAILED_TO_START);
+							SetServiceJobStatus (base_job_p, OS_FAILED_TO_START);
 
-							LogServiceJob (& (job_p -> bsj_job));
+							LogServiceJob (base_job_p);
 
 							if (tool_p)
 								{
@@ -1457,46 +1460,11 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 																	/* If the status needs updating, refresh it */
 																	if ((job_p -> bsj_job.sj_status == OS_PENDING) || (job_p -> bsj_job.sj_status == OS_STARTED))
 																		{
-																			SetServiceJobStatus (& (job_p -> bsj_job), tool_p -> GetStatus ());
+																			SetServiceJobStatus (base_job_p, tool_p -> GetStatus ());
 																		}
 
-																	LogServiceJob (& (job_p -> bsj_job));
-
-
-																	switch (job_p -> bsj_job.sj_status)
-																		{
-																			case OS_SUCCEEDED:
-																			case OS_PARTIALLY_SUCCEEDED:
-																				if (! (job_p -> bsj_job.sj_result_p))
-																					{
-																						char job_id_s [UUID_STRING_BUFFER_SIZE];
-
-																						ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-																						PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
-																					}
-																				break;
-
-																			case OS_PENDING:
-																			case OS_STARTED:
-																				{
-																					JobsManager *jobs_manager_p = GetJobsManager ();
-
-																					if (jobs_manager_p)
-																						{
-																							if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> bsj_job.sj_id, (ServiceJob *) job_p))
-																								{
-																									char job_id_s [UUID_STRING_BUFFER_SIZE];
-
-																									ConvertUUIDToString (job_p -> bsj_job.sj_id, job_id_s);
-																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
-																								}
-																						}
-																				}
-																				break;
-
-																			default:
-																				break;
-																		}		/* switch (job_p -> bsj_job.sj_status) */
+																	LogServiceJob (base_job_p);
+																	job_ran_flag = true;
 
 																}
 															else
@@ -1529,6 +1497,50 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 								}
 
 						}		/* if (strcmp (base_job_p -> sj_type_s, BSJ_TYPE_S) == 0) */
+					else if (strcmp (base_job_p -> sj_type_s, RSJ_TYPE_S) == 0)
+						{
+							job_ran_flag = true;
+						}		/* else if (strcmp (base_job_p -> sj_type_s, RSJ_TYPE_S) == 0) */
+
+
+					if (job_ran_flag)
+						{
+							switch (base_job_p -> sj_status)
+									{
+										case OS_SUCCEEDED:
+										case OS_PARTIALLY_SUCCEEDED:
+											if (base_job_p -> sj_result_p)
+												{
+													char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+													ConvertUUIDToString (base_job_p -> sj_id, job_id_s);
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
+												}
+											break;
+
+										case OS_PENDING:
+										case OS_STARTED:
+											{
+												JobsManager *jobs_manager_p = GetJobsManager ();
+
+												if (jobs_manager_p)
+													{
+														if (!AddServiceJobToJobsManager (jobs_manager_p, base_job_p -> sj_id, base_job_p))
+															{
+																char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+																ConvertUUIDToString (base_job_p -> sj_id, job_id_s);
+																PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
+															}
+													}
+											}
+											break;
+
+										default:
+											break;
+									}		/* switch (job_p -> bsj_job.sj_status) */
+
+						}		/* if (job_ran_flag) */
 
 					base_job_p = GetNextServiceJobFromServiceJobSetIterator (iterator_p);
 					loop_flag = (base_job_p != NULL);
