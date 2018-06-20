@@ -972,7 +972,25 @@ char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *jo
 
 json_t *BuildBlastServiceJobJSON (Service * UNUSED_PARAM (service_p), ServiceJob *service_job_p, bool omit_results_flag)
 {
-	return ConvertBlastServiceJobToJSON ((BlastServiceJob *) service_job_p, omit_results_flag);
+	json_t *res_p = NULL;
+
+	if (strcmp (service_job_p -> sj_type_s, BSJ_TYPE_S) == 0)
+		{
+			res_p = ConvertBlastServiceJobToJSON ((BlastServiceJob *) service_job_p, omit_results_flag);
+		}
+	else if (strcmp (service_job_p -> sj_type_s, RSJ_TYPE_S) == 0)
+		{
+			res_p = GetRemoteServiceJobAsJSON ((RemoteServiceJob *) service_job_p, omit_results_flag);
+		}
+	else
+		{
+			char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+			ConvertUUIDToString (service_job_p -> sj_id, uuid_s);
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "BuildBlastServiceJobJSON failed, unknpown type \"%s\" for \"%s\"", service_job_p -> sj_type_s, uuid_s);
+		}
+
+	return res_p;
 }
 
 

@@ -120,6 +120,7 @@ DrmaaBlastTool :: DrmaaBlastTool (BlastServiceJob *job_p, const BlastServiceData
 			if (dbt_drmaa_tool_p)
 				{
 					dbt_args_processor_p = new DrmaaToolArgsProcessor (dbt_drmaa_tool_p);
+					dbt_async_flag = true;
 				}
 			else
 				{
