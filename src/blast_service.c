@@ -987,7 +987,7 @@ json_t *BuildBlastServiceJobJSON (Service * UNUSED_PARAM (service_p), ServiceJob
 			char uuid_s [UUID_STRING_BUFFER_SIZE];
 
 			ConvertUUIDToString (service_job_p -> sj_id, uuid_s);
-			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "BuildBlastServiceJobJSON failed, unknpown type \"%s\" for \"%s\"", service_job_p -> sj_type_s, uuid_s);
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "BuildBlastServiceJobJSON failed, unknown type \"%s\" for \"%s\"", service_job_p -> sj_type_s, uuid_s);
 		}
 
 	return res_p;

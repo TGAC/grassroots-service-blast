@@ -32,7 +32,7 @@
 #include "blast_tool.hpp"
 #include "blast_service_params.h"
 #include "json_util.h"
-
+#include "string_utils.h"
 
 
 #ifdef _DEBUG
@@ -67,9 +67,6 @@ BlastServiceJob *AllocateBlastServiceJobForDatabase (Service *service_p, const D
 {
 	return AllocateBlastServiceJob (service_p, db_p -> di_name_s, db_p -> di_description_s, db_p -> di_filename_s, data_p);
 }
-
-
-#include "string_utils.h"
 
 
 BlastServiceJob *AllocateBlastServiceJob (Service *service_p, const char *job_name_s, const char *job_description_s, const char *job_filename_s, BlastServiceData *data_p)
