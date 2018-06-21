@@ -594,11 +594,32 @@ void BlastServiceJobCompleted (ServiceJob *job_p)
 {
 	JobsManager *manager_p = GetJobsManager ();
 
+	#if BLAST_SERVICE_JOB_DEBUG >= STM_LEVEL_FINEST
+		{
+			char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+			ConvertUUIDToString (job_p -> sj_id, uuid_s);
+			PrintLog (BLAST_SERVICE_JOB_DEBUG, __FILE__, __LINE__, "BlastServiceJobCompleted for \"%s\" with status \"%s\"", uuid_s, GetOperationStatusAsString (job_p -> sj_status));
+		}
+	#endif
+
+
 	if (job_p -> sj_result_p == NULL)
 		{
 			BlastServiceJob *blast_job_p = (BlastServiceJob *) job_p;
 
-			if (!DetermineBlastResult (blast_job_p))
+			if (DetermineBlastResult (blast_job_p))
+				{
+					#if BLAST_SERVICE_JOB_DEBUG >= STM_LEVEL_FINEST
+						{
+							char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+							ConvertUUIDToString (job_p -> sj_id, uuid_s);
+							PrintJSONToLog (BLAST_SERVICE_JOB_DEBUG, __FILE__, __LINE__, blast_job_p -> bsj_job.sj_result_p, "DetermineBlastResult for \"%s\" with status \"%s\"", uuid_s, GetOperationStatusAsString (job_p -> sj_status));
+						}
+					#endif
+				}
+			else
 				{
 					char uuid_s [UUID_STRING_BUFFER_SIZE];
 
@@ -610,7 +631,18 @@ void BlastServiceJobCompleted (ServiceJob *job_p)
 
 	if (manager_p)
 		{
-			if (!AddServiceJobToJobsManager (manager_p, job_p -> sj_id, job_p))
+			if (AddServiceJobToJobsManager (manager_p, job_p -> sj_id, job_p))
+				{
+					#if BLAST_SERVICE_JOB_DEBUG >= STM_LEVEL_FINEST
+						{
+							char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+							ConvertUUIDToString (job_p -> sj_id, uuid_s);
+							PrintLog (BLAST_SERVICE_JOB_DEBUG, __FILE__, __LINE__, "AddServiceJobToJobsManager for \"%s\" with status \"%s\"", uuid_s, GetOperationStatusAsString (job_p -> sj_status));
+						}
+					#endif
+				}
+			else
 				{
 					char uuid_s [UUID_STRING_BUFFER_SIZE];
 					const char *status_s = GetOperationStatusAsString (job_p -> sj_status);
