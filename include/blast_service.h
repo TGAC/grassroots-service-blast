@@ -451,7 +451,7 @@ BLAST_SERVICE_LOCAL ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *p
  *
  * @param db_p The list of available databases terminated by <code>NULL</code>.
  * @param param_set_p The ParameterSet for specifying the configuration of the BlastServiceJobs.
- * @param jobs_p The BlastService.
+ * @param service_p The BlastService.
  * @param data_p The Blast Service configuration data.
  * @ingroup blast_service
  */
