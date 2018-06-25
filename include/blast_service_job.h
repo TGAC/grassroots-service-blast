@@ -137,40 +137,6 @@ BLAST_SERVICE_LOCAL char *GetPreviousJobFilename (const BlastServiceData *data_p
 
 
 /**
- * Save the BlastServiceJob to a persistent format that allows the BlastServiceJob
- * to be recreated in a potentially different thread and/or process. This is used to
- * save a BlastServiceJob in the JobsManager.
- *
- * @param base_job_p The BlastServiceJob.
- * @param value_length_p If the serialisation was successful, the value that this pointer
- * refers to will have the length of the serialised data in bytes.
- * @return The persistent representation of this BlastServiceJob or <code>NULL</code>
- * upon error.
- * @see JobsManager
- * @see SerialiseServiceJobToJSON
- * @see DeserialiseBlastServiceJobFromJSON
- * @memberof BlastServiceJob
- */
-//BLAST_SERVICE_LOCAL unsigned char *SerialiseBlastServiceJob (ServiceJob *base_job_p, unsigned int *value_length_p);
-
-
-/**
- * Recreate a BlastServiceJob from a persistent format. This is used to
- * access a BlastServiceJob stored in the JobsManager.
- *
- * @param data_p The data representing the BlastServiceJob.
- * @param config_p A BlastServiceData object containing the Blast Service configuration details.
- * @return The BlastServiceJob or <code>NULL</code>
- * upon error.
- * @see JobsManager
- * @see SerialiseBlastServiceJob
- * @see DeserialiseServiceJobFromJSON
- * @memberof BlastServiceJob
- */
-//BLAST_SERVICE_LOCAL ServiceJob *DeserialiseBlastServiceJob (unsigned char *data_p, void *config_p);
-
-
-/**
  * Deserialise a BlastServiceJob from a JSON fragment.
  *
  * @param blast_job_json_p The JSON fragment to generate the BlastServiceJob from .
