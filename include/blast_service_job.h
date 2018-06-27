@@ -49,8 +49,12 @@ class BlastTool;
 
 #endif
 
-
-BLAST_SERVICE_JOB_PREFIX const char *BSJ_TYPE_S BLAST_SERVICE_JOB_VAL ("blast_service_job");
+/**
+ * The type for BlastServiceJobs.
+ *
+ * @memberof BlastServiceJob
+ */
+BLAST_SERVICE_JOB_PREFIX const char * const BSJ_TYPE_S BLAST_SERVICE_JOB_VAL ("blast_service_job");
 
 
 /**
