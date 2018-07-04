@@ -330,6 +330,9 @@ BLAST_SERVICE_LOCAL char *CreateGroupName (const char *server_s);
 BLAST_SERVICE_LOCAL int8 GetOutputFormatCodeForString (const char *output_format_s);
 
 
+
+BLAST_SERVICE_LOCAL char *GetLocalDatabaseGroupName (void);
+
 #ifdef __cplusplus
 }
 #endif

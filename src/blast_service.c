@@ -612,6 +612,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, Service *service_p, BlastServiceData *data_p)
 {
+	char *group_s = GetLocalDatabaseGroupName ();
 
 	if (db_p)
 		{
@@ -622,25 +623,53 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 					/* Do we have a matching parameter? */
 					if (param_p)
 						{
-							/* Is the database selected to search against? */
-							if (param_p -> pa_current_value.st_boolean_value)
+							bool match_flag = true;
+
+							/*
+							 * If possible, check that we are in the expected group
+							 * for this Server.
+							 */
+							if (group_s)
 								{
-									BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (service_p, db_p, data_p);
-
-									if (job_p)
+									if (param_p -> pa_group_p)
 										{
-											if (!AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
+											if (param_p -> pa_group_p -> pg_name_s)
 												{
-													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add ServiceJob to the ServiceJobSet for \"%s\"", db_p -> di_name_s);
-													FreeBlastServiceJob (& (job_p -> bsj_job));
-												}
-										}
-									else
-										{
-											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create ServiceJob for \"%s\"", db_p -> di_name_s);
-										}
+													if (strcmp (group_s, param_p -> pa_group_p -> pg_name_s) != 0)
+														{
+															match_flag = false;
+														}
 
-								}		/* if (param_p -> pa_current_value.st_boolean_value) */
+												}		/* if (param_p -> pa_group_p -> pg_name_s) */
+
+										}		/* if (param_p -> pa_group_p) */
+
+								}		/* if (group_s) */
+
+
+							if (match_flag)
+								{
+									/* Is the database selected to search against? */
+									if (param_p -> pa_current_value.st_boolean_value)
+										{
+											BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (service_p, db_p, data_p);
+
+											if (job_p)
+												{
+													if (!AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
+														{
+															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add ServiceJob to the ServiceJobSet for \"%s\"", db_p -> di_name_s);
+															FreeBlastServiceJob (& (job_p -> bsj_job));
+														}
+												}
+											else
+												{
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create ServiceJob for \"%s\"", db_p -> di_name_s);
+												}
+
+										}		/* if (param_p -> pa_current_value.st_boolean_value) */
+
+								}		/* if (match_flag) */
 
 						}		/* if (param_p) */
 
@@ -649,6 +678,11 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 
 		}		/* if (db_p) */
 
+
+	if (group_s)
+		{
+			FreeCopiedString (group_s);
+		}
 }
 
 

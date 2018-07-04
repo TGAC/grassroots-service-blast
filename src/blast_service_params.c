@@ -58,6 +58,9 @@ static const char *s_output_formats_ss [BOF_NUM_TYPES] =
 };
 
 
+
+
+
 /**************************************************/
 /**************** PUBLIC FUNCTIONS ****************/
 /**************************************************/
@@ -119,25 +122,9 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 		{
 			ParameterGroup *group_p = NULL;
 			const DatabaseInfo *db_p = data_p -> bsd_databases_p;
-			char *group_s = NULL;
-			const json_t *provider_p = NULL;
-			const char *group_to_use_s = NULL;
+			char *group_s = GetLocalDatabaseGroupName ();
 
-			provider_p = GetGlobalConfigValue (SERVER_PROVIDER_S);
-
-			if (provider_p)
-				{
-					const char *provider_s = GetProviderName (provider_p);
-
-					if (provider_s)
-						{
-							group_s = CreateGroupName (provider_s);
-						}
-				}
-
-			group_to_use_s = group_s ? group_s : BS_DATABASE_GROUP_NAME_S;
-
-			group_p = CreateAndAddParameterGroupToParameterSet (group_to_use_s, NULL, false, & (data_p -> bsd_base_data), param_set_p);
+			group_p = CreateAndAddParameterGroupToParameterSet (group_s ? group_s : BS_DATABASE_GROUP_NAME_S, NULL, false, & (data_p -> bsd_base_data), param_set_p);
 
 			if (db_p)
 				{
@@ -388,6 +375,25 @@ bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet
 
 
 	return success_flag;
+}
+
+
+char *GetLocalDatabaseGroupName (void)
+{
+	char *group_s = NULL;
+	const json_t *provider_p = GetGlobalConfigValue (SERVER_PROVIDER_S);
+
+	if (provider_p)
+		{
+			const char *provider_s = GetProviderName (provider_p);
+
+			if (provider_s)
+				{
+					group_s = CreateGroupName (provider_s);
+				}
+		}		/* if (provider_p) */
+
+	return group_s;
 }
 
 
