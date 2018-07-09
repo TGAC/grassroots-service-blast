@@ -34,6 +34,8 @@ INCLUDES := \
 	-I$(DIR_PCRE_INC)
 	
 SRCS 	:= \
+	args_processor.cpp \
+	async_system_blast_tool.cpp \
 	blast_app_parameters.c \
 	blast_service.c \
 	blastn_service.c \
@@ -42,16 +44,15 @@ SRCS 	:= \
 	blast_service_job.c \
 	blast_service_job_markup.c \
 	blast_service_params.c \
-	paired_blast_service.c \
-	blast_util.c \
-	args_processor.cpp \
 	blast_formatter.cpp \
 	blast_tool.cpp \
-	async_system_blast_tool.cpp \
 	blast_tool_factory.cpp \
+	blast_util.c \
 	byte_buffer_args_processor.cpp \
 	external_blast_tool.cpp \
 	external_blast_tool_factory.cpp \
+	magic_blast_service.c \
+	paired_blast_service.c \
 	strings_args_processor.cpp \
 	system_blast_tool.cpp \
 	system_blast_tool_factory.cpp 
