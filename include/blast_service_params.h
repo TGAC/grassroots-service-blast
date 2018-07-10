@@ -35,6 +35,83 @@
 #include "parameter_set.h"
 
 
+/**
+ * The different available output formats.
+ *
+ * @ingroup blast_service
+ */
+typedef enum BlastOutputFormat
+{
+	/** Pairwise */
+	BOF_PAIRWISE,
+
+	/** Query-anchored showing identities */
+	BOF_QUERY_ANCHORED_WITH_IDENTITIES,
+
+	/** Query-anchored no identities */
+	BOF_QUERY_ANCHORED_NO_IDENTITIES,
+
+	/** Flat query-anchored showing identities */
+	BOF_FLAT_QUERY_ANCHORED_WITH_IDENTITIES,
+
+	/** Flat query-anchored no identities */
+	BOF_FLAT_QUERY_ANCHORED_NO_IDENTITIES,
+
+	/** BLAST XML */
+	BOF_XML_BLAST,
+
+	/** Tabular */
+	BOF_TABULAR,
+
+	/** Tabular with comment lines */
+	BOF_TABULAR_WITH_COMMENTS,
+
+	/** Seqalign (Text ASN.1) */
+	BOF_TEXT_ASN1,
+
+	/** Seqalign (Binary ASN.1) */
+	BOF_BINARY_ASN1,
+
+	/** Comma-separated values */
+	BOF_CSV,
+
+	/** BLAST archive (ASN.1) */
+	BOF_BLAST_ASN1,
+
+	/** Seqalign (JSON) */
+	BOF_JSON_SEQALIGN,
+
+	/** Multiple-file BLAST JSON */
+	BOF_MULTI_FILE_JSON_BLAST,
+
+	/** Multiple-file BLAST XML2 */
+	BOF_MULTI_FILE_XML2_BLAST,
+
+	/** Single-file BLAST JSON */
+	BOF_SINGLE_FILE_JSON_BLAST,
+
+	/** Single-file BLAST XML2 */
+	BOF_SINGLE_FILE_XML2_BLAST,
+
+	/** Sequence Alignment/Map (SAM) */
+	BOF_SEQUENCE_ALIGNMENT,
+
+	/** Organism Report */
+	BOF_ORGANISM_REPORT,
+
+	/** Grassroots JSON */
+	BOF_GRASSROOTS,
+
+	/** The number of different output formats */
+	BOF_NUM_TYPES
+} BlastOutputFormat;
+
+
+
+extern const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES];
+
+
+
 /* Grassroots params */
 
 /**
@@ -107,76 +184,6 @@ BLAST_SERVICE_PREFIX NamedParameterType BS_EXPECT_THRESHOLD BLAST_SERVICE_STRUCT
 BLAST_SERVICE_PREFIX NamedParameterType BS_OUTPUT_FORMAT BLAST_SERVICE_STRUCT_VAL ("outfmt", PT_STRING);
 
 
-/**
- * The different available output formats.
- *
- * @ingroup blast_service
- */
-typedef enum BlastOutputFormat
-{
-	/** Pairwise */
-	BOF_PAIRWISE,
-
-	/** Query-anchored showing identities */
-	BOF_QUERY_ANCHORED_WITH_IDENTITIES,
-
-	/** Query-anchored no identities */
-	BOF_QUERY_ANCHORED_NO_IDENTITIES,
-
-	/** Flat query-anchored showing identities */
-	BOF_FLAT_QUERY_ANCHORED_WITH_IDENTITIES,
-
-	/** Flat query-anchored no identities */
-	BOF_FLAT_QUERY_ANCHORED_NO_IDENTITIES,
-
-	/** BLAST XML */
-	BOF_XML_BLAST,
-
-	/** Tabular */
-	BOF_TABULAR,
-
-	/** Tabular with comment lines */
-	BOF_TABULAR_WITH_COMMENTS,
-
-	/** Seqalign (Text ASN.1) */
-	BOF_TEXT_ASN1,
-
-	/** Seqalign (Binary ASN.1) */
-	BOF_BINARY_ASN1,
-
-	/** Comma-separated values */
-	BOF_CSV,
-
-	/** BLAST archive (ASN.1) */
-	BOF_BLAST_ASN1,
-
-	/** Seqalign (JSON) */
-	BOF_JSON_SEQALIGN,
-
-	/** Multiple-file BLAST JSON */
-	BOF_MULTI_FILE_JSON_BLAST,
-
-	/** Multiple-file BLAST XML2 */
-	BOF_MULTI_FILE_XML2_BLAST,
-
-	/** Single-file BLAST JSON */
-	BOF_SINGLE_FILE_JSON_BLAST,
-
-	/** Single-file BLAST XML2 */
-	BOF_SINGLE_FILE_XML2_BLAST,
-
-	/** Sequence Alignment/Map (SAM) */
-	BOF_SEQUENCE_ALIGNMENT,
-
-	/** Organism Report */
-	BOF_ORGANISM_REPORT,
-
-	/** Grassroots JSON */
-	BOF_GRASSROOTS,
-
-	/** The number of different output formats */
-	BOF_NUM_TYPES
-} BlastOutputFormat;
 
 
 /**
@@ -293,7 +300,7 @@ BLAST_SERVICE_LOCAL uint32 GetNumberOfDatabases (const BlastServiceData *data_p,
  * @return The UUID Parameter or <code>NULL</code> upon error.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL Parameter *SetUpPreviousJobUUIDParamater (const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
+BLAST_SERVICE_LOCAL Parameter *SetUpPreviousJobUUIDParameter (const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
 
 /**
@@ -305,7 +312,7 @@ BLAST_SERVICE_LOCAL Parameter *SetUpPreviousJobUUIDParamater (const BlastService
  * @return The output format Parameter or <code>NULL</code> upon error.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
+BLAST_SERVICE_LOCAL Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const char *default_format_s, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
 
 /**

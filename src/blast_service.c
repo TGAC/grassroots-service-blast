@@ -21,6 +21,7 @@
 #include "blastn_service.h"
 #include "blastp_service.h"
 #include "blastx_service.h"
+#include "magic_blast_service.h"
 
 #include "memory_allocations.h"
 
@@ -62,7 +63,7 @@ static bool CleanupAsyncBlastService (void *data_p);
 ServicesArray *GetServices (UserDetails * UNUSED_PARAM (user_p))
 {
 	ServicesArray *services_array_p = NULL;
-	const uint32 NUM_SERVICES = 3;
+	const uint32 NUM_SERVICES = 4;
 	Service *services_pp [NUM_SERVICES];
 	uint32 num_added_services = 0;
 	uint32 i;
@@ -72,6 +73,7 @@ ServicesArray *GetServices (UserDetails * UNUSED_PARAM (user_p))
 	*services_pp = GetBlastNService ();
 	* (services_pp + 1) = GetBlastPService ();
 	* (services_pp + 2) = GetBlastXService ();
+	* (services_pp + 3) = GetMagicBlastService ();
 
 
 	/*

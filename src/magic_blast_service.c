@@ -9,6 +9,7 @@
 #include "args_processor.hpp"
 #include "blast_service.h"
 #include "blast_util.h"
+#include "blast_service_params.h"
 
 
 /*
@@ -16,10 +17,41 @@
  */
 
 
+/* Input query sequences are paired */
+static NamedParameterType S_PAIRED = { "paired", PT_BOOLEAN };
 
 
 static NamedParameterType S_PERCENT_IDENTITY = { "perc_identity", PT_UNSIGNED_REAL };
+
 static NamedParameterType S_SRA = { "sra", PT_KEYWORD };
+
+/**
+ * The different available output formats.
+ *
+ * @ingroup blast_service
+ */
+typedef enum MagicBlastOutputFormat
+{
+	/** SAM format */
+	MBOF_SAM,
+
+	/** Tabular Format */
+	MBOF_TABULAR,
+
+	/** Seqalign (Text ASN.1) */
+	MBOF_TEXT_ASN1,
+
+	/** The number of different output formats */
+	MBOF_NUM_TYPES
+} MagicBlastOutputFormat;
+
+
+const char *S_OUTPUT_FORMATS_SS [MBOF_NUM_TYPES] =
+{
+	"sam",
+	"tabular",
+	"asn"
+};
 
 
 
@@ -35,6 +67,7 @@ static bool ParseMagicBlastParameters (const BlastServiceData *data_p, Parameter
 
 static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p));
 
+static bool AddFormattingOptionsParameters (ParameterSet *param_set_p, BlastServiceData *data_p);
 
 
 /*
@@ -97,10 +130,47 @@ static const char *GetMagicBlastServiceDescription (Service * UNUSED_PARAM (serv
 static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("Magic Blast service parameters", "A service to run Magic Blast searches");
+	BlastServiceData *data_p = (BlastServiceData *) service_p -> se_data_p;
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Query Sequence Parameters", false, NULL, & (data_p -> bsd_base_data), param_set_p);
+	Parameter *param_p;
+	SharedType def;
 
-	return param_set_p;
+	InitSharedType (&def);
+
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_type, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", def, PL_ALL)) != NULL)
+		{
+			if ((param_p = SetUpOutputFormatParameter (S_OUTPUT_FORMATS_SS, MBOF_NUM_TYPES, * (S_OUTPUT_FORMATS_SS + MBOF_SAM), data_p, param_set_p, group_p)) != NULL)
+				{
+					if (AddFormattingOptionsParameters (param_set_p, data_p))
+						{
+							return param_set_p;
+						}
+				}
+
+		}		/* if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_type, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", def, PL_ALL)) != NULL) */
+
+	FreeParameterSet (param_set_p);
+
+	return NULL;
 }
 
+
+static bool AddFormattingOptionsParameters (ParameterSet *param_set_p, BlastServiceData *data_p)
+{
+	bool success_flag = false;
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Formatting Options", false, NULL, & (data_p -> bsd_base_data), param_set_p);
+	Parameter *param_p;
+	SharedType def;
+
+	InitSharedType (&def);
+
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_type, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", def, PL_ALL)) != NULL)
+		{
+			success_flag = true;
+		}
+
+	return success_flag;
+}
 
 
 static ServiceJobSet *RunMagicBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p)
@@ -181,5 +251,8 @@ static bool ParseMagicBlastParameters (const BlastServiceData *data_p, Parameter
 
 	return success_flag;
 }
+
+
+
 
 

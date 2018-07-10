@@ -194,13 +194,13 @@ char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32
 
 									if (param_set_p)
 										{
-											Parameter *param_p = SetUpPreviousJobUUIDParamater (blast_data_p, param_set_p, group_p);
+											Parameter *param_p = SetUpPreviousJobUUIDParameter (blast_data_p, param_set_p, group_p);
 
 											if (param_p)
 												{
 													if (SetParameterValue (param_p, remote_job_id_s, true))
 														{
-															param_p = SetUpOutputFormatParamater (blast_data_p, param_set_p, group_p);
+															param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), blast_data_p, param_set_p, group_p);
 
 															if (param_p)
 																{

@@ -33,7 +33,7 @@
 
 
 
-static const char *s_output_formats_ss [BOF_NUM_TYPES] =
+const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES] =
 {
 	"pairwise",
 	"query-anchored showing identities",
@@ -56,7 +56,6 @@ static const char *s_output_formats_ss [BOF_NUM_TYPES] =
 	"Organism report",
 	"Grassroots markup"
 };
-
 
 
 
@@ -160,7 +159,7 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 }
 
 
-Parameter *SetUpPreviousJobUUIDParamater (const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
+Parameter *SetUpPreviousJobUUIDParameter (const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
 {
 	Parameter *param_p = NULL;
 	SharedType def;
@@ -176,7 +175,7 @@ Parameter *SetUpPreviousJobUUIDParamater (const BlastServiceData *service_data_p
 int8 GetOutputFormatCodeForString (const char *output_format_s)
 {
 	int8 code = -1;
-	const char **formats_ss = s_output_formats_ss;
+	const char **formats_ss = BSP_OUTPUT_FORMATS_SS;
 	int8 i;
 
 	for (i = 0; i < BOF_NUM_TYPES; ++ i, ++ formats_ss)
@@ -192,7 +191,7 @@ int8 GetOutputFormatCodeForString (const char *output_format_s)
 }
 
 
-Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
+Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const char *default_format_s, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
 {
 	Parameter *param_p = NULL;
 	SharedType def;
@@ -204,11 +203,11 @@ Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, P
 			uint32 i;
 			bool success_flag = true;
 
-			for (i = 0; i < BOF_NUM_TYPES; ++ i)
+			for (i = 0; i < num_formats; ++ i)
 				{
-					def.st_string_value_s = (char *) * (s_output_formats_ss + i);
+					def.st_string_value_s = (char *) * (formats_ss + i);
 
-					if (!CreateAndAddParameterOption (options_p, def, * (s_output_formats_ss + i), PT_STRING))
+					if (!CreateAndAddParameterOption (options_p, def, * (formats_ss + i), PT_STRING))
 						{
 							i = BOF_NUM_TYPES;
 							success_flag = false;
@@ -218,7 +217,7 @@ Parameter *SetUpOutputFormatParamater (const BlastServiceData *service_data_p, P
 			if (success_flag)
 				{
 					/* default to grassroots */
-					def.st_string_value_s = CopyToNewString (* (s_output_formats_ss + BOF_GRASSROOTS), 0, false);
+					def.st_string_value_s = CopyToNewString (default_format_s, 0, false);
 
 					param_p = CreateAndAddParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_type, false, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", options_p, def, NULL, NULL, PL_ALL, NULL);
 
@@ -254,7 +253,7 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 		{
 			def.st_string_value_s = NULL;
 
-			if ((param_p = SetUpPreviousJobUUIDParamater (data_p, param_set_p, group_p)) != NULL)
+			if ((param_p = SetUpPreviousJobUUIDParameter (data_p, param_set_p, group_p)) != NULL)
 				{
 					def.st_string_value_s = NULL;
 
@@ -319,7 +318,7 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 
 							if ((param_p = CreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, PT_UNSIGNED_INT, false, "max_matches_in_a_query_range", "Max matches in a query range", "Limit the number of matches to a query range. This option is useful if many strong matches to one part of a query may prevent BLAST from presenting weaker matches to another part of the query", NULL, def, NULL, NULL, level, NULL)) != NULL)
 								{
-									if ((param_p = SetUpOutputFormatParamater (data_p, param_set_p, group_p)) != NULL)
+									if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), data_p, param_set_p, group_p)) != NULL)
 										{
 											if (callback_fn)
 												{
