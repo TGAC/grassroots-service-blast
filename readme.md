@@ -1,4 +1,4 @@
-﻿# BLAST Services {#blast_services}
+﻿# BLAST Services {#blast_services_guide}
 
 The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Services module allows BLAST queries to be submitted against a number of databases.  This Grassroots service module contains three Services: 
 
