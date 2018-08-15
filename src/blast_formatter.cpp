@@ -27,6 +27,7 @@
 #include "byte_buffer.h"
 #include "string_utils.h"
 #include "streams.h"
+#include "math_utils.h"
 
 
 BlastFormatter :: BlastFormatter ()
