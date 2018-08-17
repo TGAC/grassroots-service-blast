@@ -109,7 +109,7 @@ bool AddBlastArgs (const Parameter *param_p, ArgsProcessor *ap_p)
 			case PT_SIGNED_REAL:
 			case PT_UNSIGNED_REAL:
 				{
-					char *value_s = ConvertNumberToString (param_p -> pa_current_value.st_data_value);
+					char *value_s = ConvertDoubleToString (param_p -> pa_current_value.st_data_value);
 
 					if (value_s)
 						{
