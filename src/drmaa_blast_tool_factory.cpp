@@ -20,10 +20,11 @@
  *      Author: tyrrells
  */
 
+#include "../../blast-service/include/drmaa_blast_tool_factory.hpp"
+
+#include "../../blast-service/include/drmaa_blast_tool.hpp"
 #include "json_util.h"
 #include "streams.h"
-#include "drmaa_blast_tool_factory.hpp"
-#include "drmaa_blast_tool.hpp"
 
 
 

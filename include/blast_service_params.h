@@ -30,8 +30,8 @@
 #define SERVICES_BLAST_INCLUDE_BLAST_SERVICE_PARAMS_H_
 
 
-#include "blast_service_api.h"
 #include "blast_service.h"
+#include "blast_service_api.h"
 #include "parameter_set.h"
 
 

@@ -29,10 +29,10 @@
 #define BLAST_SERVICE_JOB_H_
 
 
+#include "blast_service.h"
 #include "blast_service_api.h"
 #include "service.h"
 #include "service_job.h"
-#include "blast_service.h"
 
 class BlastTool;
 

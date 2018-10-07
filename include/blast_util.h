@@ -30,10 +30,10 @@
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_BLAST_UTIL_H_
 
 
+#include "args_processor.hpp"
 #include "blast_service_api.h"
 #include "byte_buffer.h"
 #include "parameter_set.h"
-#include "args_processor.hpp"
 
 
 #ifdef __cplusplus

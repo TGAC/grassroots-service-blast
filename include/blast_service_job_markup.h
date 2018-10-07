@@ -10,11 +10,10 @@
 #ifndef SERVER_SRC_SERVICES_BLAST_INCLUDE_BLAST_SERVICE_JOB_MARKUP_H_
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_BLAST_SERVICE_JOB_MARKUP_H_
 
+#include "blast_service.h"
+#include "blast_service_api.h"
 #include "typedefs.h"
 #include "linked_list.h"
-
-#include "blast_service_api.h"
-#include "blast_service.h"
 
 #include "jansson.h"
 

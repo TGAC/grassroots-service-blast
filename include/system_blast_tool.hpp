@@ -28,8 +28,8 @@
 #ifndef SYSTEM_BLAST_TOOL_HPP_
 #define SYSTEM_BLAST_TOOL_HPP_
 
-#include "external_blast_tool.hpp"
-#include "byte_buffer_args_processor.hpp"
+#include "../../blast-service/include/byte_buffer_args_processor.hpp"
+#include "../../blast-service/include/external_blast_tool.hpp"
 
 /**
  * A class that will run Blast as a system process.

@@ -28,9 +28,9 @@
 #ifndef DRMAA_BLAST_TOOL_HPP_
 #define DRMAA_BLAST_TOOL_HPP_
 
-#include "external_blast_tool.hpp"
+#include "../../blast-service/include/drmaa_tool_args_processor.hpp"
+#include "../../blast-service/include/external_blast_tool.hpp"
 #include "drmaa_tool.h"
-#include "drmaa_tool_args_processor.hpp"
 
 
 /**

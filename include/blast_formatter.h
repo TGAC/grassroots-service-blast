@@ -29,9 +29,9 @@
 #ifndef BLAST_FORMATTER_H_
 #define BLAST_FORMATTER_H_
 
+#include "blast_service_api.h"
 #include "jansson.h"
 
-#include "blast_service_api.h"
 
 /**
  * This class is for converting the output of a blast

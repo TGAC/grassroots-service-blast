@@ -20,15 +20,16 @@
  *      Author: tyrrells
  */
 
+#include "../../blast-service/include/external_blast_tool.hpp"
+
 #include <cstring>
 #include <stdexcept>
 
-#include "external_blast_tool.hpp"
+#include "../../blast-service/include/blast_service_job.h"
+#include "../../blast-service/include/blast_service_params.h"
+#include "../../blast-service/include/blast_util.h"
 #include "string_utils.h"
 #include "temp_file.hpp"
-#include "blast_service_job.h"
-#include "blast_service_params.h"
-#include "blast_util.h"
 #include "math_utils.h"
 
 const char * const ExternalBlastTool :: EBT_INPUT_SUFFIX_S = ".input";

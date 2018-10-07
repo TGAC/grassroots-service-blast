@@ -20,11 +20,12 @@
  *      Author: tyrrells
  */
 
+#include "../../blast-service/include/system_blast_tool_factory.hpp"
+
 #include <stdexcept>
 
-#include "system_blast_tool_factory.hpp"
-#include "system_blast_tool.hpp"
-#include "async_system_blast_tool.hpp"
+#include "../../blast-service/include/async_system_blast_tool.hpp"
+#include "../../blast-service/include/system_blast_tool.hpp"
 #include "streams.h"
 #include "json_util.h"
 #include "alloc_failure.hpp"

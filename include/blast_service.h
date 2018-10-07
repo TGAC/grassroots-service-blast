@@ -25,8 +25,8 @@
 
 
 #include "blast_app_parameters.h"
-#include "blast_service_api.h"
 #include "blast_formatter.h"
+#include "blast_service_api.h"
 #include "parameter_set.h"
 #include "temp_file.hpp"
 #include "async_tasks_manager.h"

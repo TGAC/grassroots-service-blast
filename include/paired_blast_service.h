@@ -29,10 +29,10 @@
 #ifndef SERVICES_BLAST_INCLUDE_PAIRED_BLAST_SERVICE_H_
 #define SERVICES_BLAST_INCLUDE_PAIRED_BLAST_SERVICE_H_
 
+#include "blast_service.h"
 #include "blast_service_api.h"
 #include "service.h"
 #include "paired_service.h"
-#include "blast_service.h"
 #include "providers_state_table.h"
 #include "remote_service_job.h"
 

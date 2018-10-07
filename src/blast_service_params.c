@@ -21,10 +21,11 @@
  *      Author: billy
  */
 
+#include "blast_service_params.h"
+
 #include <limits.h>
 #include <string.h>
 
-#include "blast_service_params.h"
 #include "provider.h"
 #include "grassroots_config.h"
 #include "string_utils.h"

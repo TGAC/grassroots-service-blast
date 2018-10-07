@@ -9,12 +9,12 @@
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_BLASTP_SERVICE_H_
 
 
-#include "blast_service_api.h"
+#include "args_processor.hpp"
 #include "blast_service.h"
+#include "blast_service_api.h"
+#include "blast_service_params.h"
 #include "parameter_set.h"
 #include "service.h"
-#include "args_processor.hpp"
-#include "blast_service_params.h"
 
 
 #ifdef __cplusplus

@@ -30,7 +30,7 @@
 
 
 
-#include "blast_tool_factory.hpp"
+#include "../../blast-service/include/blast_tool_factory.hpp"
 
 /**
  * The base class for running blast tools as a separate process

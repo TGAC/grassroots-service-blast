@@ -6,10 +6,11 @@
  */
 
 #include "magic_blast_service.h"
+
 #include "args_processor.hpp"
 #include "blast_service.h"
-#include "blast_util.h"
 #include "blast_service_params.h"
+#include "blast_util.h"
 
 
 /*

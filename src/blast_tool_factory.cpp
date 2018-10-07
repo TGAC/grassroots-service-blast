@@ -20,14 +20,15 @@
  *      Author: tyrrells
  */
 
+#include "../../blast-service/include/blast_tool_factory.hpp"
+
 #include <cstring>
 
-#include "blast_service.h"
-#include "blast_tool_factory.hpp"
+#include "../../blast-service/include/blast_service.h"
+#include "../../blast-service/include/drmaa_blast_tool_factory.hpp"
+#include "../../blast-service/include/system_blast_tool_factory.hpp"
 #include "streams.h"
 
-#include "drmaa_blast_tool_factory.hpp"
-#include "system_blast_tool_factory.hpp"
 
 
 #ifdef _DEBUG

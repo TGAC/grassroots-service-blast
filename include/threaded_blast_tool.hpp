@@ -30,8 +30,8 @@
 #define THREADED_BLAST_TOOL_HPP_
 
 
-#include "system_blast_tool.hpp"
 #include "pthread.h"
+#include "../../blast-service/include/system_blast_tool.hpp"
 
 /**
  * A class that will run Blast within a pthread.

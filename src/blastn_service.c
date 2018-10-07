@@ -7,9 +7,9 @@
 
 #include "blastn_service.h"
 
+#include "args_processor.hpp"
 #include "blast_service.h"
 #include "blast_service_params.h"
-#include "args_processor.hpp"
 #include "blast_util.h"
 
 

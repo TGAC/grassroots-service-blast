@@ -21,9 +21,10 @@
  *      Author: billy
  */
 
+#include "../../blast-service/include/blast_formatter.h"
+
 #include <new>
 
-#include "blast_formatter.h"
 #include "byte_buffer.h"
 #include "string_utils.h"
 #include "streams.h"

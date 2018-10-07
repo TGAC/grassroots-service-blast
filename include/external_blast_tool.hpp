@@ -28,7 +28,7 @@
 #ifndef EXTERNAL_BLAST_TOOL_HPP_
 #define EXTERNAL_BLAST_TOOL_HPP_
 
-#include "blast_tool.hpp"
+#include "../../blast-service/include/blast_tool.hpp"
 #include "byte_buffer.h"
 #include "temp_file.hpp"
 

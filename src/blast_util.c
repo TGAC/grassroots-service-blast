@@ -20,9 +20,10 @@
  *      Author: billy
  */
 
+#include "blast_util.h"
+
 #include <string.h>
 
-#include "blast_util.h"
 #include "math_utils.h"
 #include "string_utils.h"
 

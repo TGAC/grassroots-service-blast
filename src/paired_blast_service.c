@@ -20,18 +20,19 @@
  *  Created on: 9 Feb 2016
  *      Author: billy
  */
+#include "paired_blast_service.h"
+
 #include <string.h>
 
-#include "typedefs.h"
-#include "paired_blast_service.h"
 #include "blast_service.h"
+#include "blast_service_job.h"
+#include "blast_service_params.h"
+#include "typedefs.h"
 #include "servers_pool.h"
 #include "parameter.h"
 #include "parameter_group.h"
 #include "json_tools.h"
 #include "service_job.h"
-#include "blast_service_job.h"
-#include "blast_service_params.h"
 #include "remote_service_job.h"
 
 #ifdef _DEBUG

@@ -19,13 +19,13 @@
  *  Created on: 21 Jan 2016
  *      Author: tyrrells
  */
+#include "blast_service_job_markup.h"
+
 #include <ctype.h>
 #include <string.h>
 
-#include "blast_service_job_markup.h"
 #include "blast_service_job.h"
 #include "blast_service_params.h"
-
 #include "string_utils.h"
 #include "regular_expressions.h"
 

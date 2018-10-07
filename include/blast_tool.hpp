@@ -23,13 +23,12 @@
 
 #include <vector>
 
-#include "blast_app_parameters.h"
-#include "blast_service_api.h"
-
+#include "../../blast-service/include/blast_app_parameters.h"
+#include "../../blast-service/include/blast_formatter.h"
+#include "../../blast-service/include/blast_service_api.h"
 #include "byte_buffer.h"
 
 #include "service_job.h"
-#include "blast_formatter.h"
 
 
 /* forward declaration */

@@ -20,10 +20,11 @@
  *      Author: tyrrells
  */
 
-#include "system_blast_tool.hpp"
+#include "../../blast-service/include/system_blast_tool.hpp"
+
+#include "../../blast-service/include/blast_service_job.h"
 #include "streams.h"
 #include "string_utils.h"
-#include "blast_service_job.h"
 
 
 #ifdef _DEBUG

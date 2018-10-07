@@ -28,7 +28,7 @@
 #ifndef SERVER_SRC_SERVICES_BLAST_INCLUDE_DRMAA_TOOL_ARGS_PROCESSOR_HPP_
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_DRMAA_TOOL_ARGS_PROCESSOR_HPP_
 
-#include "args_processor.hpp"
+#include "../../blast-service/include/args_processor.hpp"
 #include "drmaa_tool.h"
 
 

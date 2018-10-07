@@ -20,10 +20,11 @@
  *      Author: tyrrells
  */
 
+#include "../../blast-service/include/external_blast_tool_factory.hpp"
+
 #include <stdexcept>
 
-#include "external_blast_tool_factory.hpp"
-#include "blast_service.h"
+#include "../../blast-service/include/blast_service.h"
 
 
 ExternalBlastToolFactory :: ExternalBlastToolFactory (const json_t *config_p)
