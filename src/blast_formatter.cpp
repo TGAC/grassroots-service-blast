@@ -21,7 +21,7 @@
  *      Author: billy
  */
 
-#include "../../blast-service/include/blast_formatter.h"
+#include "blast_formatter.h"
 
 #include <new>
 
