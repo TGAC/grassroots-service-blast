@@ -267,11 +267,11 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 
 							def.st_ulong_value = 0;
 
-							if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_FROM.npt_type, BS_SUBRANGE_FROM.npt_name_s, "From", subrange_s, def, PL_INTERMEDIATE | PL_ADVANCED)) != NULL)
+							if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_FROM.npt_type, BS_SUBRANGE_FROM.npt_name_s, "From", subrange_s, def, PL_ADVANCED)) != NULL)
 								{
 									def.st_ulong_value = 0;
 
-									if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_TO.npt_type, BS_SUBRANGE_TO.npt_name_s, "To", subrange_s, def, PL_INTERMEDIATE | PL_ADVANCED)) != NULL)
+									if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_TO.npt_type, BS_SUBRANGE_TO.npt_name_s, "To", subrange_s, def, PL_ADVANCED)) != NULL)
 										{
 											if (callback_fn)
 												{
@@ -296,10 +296,9 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 	bool success_flag = false;
 	Parameter *param_p = NULL;
 	SharedType def;
-	uint8 level = PL_INTERMEDIATE | PL_ALL;
 	const char *param_name_s = "max_target_seqs";
 	ParameterType pt = PT_UNSIGNED_INT;
-
+	ParameterLevel level = PL_ADVANCED;
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("General Algorithm Parameters", NULL, false, & (data_p -> bsd_base_data), param_set_p);
 
 	def.st_ulong_value = 5;
@@ -346,7 +345,7 @@ bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Program Selection Parameters", NULL, false, & (blast_data_p -> bsd_base_data), param_set_p);
 	Parameter *param_p = NULL;
 	SharedType def;
-	const ParameterLevel level = PL_INTERMEDIATE | PL_ADVANCED;
+	const ParameterLevel level = PL_ADVANCED;
 
 	def.st_string_value_s = (char *) tasks_p -> bt_name_s;
 

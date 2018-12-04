@@ -107,7 +107,7 @@ bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_para
 
 													def.st_boolean_value = external_param_p -> pa_current_value.st_boolean_value;
 
-													param_p = CreateAndAddParameterToParameterSet (service_p -> se_data_p, internal_params_p, dest_group_p, PT_BOOLEAN, false, external_param_p -> pa_name_s, external_param_p -> pa_display_name_s, external_param_p -> pa_description_s, NULL, def, NULL, NULL, PL_INTERMEDIATE | PL_ALL, NULL);
+													param_p = CreateAndAddParameterToParameterSet (service_p -> se_data_p, internal_params_p, dest_group_p, PT_BOOLEAN, false, external_param_p -> pa_name_s, external_param_p -> pa_display_name_s, external_param_p -> pa_description_s, NULL, def, NULL, NULL, PL_ALL, NULL);
 
 													if (param_p)
 														{
