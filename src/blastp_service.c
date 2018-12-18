@@ -224,7 +224,7 @@ static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, Para
 
 	def.st_ulong_value = 3;
 
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_WORD_SIZE.npt_type, S_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ALL)) != NULL)
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_WORD_SIZE.npt_type, S_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ADVANCED)) != NULL)
 		{
 			success_flag = true;
 		}
@@ -284,7 +284,7 @@ static bool AddMatrixParameter (BlastServiceData *data_p, ParameterSet *param_se
 	/* set BLOSUM62 as default */
 	def.st_string_value_s = (char *) (* (S_MATRICES_SS + 4));
 
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MATRIX.npt_type, S_MATRIX.npt_name_s, "Matrix", "The Scoring matrix to use", def, PL_ALL)) != NULL)
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MATRIX.npt_type, S_MATRIX.npt_name_s, "Matrix", "The Scoring matrix to use", def, PL_ADVANCED)) != NULL)
 		{
 			success_flag = true;
 
@@ -332,7 +332,7 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 
 	def.st_ulong_value = 2;
 
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_COMP_BASED_STATS.npt_type, S_COMP_BASED_STATS.npt_name_s, "Compositional adjustments", "Matrix adjustment method to compensate for amino acid composition of sequences.", def, PL_ALL)) != NULL)
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_COMP_BASED_STATS.npt_type, S_COMP_BASED_STATS.npt_name_s, "Compositional adjustments", "Matrix adjustment method to compensate for amino acid composition of sequences.", def, PL_ADVANCED)) != NULL)
 		{
 			uint32 i;
 

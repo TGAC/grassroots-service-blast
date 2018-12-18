@@ -196,7 +196,7 @@ static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, Para
 
 	def.st_ulong_value = 28;
 
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_WORD_SIZE.npt_type, S_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ALL)) != NULL)
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_WORD_SIZE.npt_type, S_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ADVANCED)) != NULL)
 		{
 			success_flag = true;
 		}
@@ -230,11 +230,11 @@ static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_
 
 	def.st_long_value = 2;
 
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_type, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", def, PL_ALL)) != NULL)
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_type, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", def, PL_ADVANCED)) != NULL)
 		{
 			def.st_long_value = -3;
 
-			if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_type, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", def, PL_ALL)) != NULL)
+			if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_type, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", def, PL_ADVANCED)) != NULL)
 				{
 					success_flag = true;
 				}

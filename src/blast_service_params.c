@@ -167,7 +167,7 @@ Parameter *SetUpPreviousJobUUIDParameter (const BlastServiceData *service_data_p
 
 	InitSharedType (&def);
 
-	param_p = EasyCreateAndAddParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_JOB_ID.npt_type, BS_JOB_ID.npt_name_s, "Job IDs", "The UUIDs for Blast jobs that have previously been run", def, PL_ALL);
+	param_p = EasyCreateAndAddParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_JOB_ID.npt_type, BS_JOB_ID.npt_name_s, "Job IDs", "The UUIDs for Blast jobs that have previously been run", def, PL_ADVANCED);
 
 	return param_p;
 }
@@ -220,7 +220,7 @@ Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num
 					/* default to grassroots */
 					def.st_string_value_s = CopyToNewString (default_format_s, 0, false);
 
-					param_p = CreateAndAddParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_type, false, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", options_p, def, NULL, NULL, PL_ALL, NULL);
+					param_p = CreateAndAddParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_type, false, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", options_p, def, NULL, NULL, PL_ADVANCED, NULL);
 
 					if (def.st_string_value_s)
 						{
@@ -250,7 +250,7 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 
 	def.st_string_value_s = NULL;
 
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_INPUT_FILE.npt_type, BS_INPUT_FILE.npt_name_s, "Input", "The input file to read", def, PL_ALL)) != NULL)
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_INPUT_FILE.npt_type, BS_INPUT_FILE.npt_name_s, "Input", "The input file to read", def, PL_ADVANCED)) != NULL)
 		{
 			def.st_string_value_s = NULL;
 
