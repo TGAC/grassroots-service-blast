@@ -343,6 +343,9 @@ BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p,
 BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, bool (*add_additional_params_fn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p));
 
 
+BLAST_SERVICE_LOCAL bool GetBaseBlastServiceParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
+
+
 /**
  * Free a ParameterSet of Blast Service parameters.
  *

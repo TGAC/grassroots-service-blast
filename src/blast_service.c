@@ -404,6 +404,28 @@ bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *para
 
 
 
+bool GetBaseBlastServiceParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (!GetQuerySequenceParameterTypeForNamedParameter (param_name_s, pt_p))
+		{
+			if (!GetDatabaseParameterTypeForNamedParameter (param_name_s, pt_p))
+				{
+					if (!GetPairedServiceParameterTypeForNamedParameter (param_name_s, pt_p))
+						{
+							success_flag = false;
+						}		/* if (!GetPairedServiceParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+				}		/* if (!GetDatabaseParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+		}		/* if (!GetQuerySequenceParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+	return success_flag;
+}
+
+
+
 TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_directory_s, const uuid_t id)
 {
 	TempFile *input_file_p = NULL;

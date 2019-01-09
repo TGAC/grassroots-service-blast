@@ -44,6 +44,8 @@ static const char *GetBlastNServiceDescription (Service *service_p);
 
 static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
 
+static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+
 static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
 static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p);
@@ -80,6 +82,7 @@ Service *GetBlastNService (void)
 														 RunNucleotideBlastService,
 														 IsResourceForBlastService,
 														 GetBlastNServiceParameters,
+														 GetBlastNServiceParameterTypeForNamedParameter,
 														 ReleaseBlastServiceParameters,
 														 CloseBlastService,
 														 CustomiseBlastServiceJob,
@@ -184,6 +187,32 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource * 
 
 
 	return NULL;
+}
+
+
+
+static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (!GetBaseBlastServiceParameterTypeForNamedParameter (param_name_s, pt_p))
+		{
+			if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+				{
+					if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
+						{
+							if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p))
+								{
+									success_flag = false;
+								}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+						}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+				}		/* if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+		}		/* if (!GetBaseBlastServiceParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+	return success_flag;
 }
 
 

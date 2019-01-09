@@ -160,6 +160,37 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 }
 
 
+bool GetDatabaseParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, BS_INPUT_FILE.npt_name_s) == 0)
+		{
+			*pt_p = BS_INPUT_FILE.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_INPUT_QUERY.npt_name_s) == 0)
+		{
+			*pt_p = BS_INPUT_QUERY.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_SUBRANGE_FROM.npt_name_s) == 0)
+		{
+			*pt_p = BS_SUBRANGE_FROM.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_SUBRANGE_TO.npt_name_s) == 0)
+		{
+			*pt_p = BS_SUBRANGE_TO.npt_type;
+		}
+	else
+		{
+			success_flag = false;
+		}
+
+	return success_flag;
+}
+
+
+
+
 Parameter *SetUpPreviousJobUUIDParameter (const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
 {
 	Parameter *param_p = NULL;
@@ -285,6 +316,35 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 								}
 						}
 				}
+		}
+
+	return success_flag;
+}
+
+
+bool GetQuerySequenceParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, BS_INPUT_FILE.npt_name_s) == 0)
+		{
+			*pt_p = BS_INPUT_FILE.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_INPUT_QUERY.npt_name_s) == 0)
+		{
+			*pt_p = BS_INPUT_QUERY.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_SUBRANGE_FROM.npt_name_s) == 0)
+		{
+			*pt_p = BS_SUBRANGE_FROM.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_SUBRANGE_TO.npt_name_s) == 0)
+		{
+			*pt_p = BS_SUBRANGE_TO.npt_type;
+		}
+	else
+		{
+			success_flag = false;
 		}
 
 	return success_flag;
