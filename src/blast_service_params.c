@@ -34,6 +34,13 @@
 
 
 
+static NamedParameterType S_MAX_TARGET_SEQS = { "max_target_seqs", PT_UNSIGNED_INT };
+static NamedParameterType S_SHORT_QUERIES = { "max_target_seqs", PT_UNSIGNED_INT };
+static NamedParameterType S_EXPECT_THRESHOLD =  { "max_target_seqs", PT_UNSIGNED_INT };
+static NamedParameterType S_MAX_MATCHES = { "max_target_seqs", PT_UNSIGNED_INT };
+
+static const char * const S_DB_SEP_S = " -> ";
+
 const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES] =
 {
 	"pairwise",
@@ -136,9 +143,17 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 								{
 									def.st_boolean_value = db_p -> di_active_flag;
 
-									if (!EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, PT_BOOLEAN, db_p -> di_name_s, db_p -> di_name_s, db_p -> di_description_s, def, PL_ALL))
+									char *db_s = GetFullyQualifiedDatabaseName (group_s ? group_s : BS_DATABASE_GROUP_NAME_S, db_p -> di_name_s);
+
+									if (db_s)
 										{
-											PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add database \"%s\"", db_p -> di_name_s);
+
+											if (!EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, PT_BOOLEAN, db_s, db_p -> di_name_s, db_p -> di_description_s, def, PL_ALL))
+												{
+													PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add database \"%s\"", db_p -> di_name_s);
+												}
+
+											FreeCopiedString (db_s);
 										}
 
 								}		/* if (db_p -> di_type == db_type) */
@@ -160,29 +175,33 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 }
 
 
-bool GetDatabaseParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+bool GetDatabaseParameterTypeForNamedParameter (BlastServiceData *data_p, const char *param_name_s, ParameterType *pt_p)
 {
-	bool success_flag = true;
+	bool success_flag = false;
+	char *group_s = GetLocalDatabaseGroupName ();
+	const DatabaseInfo *db_p = data_p -> bsd_databases_p;
 
-	if (strcmp (param_name_s, BS_INPUT_FILE.npt_name_s) == 0)
+	if (db_p)
 		{
-			*pt_p = BS_INPUT_FILE.npt_type;
-		}
-	else if (strcmp (param_name_s, BS_INPUT_QUERY.npt_name_s) == 0)
+			while ((!success_flag) && (db_p -> di_name_s))
+				{
+					char *db_s = GetFullyQualifiedDatabaseName (group_s ? group_s : BS_DATABASE_GROUP_NAME_S, db_p -> di_name_s);
+
+					if (db_s)
+						{
+							*pt_p = PT_BOOLEAN;
+							success_flag = true;
+						}
+
+					++ db_p;
+				}		/* while ((!success_flag) && (db_p -> di_name_s)) */
+
+		}		/* if (db_p) */
+
+
+	if (group_s)
 		{
-			*pt_p = BS_INPUT_QUERY.npt_type;
-		}
-	else if (strcmp (param_name_s, BS_SUBRANGE_FROM.npt_name_s) == 0)
-		{
-			*pt_p = BS_SUBRANGE_FROM.npt_type;
-		}
-	else if (strcmp (param_name_s, BS_SUBRANGE_TO.npt_name_s) == 0)
-		{
-			*pt_p = BS_SUBRANGE_TO.npt_type;
-		}
-	else
-		{
-			success_flag = false;
+			FreeCopiedString (group_s);
 		}
 
 	return success_flag;
@@ -356,27 +375,24 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 	bool success_flag = false;
 	Parameter *param_p = NULL;
 	SharedType def;
-	const char *param_name_s = "max_target_seqs";
-	ParameterType pt = PT_UNSIGNED_INT;
 	ParameterLevel level = PL_ADVANCED;
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("General Algorithm Parameters", NULL, false, & (data_p -> bsd_base_data), param_set_p);
 
 	def.st_ulong_value = 5;
 
-
-	if ((param_p = CreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, pt, false, param_name_s, "Max target sequences", "Select the maximum number of aligned sequences to display (the actual number of alignments may be greater than this).", NULL, def, NULL, NULL, level, NULL)) != NULL)
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MAX_TARGET_SEQS.npt_type, S_MAX_TARGET_SEQS.npt_name_s, "Max target sequences", "Select the maximum number of aligned sequences to display (the actual number of alignments may be greater than this).", def, level)) != NULL)
 		{
 			def.st_boolean_value = true;
 
-			if ((param_p = CreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, PT_BOOLEAN, false, "short_queries", "Short queries", "Automatically adjust parameters for short input sequences", NULL, def, NULL, NULL, level, NULL)) != NULL)
+			if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_SHORT_QUERIES.npt_type, S_SHORT_QUERIES.npt_name_s, "Short queries", "Automatically adjust parameters for short input sequences", def, level)) != NULL)
 				{
 					def.st_ulong_value = 10;
 
-					if ((param_p = CreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, PT_UNSIGNED_INT, false, "expect_threshold", "Expect threshold", "Expected number of chance matches in a random model", NULL, def, NULL, NULL, level, NULL)) != NULL)
+					if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_EXPECT_THRESHOLD.npt_type, S_EXPECT_THRESHOLD.npt_name_s, "Expect threshold", "Expected number of chance matches in a random model", def, level)) != NULL)
 						{
 							def.st_ulong_value = 0;
 
-							if ((param_p = CreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, PT_UNSIGNED_INT, false, "max_matches_in_a_query_range", "Max matches in a query range", "Limit the number of matches to a query range. This option is useful if many strong matches to one part of a query may prevent BLAST from presenting weaker matches to another part of the query", NULL, def, NULL, NULL, level, NULL)) != NULL)
+							if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MAX_MATCHES.npt_type, S_MAX_MATCHES.npt_name_s, "Max matches in a query range", "Limit the number of matches to a query range. This option is useful if many strong matches to one part of a query may prevent BLAST from presenting weaker matches to another part of the query", def, level)) != NULL)
 								{
 									if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), data_p, param_set_p, group_p)) != NULL)
 										{
@@ -392,6 +408,35 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 								}
 						}
 				}
+		}
+
+	return success_flag;
+}
+
+
+bool GetGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, S_MAX_TARGET_SEQS.npt_name_s) == 0)
+		{
+			*pt_p = S_MAX_TARGET_SEQS.npt_type;
+		}
+	else if (strcmp (param_name_s, S_SHORT_QUERIES.npt_name_s) == 0)
+		{
+			*pt_p = S_SHORT_QUERIES.npt_type;
+		}
+	else if (strcmp (param_name_s, S_EXPECT_THRESHOLD.npt_name_s) == 0)
+		{
+			*pt_p = S_EXPECT_THRESHOLD.npt_type;
+		}
+	else if (strcmp (param_name_s, S_MAX_MATCHES.npt_name_s) == 0)
+		{
+			*pt_p = S_MAX_MATCHES.npt_type;
+		}
+	else
+		{
+			success_flag = false;
 		}
 
 	return success_flag;
@@ -437,6 +482,40 @@ bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet
 }
 
 
+bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p)
+{
+	bool success_flag = false;
+	SharedType def;
+	Parameter *param_p;
+	uint32 *value_p = (uint32 *) callback_data_p;
+
+	def.st_ulong_value = *value_p;
+
+	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_WORD_SIZE.npt_type, BS_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ADVANCED)) != NULL)
+		{
+			success_flag = true;
+		}
+
+	return success_flag;
+}
+
+bool GetProgramSelectionParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, BS_TASK.npt_name_s) == 0)
+		{
+			*pt_p = BS_TASK.npt_type;
+		}
+	else
+		{
+			success_flag = false;
+		}
+
+	return success_flag;
+}
+
+
 char *GetLocalDatabaseGroupName (void)
 {
 	char *group_s = NULL;
@@ -454,5 +533,34 @@ char *GetLocalDatabaseGroupName (void)
 
 	return group_s;
 }
+
+
+char *GetFullyQualifiedDatabaseName (const char *group_s, const char *db_s)
+{
+	char *fq_db_s = ConcatenateVarargsStrings (group_s ? group_s : BS_DATABASE_GROUP_NAME_S, S_DB_SEP_S, db_s, NULL);
+
+	return fq_db_s;
+}
+
+
+const char *GetLocalDatabaseName (const char *fully_qualified_db_s)
+{
+	const char *db_s = NULL;
+	const char *sep_p = strstr (fully_qualified_db_s, S_DB_SEP_S);
+
+	if (sep_p)
+		{
+			const size_t l = strlen (S_DB_SEP_S);
+
+			if (strlen (sep_p) >= l)
+				{
+					db_s += l;
+				}
+		}
+
+	return db_s;
+}
+
+
 
 

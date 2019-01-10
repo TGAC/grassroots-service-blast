@@ -387,7 +387,7 @@ bool CloseBlastService (Service *service_p)
 }
 
 
-bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, bool (*add_additional_params_fn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p))
+bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, AddAdditionalParamsFn add_additional_params_fn)
 {
 	bool success_flag = false;
 	BlastServiceData *blast_data_p = (BlastServiceData *) (blast_service_p -> se_data_p);
@@ -404,15 +404,17 @@ bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *para
 
 
 
-bool GetBaseBlastServiceParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+bool GetBaseBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 
 	if (!GetQuerySequenceParameterTypeForNamedParameter (param_name_s, pt_p))
 		{
-			if (!GetDatabaseParameterTypeForNamedParameter (param_name_s, pt_p))
+			BlastServiceData *data_p = (BlastServiceData *) (& (service_p -> se_data_p));
+
+			if (!GetDatabaseParameterTypeForNamedParameter (data_p, param_name_s, pt_p))
 				{
-					if (!GetPairedServiceParameterTypeForNamedParameter (param_name_s, pt_p))
+					if (!GetPairedServiceParameterTypeForNamedParameter (service_p, param_name_s, pt_p))
 						{
 							success_flag = false;
 						}		/* if (!GetPairedServiceParameterTypeForNamedParameter (param_name_s, pt_p)) */
@@ -642,36 +644,14 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 		{
 			while (db_p -> di_name_s)
 				{
-					Parameter *param_p = GetParameterFromParameterSetByName (param_set_p, db_p -> di_name_s);
+					char *full_db_name_s = GetFullyQualifiedDatabaseName (group_s, db_p -> di_name_s);
 
-					/* Do we have a matching parameter? */
-					if (param_p)
+					if (full_db_name_s)
 						{
-							bool match_flag = true;
+							Parameter *param_p = GetParameterFromParameterSetByName (param_set_p, full_db_name_s);
 
-							/*
-							 * If possible, check that we are in the expected group
-							 * for this Server.
-							 */
-							if (group_s)
-								{
-									if (param_p -> pa_group_p)
-										{
-											if (param_p -> pa_group_p -> pg_name_s)
-												{
-													if (strcmp (group_s, param_p -> pa_group_p -> pg_name_s) != 0)
-														{
-															match_flag = false;
-														}
-
-												}		/* if (param_p -> pa_group_p -> pg_name_s) */
-
-										}		/* if (param_p -> pa_group_p) */
-
-								}		/* if (group_s) */
-
-
-							if (match_flag)
+							/* Do we have a matching parameter? */
+							if (param_p)
 								{
 									/* Is the database selected to search against? */
 									if (param_p -> pa_current_value.st_boolean_value)
@@ -693,9 +673,10 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 
 										}		/* if (param_p -> pa_current_value.st_boolean_value) */
 
-								}		/* if (match_flag) */
+								}		/* if (param_p) */
 
-						}		/* if (param_p) */
+							FreeCopiedString (full_db_name_s);
+						}		/* if (full_db_name_s) */
 
 					++ db_p;
 				}		/* while (db_p) */

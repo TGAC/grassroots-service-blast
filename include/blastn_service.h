@@ -27,6 +27,7 @@ extern "C"
  */
 BLAST_SERVICE_LOCAL Service *GetBlastNService (void);
 
+
 #ifdef __cplusplus
 }
 #endif

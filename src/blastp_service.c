@@ -20,7 +20,7 @@
 /*******************************/
 
 
-static NamedParameterType S_WORD_SIZE = { "word_size", PT_UNSIGNED_INT };
+
 static NamedParameterType S_MATRIX = { "matrix", PT_STRING };
 static NamedParameterType S_COMP_BASED_STATS = { "comp_based_stats", PT_UNSIGNED_INT };
 
@@ -70,9 +70,9 @@ static bool AddMatrixParameter (BlastServiceData *data_p, ParameterSet *param_se
 
 static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
-static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
-
 static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p);
+
+static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
 /*******************************/
@@ -97,6 +97,7 @@ Service *GetBlastPService (void)
 														 RunProteinBlastService,
 														 IsResourceForBlastService,
 														 GetProteinBlastServiceParameters,
+														 GetBlastPServiceParameterTypeForNamedParameter,
 														 ReleaseBlastServiceParameters,
 														 CloseBlastService,
 														 CustomiseBlastServiceJob,
@@ -152,6 +153,34 @@ ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const cha
 }
 
 
+
+static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (!GetBaseBlastServiceParameterTypeForNamedParameter (service_p, param_name_s, pt_p))
+		{
+			if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+				{
+					if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+						{
+							if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
+								{
+									if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p))
+										{
+											success_flag = false;
+										}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+								}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+						}		/* if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+				}		/* if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+		}		/* if (!GetBaseBlastServiceParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+	return success_flag;
+}
 
 
 bool AddProteinBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p)
@@ -210,26 +239,6 @@ static const char *GetProteinBlastServiceDescription (Service * UNUSED_PARAM (se
 static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
 {
 	return CreateProteinBlastServiceParameters (service_p, "Protein Blast service parameters", "A service to run Protein Blast searches", NULL, s_tasks_p, S_NUM_TASKS);
-}
-
-
-
-
-
-static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
-{
-	bool success_flag = false;
-	SharedType def;
-	Parameter *param_p;
-
-	def.st_ulong_value = 3;
-
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_WORD_SIZE.npt_type, S_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ADVANCED)) != NULL)
-		{
-			success_flag = true;
-		}
-
-	return success_flag;
 }
 
 

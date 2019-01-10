@@ -5,6 +5,8 @@
  *      Author: billy
  */
 
+#include <string.h>
+
 #include "blastn_service.h"
 
 #include "args_processor.hpp"
@@ -22,7 +24,6 @@
 
 static NamedParameterType S_MATCH_SCORE = { "reward", PT_UNSIGNED_INT };
 static NamedParameterType S_MISMATCH_SCORE = { "penalty", PT_NEGATIVE_INT };
-static NamedParameterType S_WORD_SIZE = { "word_size", PT_UNSIGNED_INT };
 
 
 
@@ -58,6 +59,8 @@ static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_
 static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
 static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
+
+static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
 
 
 /*******************************/
@@ -195,7 +198,7 @@ static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, 
 {
 	bool success_flag = true;
 
-	if (!GetBaseBlastServiceParameterTypeForNamedParameter (param_name_s, pt_p))
+	if (!GetBaseBlastServiceParameterTypeForNamedParameter (service_p, param_name_s, pt_p))
 		{
 			if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
 				{
@@ -216,22 +219,6 @@ static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, 
 }
 
 
-static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
-{
-	bool success_flag = false;
-	SharedType def;
-	Parameter *param_p = NULL;
-	ServiceData *service_data_p = & (data_p -> bsd_base_data);
-
-	def.st_ulong_value = 28;
-
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_WORD_SIZE.npt_type, S_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ADVANCED)) != NULL)
-		{
-			success_flag = true;
-		}
-
-	return success_flag;
-}
 
 
 static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p)
@@ -274,13 +261,33 @@ static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_
 }
 
 
-bool ParseNucleotideBlastParameters (const BlastServiceData * UNUSED_PARAM (data_p), ParameterSet *params_p, ArgsProcessor *ap_p)
+static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, S_MATCH_SCORE.npt_name_s) == 0)
+		{
+			*pt_p = S_MATCH_SCORE.npt_type;
+		}
+	else if (strcmp (param_name_s, S_MISMATCH_SCORE.npt_name_s) == 0)
+		{
+			*pt_p = S_MISMATCH_SCORE.npt_type;
+		}
+	else
+		{
+			success_flag = false;
+		}
+
+	return success_flag;
+}
+
+
+static bool ParseNucleotideBlastParameters (const BlastServiceData * UNUSED_PARAM (data_p), ParameterSet *params_p, ArgsProcessor *ap_p)
 {
 	bool success_flag = false;
 
-
 	/* Word size */
-	if (GetAndAddBlastArgs (params_p, S_WORD_SIZE.npt_name_s, false, ap_p))
+	if (GetAndAddBlastArgs (params_p, BS_WORD_SIZE.npt_name_s, false, ap_p))
 		{
 			/* Reward */
 			if (GetAndAddBlastArgs (params_p, S_MATCH_SCORE.npt_name_s, false, ap_p))
@@ -301,10 +308,10 @@ bool ParseNucleotideBlastParameters (const BlastServiceData * UNUSED_PARAM (data
 					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add \"%s\"", S_MATCH_SCORE.npt_name_s);
 				}
 
-		}		/* if (GetAndAddBlastArgsToByteBuffer (params_p, S_WORD_SIZE.npt_name_s, false, buffer_p) */
+		}		/* if (GetAndAddBlastArgsToByteBuffer (params_p, BS_WORD_SIZE.npt_name_s, false, buffer_p) */
 	else
 		{
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add \"%s\"", S_WORD_SIZE.npt_name_s);
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add \"%s\"", BS_WORD_SIZE.npt_name_s);
 		}
 
 	return success_flag;

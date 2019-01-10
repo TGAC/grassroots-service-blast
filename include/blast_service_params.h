@@ -184,6 +184,14 @@ BLAST_SERVICE_PREFIX NamedParameterType BS_EXPECT_THRESHOLD BLAST_SERVICE_STRUCT
 BLAST_SERVICE_PREFIX NamedParameterType BS_OUTPUT_FORMAT BLAST_SERVICE_STRUCT_VAL ("outfmt", PT_STRING);
 
 
+/**
+ * The Blast Service NamedParameterType for specifying the word size to use.
+ *
+ * @ingroup blast_service
+ * @see BlastOutputFormat
+ */
+BLAST_SERVICE_PREFIX NamedParameterType BS_WORD_SIZE BLAST_SERVICE_STRUCT_VAL ("word_size", PT_UNSIGNED_INT);
+
 
 
 /**
@@ -208,16 +216,7 @@ typedef struct BlastTask
 } BlastTask;
 
 
-/**
- * A callback function used to amend a given ParameterSet.
- *
- * @param data_p The configuration data for the Blast Service.
- * @param param_set_p The ParameterSet that the callback function's Parameters will be added to.
- * @param group_p The optional ParameterGroup to add the generated Parameter to. This can be <code>NULL</code>.
- * @return <code>true</code> if the callback function's parameters were added successfully, <code>
- * false</code> otherwise.
- */
-typedef bool (*AddAdditionalParamsFn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
+
 
 
 #ifdef __cplusplus
@@ -338,7 +337,29 @@ BLAST_SERVICE_LOCAL int8 GetOutputFormatCodeForString (const char *output_format
 
 
 
+BLAST_SERVICE_LOCAL bool GetDatabaseParameterTypeForNamedParameter (BlastServiceData *data_p, const char *param_name_s, ParameterType *pt_p);
+
+
+BLAST_SERVICE_LOCAL bool GetQuerySequenceParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
+
+
+BLAST_SERVICE_LOCAL bool GetGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
+
+
+BLAST_SERVICE_LOCAL bool GetProgramSelectionParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
+
+
 BLAST_SERVICE_LOCAL char *GetLocalDatabaseGroupName (void);
+
+
+BLAST_SERVICE_LOCAL char *GetFullyQualifiedDatabaseName (const char *group_s, const char *db_s);
+
+
+BLAST_SERVICE_LOCAL const char *GetLocalDatabaseName (const char *fully_qualified_db_s);
+
+
+BLAST_SERVICE_LOCAL bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
+
 
 #ifdef __cplusplus
 }

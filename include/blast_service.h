@@ -171,6 +171,16 @@ typedef struct BLAST_SERVICE_LOCAL BlastServiceData
 } BlastServiceData;
 
 
+/**
+ * A callback function used to amend a given ParameterSet.
+ *
+ * @param data_p The configuration data for the Blast Service.
+ * @param param_set_p The ParameterSet that the callback function's Parameters will be added to.
+ * @param group_p The optional ParameterGroup to add the generated Parameter to. This can be <code>NULL</code>.
+ * @return <code>true</code> if the callback function's parameters were added successfully, <code>
+ * false</code> otherwise.
+ */
+typedef bool (*AddAdditionalParamsFn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -340,10 +350,10 @@ BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p,
  * otherwise.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, bool (*add_additional_params_fn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p));
+BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, AddAdditionalParamsFn query_sequence_callback_fn);
 
 
-BLAST_SERVICE_LOCAL bool GetBaseBlastServiceParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
+BLAST_SERVICE_LOCAL bool GetBaseBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
 /**

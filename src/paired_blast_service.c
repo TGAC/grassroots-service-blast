@@ -105,19 +105,26 @@ bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_para
 													Parameter *external_param_p = src_node_p -> pn_parameter_p;
 													Parameter *param_p = NULL;
 
-													def.st_boolean_value = external_param_p -> pa_current_value.st_boolean_value;
+													char *db_s = GetFullyQualifiedDatabaseName (databases_group_s, external_param_p -> pa_name_s);
 
-													param_p = CreateAndAddParameterToParameterSet (service_p -> se_data_p, internal_params_p, dest_group_p, PT_BOOLEAN, false, external_param_p -> pa_name_s, external_param_p -> pa_display_name_s, external_param_p -> pa_description_s, NULL, def, NULL, NULL, PL_ALL, NULL);
-
-													if (param_p)
+													if (db_s)
 														{
-															if (!CopyRemoteParameterDetails (external_param_p, param_p))
-																{
-																	PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to copy details from external parameter \"%s\" to param \"%s\"", external_param_p -> pa_name_s, param_p -> pa_name_s);
-																}		/* if (!CopyRemoteParameterDetails (external_param_p, param_p)) */
+															def.st_boolean_value = external_param_p -> pa_current_value.st_boolean_value;
 
-															++ num_added_dbs;
-														}		/* if (param_p) */
+															param_p = CreateAndAddParameterToParameterSet (service_p -> se_data_p, internal_params_p, dest_group_p, PT_BOOLEAN, false, external_param_p -> pa_name_s, external_param_p -> pa_display_name_s, external_param_p -> pa_description_s, NULL, def, NULL, NULL, PL_ALL, NULL);
+
+															if (param_p)
+																{
+																	if (!CopyRemoteParameterDetails (external_param_p, param_p))
+																		{
+																			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to copy details from external parameter \"%s\" to param \"%s\"", external_param_p -> pa_name_s, param_p -> pa_name_s);
+																		}		/* if (!CopyRemoteParameterDetails (external_param_p, param_p)) */
+
+																	++ num_added_dbs;
+																}		/* if (param_p) */
+
+															FreeCopiedString (db_s);
+														}		/* if (db_s) */
 
 													src_node_p = (ParameterNode *) (src_node_p -> pn_node.ln_next_p);
 												}		/* while (i > 0) */
@@ -142,6 +149,70 @@ bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_para
 	return success_flag;
 }
 
+
+bool GetPairedServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = false;
+
+	if (service_p -> se_paired_services.ll_size > 0)
+		{
+			PairedServiceNode *node_p = (PairedServiceNode *) (service_p -> se_paired_services.ll_head_p);
+
+			while ((node_p) && (!success_flag))
+				{
+					/*
+					 * Try and add the external server's databases
+					 */
+					PairedService *paired_service_p = node_p -> psn_paired_service_p;
+					char *databases_group_s = CreateGroupName (paired_service_p -> ps_server_name_s);
+
+					if (databases_group_s)
+						{
+							const uint32 num_params = GetParameterSetSize (paired_service_p -> ps_params_p);
+
+							if (num_params > 0)
+								{
+									ParameterNode *src_node_p = (ParameterNode *) (paired_service_p -> ps_params_p -> ps_params_p);
+
+									while (src_node_p && (!success_flag))
+										{
+											/* Add the database to our list */
+											Parameter *external_param_p = src_node_p -> pn_parameter_p;
+											Parameter *param_p = NULL;
+
+											char *db_s = GetFullyQualifiedDatabaseName (databases_group_s, external_param_p -> pa_name_s);
+
+											if (db_s)
+												{
+													if (strcmp (db_s, param_name_s) == 0)
+														{
+															*pt_p = PT_BOOLEAN;
+															success_flag = true;
+														}
+													FreeCopiedString (db_s);
+												}		/* if (db_s) */
+
+											src_node_p = (ParameterNode *) (src_node_p -> pn_node.ln_next_p);
+										}		/* while (i > 0) */
+
+								}		/* if (num_params > 0) */
+
+
+							FreeCopiedString (databases_group_s);
+						}		/* if (databases_group_s) */
+					else
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate memory for database group name \"%s\"", paired_service_p -> ps_server_name_s);
+						}
+
+
+					node_p = (PairedServiceNode *) (node_p -> psn_node.ln_next_p);
+				}		/* while (node_p) */
+
+		}		/* if (service_p -> se_paired_services.ll_size > 0) */
+
+	return success_flag;
+}
 
 
 //int32 RunRemoteBlastJobs (Service *service_p, ServiceJobSet *jobs_p, ParameterSet *params_p, PairedService *paired_service_p, ProvidersStateTable *providers_p)
