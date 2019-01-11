@@ -74,6 +74,8 @@ static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p);
 
 static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
+static bool GetProteinBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
+
 
 /*******************************/
 /******* API DEFINITIONS *******/
@@ -154,7 +156,7 @@ ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const cha
 
 
 
-static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 
@@ -166,10 +168,10 @@ static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, 
 						{
 							if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
 								{
-									if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p))
+									if (!GetProteinBlastParameterTypeForNamedParameter (param_name_s, pt_p))
 										{
 											success_flag = false;
-										}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
+										}		/* if (!GetProteinBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
 
 								}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
 
@@ -190,6 +192,27 @@ bool AddProteinBlastParameters (BlastServiceData *data_p, ParameterSet *param_se
 	if (AddScoringParameters (data_p, param_set_p))
 		{
 			success_flag = true;
+		}
+
+	return success_flag;
+}
+
+
+static bool GetProteinBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, S_MATRIX.npt_name_s) == 0)
+		{
+			*pt_p = S_MATRIX.npt_type;
+		}
+	else if (strcmp (param_name_s, S_COMP_BASED_STATS.npt_name_s) == 0)
+		{
+			*pt_p = S_COMP_BASED_STATS.npt_type;
+		}
+	else
+		{
+			success_flag = false;
 		}
 
 	return success_flag;
