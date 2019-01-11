@@ -291,7 +291,7 @@ Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num
 }
 
 
-bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn)
+bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn, void *callback_data_p)
 {
 	bool success_flag = false;
 	Parameter *param_p = NULL;
@@ -325,7 +325,7 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 										{
 											if (callback_fn)
 												{
-													success_flag = callback_fn (data_p, param_set_p, group_p);
+													success_flag = callback_fn (data_p, param_set_p, group_p, callback_data_p);
 												}
 											else
 												{
@@ -370,7 +370,7 @@ bool GetQuerySequenceParameterTypeForNamedParameter (const char *param_name_s, P
 }
 
 
-bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn)
+bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn, void *callback_data_p)
 {
 	bool success_flag = false;
 	Parameter *param_p = NULL;
@@ -398,7 +398,7 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 										{
 											if (callback_fn)
 												{
-													success_flag = callback_fn (data_p, param_set_p, group_p);
+													success_flag = callback_fn (data_p, param_set_p, group_p, callback_data_p);
 												}
 											else
 												{
@@ -514,6 +514,23 @@ bool GetProgramSelectionParameterTypeForNamedParameter (const char *param_name_s
 
 	return success_flag;
 }
+
+bool GetProteinGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, BS_WORD_SIZE.npt_name_s) == 0)
+		{
+			*pt_p = BS_WORD_SIZE.npt_type;
+		}
+	else
+		{
+			success_flag = false;
+		}
+
+	return success_flag;
+}
+
 
 
 char *GetLocalDatabaseGroupName (void)

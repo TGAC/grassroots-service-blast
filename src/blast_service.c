@@ -387,12 +387,12 @@ bool CloseBlastService (Service *service_p)
 }
 
 
-bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, AddAdditionalParamsFn add_additional_params_fn)
+bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, AddAdditionalParamsFn add_additional_params_fn, void *callback_data_p)
 {
 	bool success_flag = false;
 	BlastServiceData *blast_data_p = (BlastServiceData *) (blast_service_p -> se_data_p);
 
-	if (AddQuerySequenceParams (blast_data_p, param_set_p, add_additional_params_fn))
+	if (AddQuerySequenceParams (blast_data_p, param_set_p, add_additional_params_fn, callback_data_p))
 		{
 			uint16 num_dbs = AddDatabaseParams (blast_data_p, param_set_p, db_type);
 

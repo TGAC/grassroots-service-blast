@@ -120,13 +120,13 @@ Service *GetBlastPService (void)
 }
 
 
-ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const char *param_set_name_s, const char *param_set_description_s, AddAdditionalParamsFn query_sequence_callback_fn, const BlastTask *tasks_p, const uint32 num_tasks)
+ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const char *param_set_name_s, const char *param_set_description_s, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p, const BlastTask *tasks_p, const uint32 num_tasks)
 {
 	ParameterSet *param_set_p = AllocateParameterSet (param_set_name_s, param_set_description_s);
 
 	if (param_set_p)
 		{
-			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_PROTEIN, query_sequence_callback_fn))
+			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_PROTEIN, query_sequence_callback_fn, callback_data_p))
 				{
           BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
 
@@ -154,7 +154,7 @@ ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const cha
 
 
 
-static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 
@@ -166,7 +166,7 @@ static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, 
 						{
 							if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
 								{
-									if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p))
+									if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
 										{
 											success_flag = false;
 										}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
@@ -238,7 +238,7 @@ static const char *GetProteinBlastServiceDescription (Service * UNUSED_PARAM (se
 
 static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
 {
-	return CreateProteinBlastServiceParameters (service_p, "Protein Blast service parameters", "A service to run Protein Blast searches", NULL, s_tasks_p, S_NUM_TASKS);
+	return CreateProteinBlastServiceParameters (service_p, "Protein Blast service parameters", "A service to run Protein Blast searches", NULL, NULL, s_tasks_p, S_NUM_TASKS);
 }
 
 

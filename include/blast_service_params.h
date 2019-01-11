@@ -235,7 +235,7 @@ extern "C"
  * false</code> otherwise.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn	);
+BLAST_SERVICE_LOCAL bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn, void *callback_data_p);
 
 
 /**
@@ -249,7 +249,7 @@ BLAST_SERVICE_LOCAL bool AddQuerySequenceParams (BlastServiceData *data_p, Param
  * false</code> otherwise.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn);
+BLAST_SERVICE_LOCAL bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn, void *callback_data_p);
 
 
 /**
@@ -359,6 +359,8 @@ BLAST_SERVICE_LOCAL const char *GetLocalDatabaseName (const char *fully_qualifie
 
 
 BLAST_SERVICE_LOCAL bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
+
+BLAST_SERVICE_LOCAL  bool GetProteinGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
 
 
 #ifdef __cplusplus

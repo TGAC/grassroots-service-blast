@@ -56,8 +56,6 @@ static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet
 
 static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p);
 
-static bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
-
 static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
 static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
@@ -165,7 +163,7 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource * 
 
 	if (param_set_p)
 		{
-			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_NUCLEOTIDE, NULL))
+			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_NUCLEOTIDE, NULL, NULL))
 				{
 				  BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
 
@@ -280,6 +278,8 @@ static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_
 
 	return success_flag;
 }
+
+
 
 
 static bool ParseNucleotideBlastParameters (const BlastServiceData * UNUSED_PARAM (data_p), ParameterSet *params_p, ArgsProcessor *ap_p)

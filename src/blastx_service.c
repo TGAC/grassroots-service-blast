@@ -57,11 +57,14 @@ static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource *r
 static ServiceJobSet *RunBlastXService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
 
-static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
+static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
 
 static bool ParseBlastXParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
 static ServiceMetadata *GetBlastXServiceMetadata (Service *service_p);
+
+static bool GetBlastXServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+
 
 /*******************************/
 /******* API DEFINITIONS *******/
@@ -85,6 +88,7 @@ Service *GetBlastXService (void)
 														 RunBlastXService,
 														 IsResourceForBlastService,
 														 GetBlastXServiceParameters,
+														 GetBlastXServiceParameterTypeForNamedParameter,
 														 ReleaseBlastServiceParameters,
 														 CloseBlastService,
 														 CustomiseBlastServiceJob,
@@ -122,13 +126,43 @@ static const char *GetBlastXServiceDescription (Service * UNUSED_PARAM (service_
 
 static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
 {
-	ParameterSet *param_set_p = CreateProteinBlastServiceParameters (service_p, "Protein BlastX service parameters", "A service to search protein databases with nucleotide queries", AddBlastXQuerySequenceParameters, s_tasks_p, S_NUM_TASKS);
+	ParameterSet *param_set_p = CreateProteinBlastServiceParameters (service_p, "Protein BlastX service parameters", "A service to search protein databases with nucleotide queries", AddBlastXQuerySequenceParameters, NULL, s_tasks_p, S_NUM_TASKS);
 
 	return param_set_p;
 }
 
 
-static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
+
+static bool GetBlastXServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (!GetBaseBlastServiceParameterTypeForNamedParameter (service_p, param_name_s, pt_p))
+		{
+			if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+				{
+					if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+						{
+							if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
+								{
+									if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+										{
+											success_flag = false;
+										}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+								}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+						}		/* if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+				}		/* if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+		}		/* if (!GetBaseBlastServiceParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+	return success_flag;
+}
+
+
+static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p)
 {
 	Parameter *param_p = NULL;
 	bool success_flag = false;
