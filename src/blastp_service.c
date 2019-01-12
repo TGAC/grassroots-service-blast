@@ -131,8 +131,9 @@ ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const cha
 			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_PROTEIN, query_sequence_callback_fn, callback_data_p))
 				{
           BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
+          uint32 word_size = 3;
 
-					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters))
+					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters, &word_size))
 						{
 							if (AddProteinBlastParameters (blast_data_p, param_set_p))
 								{

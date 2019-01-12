@@ -500,23 +500,6 @@ bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSe
 }
 
 
-bool GetProteinGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
-{
-	bool success_flag = true;
-
-	if (strcmp (param_name_s, BS_WORD_SIZE.npt_name_s) == 0)
-		{
-			*pt_p = BS_WORD_SIZE.npt_type;
-		}
-	else
-		{
-			success_flag = false;
-		}
-
-	return success_flag;
-}
-
-
 bool GetProgramSelectionParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;

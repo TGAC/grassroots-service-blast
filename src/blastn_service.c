@@ -166,8 +166,9 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource * 
 			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_NUCLEOTIDE, NULL, NULL))
 				{
 				  BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
+				  uint32 word_size = 11;
 
-					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters))
+					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters, &word_size))
 						{
 							if (AddProgramSelectionParameters (blast_data_p, param_set_p, s_tasks_p, S_NUM_TASKS))
 								{

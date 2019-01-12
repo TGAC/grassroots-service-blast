@@ -5,6 +5,8 @@
  *      Author: billy
  */
 
+#include <string.h>
+
 #include "magic_blast_service.h"
 
 #include "args_processor.hpp"
@@ -70,6 +72,7 @@ static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resourc
 
 static bool AddFormattingOptionsParameters (ParameterSet *param_set_p, BlastServiceData *data_p);
 
+static bool GetMagicBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 /*
  * API DEFINITIONS
@@ -93,6 +96,7 @@ Service *GetMagicBlastService (void)
 																 RunMagicBlastService,
 																 IsResourceForBlastService,
 																 GetMagicBlastServiceParameters,
+																 GetMagicBlastServiceParameterTypeForNamedParameter,
 																 ReleaseBlastServiceParameters,
 																 CloseBlastService,
 																 CustomiseBlastServiceJob,
@@ -153,6 +157,24 @@ static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resourc
 	FreeParameterSet (param_set_p);
 
 	return NULL;
+}
+
+
+
+static bool GetMagicBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = true;
+
+	if (strcmp (param_name_s, S_PAIRED.npt_name_s) == 0)
+		{
+			*pt_p = S_PAIRED.npt_type;
+		}
+	else
+		{
+			success_flag = false;
+		}
+
+	return success_flag;
 }
 
 
