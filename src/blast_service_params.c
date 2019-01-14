@@ -35,9 +35,9 @@
 
 
 static NamedParameterType S_MAX_TARGET_SEQS = { "max_target_seqs", PT_UNSIGNED_INT };
-static NamedParameterType S_SHORT_QUERIES = { "max_target_seqs", PT_UNSIGNED_INT };
-static NamedParameterType S_EXPECT_THRESHOLD =  { "max_target_seqs", PT_UNSIGNED_INT };
-static NamedParameterType S_MAX_MATCHES = { "max_target_seqs", PT_UNSIGNED_INT };
+//static NamedParameterType S_SHORT_QUERIES = { "max_target_seqs", PT_UNSIGNED_INT };
+static NamedParameterType S_EXPECT_THRESHOLD =  { "evalue", PT_UNSIGNED_REAL };
+//static NamedParameterType S_MAX_MATCHES = { "max_target_seqs", PT_UNSIGNED_INT };
 
 static const char * const S_DB_SEP_S = " -> ";
 
@@ -349,6 +349,10 @@ bool GetQuerySequenceParameterTypeForNamedParameter (const char *param_name_s, P
 		{
 			*pt_p = BS_INPUT_FILE.npt_type;
 		}
+	else if (strcmp (param_name_s, BS_JOB_ID.npt_name_s) == 0)
+		{
+			*pt_p = BS_JOB_ID.npt_type;
+		}
 	else if (strcmp (param_name_s, BS_INPUT_QUERY.npt_name_s) == 0)
 		{
 			*pt_p = BS_INPUT_QUERY.npt_type;
@@ -384,30 +388,27 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 		{
 			def.st_boolean_value = true;
 
-			if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_SHORT_QUERIES.npt_type, S_SHORT_QUERIES.npt_name_s, "Short queries", "Automatically adjust parameters for short input sequences", def, level)) != NULL)
-				{
+//			if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_SHORT_QUERIES.npt_type, S_SHORT_QUERIES.npt_name_s, "Short queries", "Automatically adjust parameters for short input sequences", def, level)) != NULL)
+//				{
 					def.st_ulong_value = 10;
 
 					if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_EXPECT_THRESHOLD.npt_type, S_EXPECT_THRESHOLD.npt_name_s, "Expect threshold", "Expected number of chance matches in a random model", def, level)) != NULL)
 						{
 							def.st_ulong_value = 0;
 
-							if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MAX_MATCHES.npt_type, S_MAX_MATCHES.npt_name_s, "Max matches in a query range", "Limit the number of matches to a query range. This option is useful if many strong matches to one part of a query may prevent BLAST from presenting weaker matches to another part of the query", def, level)) != NULL)
+							if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), data_p, param_set_p, group_p)) != NULL)
 								{
-									if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), data_p, param_set_p, group_p)) != NULL)
+									if (callback_fn)
 										{
-											if (callback_fn)
-												{
-													success_flag = callback_fn (data_p, param_set_p, group_p, callback_data_p);
-												}
-											else
-												{
-													success_flag = true;
-												}
+											success_flag = callback_fn (data_p, param_set_p, group_p, callback_data_p);
+										}
+									else
+										{
+											success_flag = true;
 										}
 								}
 						}
-				}
+//				}
 		}
 
 	return success_flag;
@@ -422,17 +423,9 @@ bool GetGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s
 		{
 			*pt_p = S_MAX_TARGET_SEQS.npt_type;
 		}
-	else if (strcmp (param_name_s, S_SHORT_QUERIES.npt_name_s) == 0)
-		{
-			*pt_p = S_SHORT_QUERIES.npt_type;
-		}
 	else if (strcmp (param_name_s, S_EXPECT_THRESHOLD.npt_name_s) == 0)
 		{
 			*pt_p = S_EXPECT_THRESHOLD.npt_type;
-		}
-	else if (strcmp (param_name_s, S_MAX_MATCHES.npt_name_s) == 0)
-		{
-			*pt_p = S_MAX_MATCHES.npt_type;
 		}
 	else
 		{

@@ -410,7 +410,7 @@ bool GetBaseBlastServiceParameterTypeForNamedParameter (Service *service_p, cons
 
 	if (!GetQuerySequenceParameterTypeForNamedParameter (param_name_s, pt_p))
 		{
-			BlastServiceData *data_p = (BlastServiceData *) (& (service_p -> se_data_p));
+			BlastServiceData *data_p = (BlastServiceData *) (service_p -> se_data_p);
 
 			if (!GetDatabaseParameterTypeForNamedParameter (data_p, param_name_s, pt_p))
 				{
