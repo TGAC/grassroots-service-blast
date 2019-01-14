@@ -201,14 +201,17 @@ static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, 
 		{
 			if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
 				{
-					if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
+					if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
 						{
-							if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p))
+							if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
 								{
-									success_flag = false;
-								}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
+									if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p))
+										{
+											success_flag = false;
+										}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
 
-						}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
+								}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
+						}
 
 				}		/* if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
 

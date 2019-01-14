@@ -187,7 +187,7 @@ bool GetDatabaseParameterTypeForNamedParameter (BlastServiceData *data_p, const 
 				{
 					char *db_s = GetFullyQualifiedDatabaseName (group_s ? group_s : BS_DATABASE_GROUP_NAME_S, db_p -> di_name_s);
 
-					if (db_s)
+					if (strcmp (param_name_s, db_s) == 0)
 						{
 							*pt_p = PT_BOOLEAN;
 							success_flag = true;
@@ -390,7 +390,7 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 
 //			if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_SHORT_QUERIES.npt_type, S_SHORT_QUERIES.npt_name_s, "Short queries", "Automatically adjust parameters for short input sequences", def, level)) != NULL)
 //				{
-					def.st_ulong_value = 10;
+					def.st_data_value = 10.0;
 
 					if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_EXPECT_THRESHOLD.npt_type, S_EXPECT_THRESHOLD.npt_name_s, "Expect threshold", "Expected number of chance matches in a random model", def, level)) != NULL)
 						{
@@ -426,6 +426,10 @@ bool GetGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s
 	else if (strcmp (param_name_s, S_EXPECT_THRESHOLD.npt_name_s) == 0)
 		{
 			*pt_p = S_EXPECT_THRESHOLD.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_OUTPUT_FORMAT.npt_name_s) == 0)
+		{
+			*pt_p = BS_OUTPUT_FORMAT.npt_type;
 		}
 	else
 		{
