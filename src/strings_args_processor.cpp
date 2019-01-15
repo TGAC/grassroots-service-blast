@@ -20,7 +20,7 @@
  *      Author: billy
  */
 
-#include "../../blast-service/include/strings_args_processor.hpp"
+#include "strings_args_processor.hpp"
 
 #include "string_utils.h"
 #include "alloc_failure.hpp"

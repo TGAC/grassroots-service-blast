@@ -13,7 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 */
-#include "../../blast-service/include/blast_tool.hpp"
+#include "blast_tool.hpp"
 
 #include <cstdlib>
 #include <cstring>
@@ -21,8 +21,8 @@
 
 #include <syslog.h>
 
-#include "../../blast-service/include/blast_service.h"
-#include "../../blast-service/include/blast_service_job.h"
+#include "blast_service.h"
+#include "blast_service_job.h"
 #include "io_utils.h"
 
 #include "byte_buffer.h"

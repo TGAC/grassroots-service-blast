@@ -20,7 +20,7 @@
  *      Author: billy
  */
 
-#include "../../blast-service/include/args_processor.hpp"
+#include "args_processor.hpp"
 
 
 

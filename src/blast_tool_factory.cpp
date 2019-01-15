@@ -20,13 +20,13 @@
  *      Author: tyrrells
  */
 
-#include "../../blast-service/include/blast_tool_factory.hpp"
+#include "blast_tool_factory.hpp"
 
 #include <cstring>
 
-#include "../../blast-service/include/blast_service.h"
-#include "../../blast-service/include/drmaa_blast_tool_factory.hpp"
-#include "../../blast-service/include/system_blast_tool_factory.hpp"
+#include "blast_service.h"
+#include "drmaa_blast_tool_factory.hpp"
+#include "system_blast_tool_factory.hpp"
 #include "streams.h"
 
 

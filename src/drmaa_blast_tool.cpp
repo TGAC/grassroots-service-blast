@@ -20,14 +20,14 @@
  *      Author: tyrrells
  */
 
-#include "../../blast-service/include/drmaa_blast_tool.hpp"
+#include "drmaa_blast_tool.hpp"
 
 #include <new>
 #include <cstring>
 #include <stdexcept>
 
-#include "../../blast-service/include/blast_service_job.h"
-#include "../../blast-service/include/drmaa_tool_args_processor.hpp"
+#include "blast_service_job.h"
+#include "drmaa_tool_args_processor.hpp"
 #include "streams.h"
 #include "string_utils.h"
 #include "jobs_manager.h"

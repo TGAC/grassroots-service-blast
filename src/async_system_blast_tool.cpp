@@ -24,9 +24,9 @@
  */
 
 
-#include "../../blast-service/include/async_system_blast_tool.hpp"
+#include "async_system_blast_tool.hpp"
 
-#include "../../blast-service/include/blast_service_job.h"
+#include "blast_service_job.h"
 #include "string_utils.h"
 #include "jobs_manager.h"
 

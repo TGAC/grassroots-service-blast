@@ -21,7 +21,7 @@
  */
 
 
-#include "../../blast-service/include/byte_buffer_args_processor.hpp"
+#include "byte_buffer_args_processor.hpp"
 
 #include "string_utils.h"
 #include "alloc_failure.hpp"

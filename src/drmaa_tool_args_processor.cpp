@@ -24,7 +24,7 @@
 
 
 
-#include "../../blast-service/include/drmaa_tool_args_processor.hpp"
+#include "drmaa_tool_args_processor.hpp"
 
 #include "string_utils.h"
 #include "streams.h"
