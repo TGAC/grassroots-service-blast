@@ -137,26 +137,37 @@ static bool GetBlastXServiceParameterTypeForNamedParameter (Service *service_p, 
 {
 	bool success_flag = true;
 
-	if (!GetBaseBlastServiceParameterTypeForNamedParameter (service_p, param_name_s, pt_p))
+	if (strcmp (param_name_s, S_GENETIC_CODE.npt_name_s) == 0)
 		{
-			if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+			*pt_p = S_GENETIC_CODE.npt_type;
+		}
+	else
+		{
+			if (!GetBaseBlastServiceParameterTypeForNamedParameter (service_p, param_name_s, pt_p))
 				{
-					if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+					if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
 						{
-							if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
+							if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
 								{
-									if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+									if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p))
 										{
-											success_flag = false;
-										}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
+											if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p))
+												{
+													if (!GetProteinBlastParameterTypeForNamedParameter (param_name_s, pt_p))
+														{
+															success_flag = false;
+														}		/* if (!GetProteinBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
 
-								}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
+												}		/* if (!GetNucleotideBlastParameterTypeForNamedParameter (param_name_s, pt_p)) */
 
-						}		/* if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+										}		/* if (!GetProgramSelectionParameterTypeForNamedParameter (param_name_s, pt_p)) */
 
-				}		/* if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+								}		/* if (!GetProteinGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
 
-		}		/* if (!GetBaseBlastServiceParameterTypeForNamedParameter (param_name_s, pt_p)) */
+						}		/* if (!GetGeneralAlgorithmParameterTypeForNamedParameter (param_name_s, pt_p)) */
+
+				}		/* if (!GetBaseBlastServiceParameterTypeForNamedParameter (param_name_s, pt_p)) */
+		}
 
 	return success_flag;
 }

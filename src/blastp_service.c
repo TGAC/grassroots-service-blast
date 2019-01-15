@@ -74,7 +74,6 @@ static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p);
 
 static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
-static bool GetProteinBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
 
 
 /*******************************/
@@ -199,7 +198,7 @@ bool AddProteinBlastParameters (BlastServiceData *data_p, ParameterSet *param_se
 }
 
 
-static bool GetProteinBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
+bool GetProteinBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 

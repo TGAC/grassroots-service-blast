@@ -370,11 +370,11 @@ bool GetAndAddHitLocation (json_t *marked_up_result_p, const json_t *hsps_p, con
 								{
 									strand = ST_REVERSE;
 								}
+						}
 
-							if (AddHitLocation (marked_up_result_p, child_key_s, from, to, strand))
-								{
-									success_flag = true;
-								}
+					if (AddHitLocation (marked_up_result_p, child_key_s, from, to, strand))
+						{
+							success_flag = true;
 						}
 
 				}		/* if (GetJSONInteger (hsps_p, hsp_to_key_s, &to)) */
@@ -405,13 +405,33 @@ bool AddFaldoTerminus (json_t *parent_json_p, const char *child_key_s, const int
 						{
 							if (json_array_append_new (type_array_p, json_string ("faldo:ExactPosition")) == 0)
 								{
-									const char *strand_s = (strand == ST_FORWARD) ? "faldo:ForwardStrandPosition" : "faldo:ReverseStrandPosition";
-
-									if (json_array_append_new (type_array_p, json_string (strand_s)) == 0)
+									switch (strand)
 										{
-											if (json_object_set_new (faldo_p, "@type", type_array_p) == 0)
+											case ST_FORWARD:
+												if (json_array_append_new (type_array_p, json_string ("faldo:ForwardStrandPosition")) == 0)
+													{
+														success_flag = true;
+													}
+												break;
+
+											case ST_REVERSE:
+												if (json_array_append_new (type_array_p, json_string ("faldo:ReverseStrandPosition")) == 0)
+													{
+														success_flag = true;
+													}
+												break;
+
+											case ST_NONE:
+												// nothing to do
+												success_flag = true;
+												break;
+										}
+
+									if (success_flag)
+										{
+											if (json_object_set_new (faldo_p, "@type", type_array_p) != 0)
 												{
-													success_flag = true;
+													success_flag = false;
 												}
 										}
 								}
