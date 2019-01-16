@@ -284,7 +284,7 @@ static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *
 static bool AddScoringParameters (BlastServiceData *data_p, ParameterSet *param_set_p)
 {
 	bool success_flag = false;
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", NULL, false, & (data_p -> bsd_base_data), param_set_p);
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 
 	if (AddMatrixParameter (data_p, param_set_p, group_p))
 		{

@@ -93,7 +93,7 @@ bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_para
 									if (num_params > 0)
 										{
 											ParameterNode *src_node_p = (ParameterNode *) (db_group_p -> pg_params_p -> ll_head_p);
-											ParameterGroup *dest_group_p = CreateAndAddParameterGroupToParameterSet (databases_group_s, paired_service_p -> ps_server_uri_s, false, service_p -> se_data_p, internal_params_p);
+											ParameterGroup *dest_group_p = CreateAndAddParameterGroupToParameterSet (databases_group_s, false, service_p -> se_data_p, internal_params_p);
 											SharedType def;
 											uint32 num_added_dbs = 0;
 

@@ -136,7 +136,7 @@ static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resourc
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("Magic Blast service parameters", "A service to run Magic Blast searches");
 	BlastServiceData *data_p = (BlastServiceData *) service_p -> se_data_p;
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Query Sequence Parameters", false, NULL, & (data_p -> bsd_base_data), param_set_p);
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Query Sequence Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 	Parameter *param_p;
 	SharedType def;
 
@@ -181,7 +181,7 @@ static bool GetMagicBlastServiceParameterTypeForNamedParameter (Service *service
 static bool AddFormattingOptionsParameters (ParameterSet *param_set_p, BlastServiceData *data_p)
 {
 	bool success_flag = false;
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Formatting Options", false, NULL, & (data_p -> bsd_base_data), param_set_p);
+	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Formatting Options", false, & (data_p -> bsd_base_data), param_set_p);
 	Parameter *param_p;
 	SharedType def;
 
