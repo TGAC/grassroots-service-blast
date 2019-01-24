@@ -168,35 +168,32 @@ bool GetPairedServiceParameterTypeForNamedParameter (Service *service_p, const c
 
 					if (databases_group_s)
 						{
-							const uint32 num_params = GetParameterSetSize (paired_service_p -> ps_params_p);
+							const size_t l = strlen (databases_group_s);
 
-							if (num_params > 0)
+							/*
+							 * Is the param named for a database on the paired service?
+							 */
+							if (strncmp (databases_group_s, param_name_s, l) == 0)
 								{
-									ParameterNode *src_node_p = (ParameterNode *) (paired_service_p -> ps_params_p -> ps_params_p);
+									ParameterSet *paired_service_params_p = paired_service_p -> ps_params_p;
 
-									while (src_node_p && (!success_flag))
+									if (paired_service_params_p)
 										{
-											/* Add the database to our list */
-											Parameter *external_param_p = src_node_p -> pn_parameter_p;
-											Parameter *param_p = NULL;
+											Parameter *param_p = GetParameterFromParameterSetByName (paired_service_params_p, param_name_s);
 
-											char *db_s = GetFullyQualifiedDatabaseName (databases_group_s, external_param_p -> pa_name_s);
-
-											if (db_s)
+											if (param_p)
 												{
-													if (strcmp (db_s, param_name_s) == 0)
-														{
-															*pt_p = PT_BOOLEAN;
-															success_flag = true;
-														}
-													FreeCopiedString (db_s);
-												}		/* if (db_s) */
+													*pt_p = param_p -> pa_type;
+													success_flag = true;
+												}
 
-											src_node_p = (ParameterNode *) (src_node_p -> pn_node.ln_next_p);
-										}		/* while (i > 0) */
+										}		/* if (paired_service_params_p) */
+									else
+										{
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "NULL parameter set for \"%s\" -> \"%s\"", paired_service_p -> ps_server_name_s, paired_service_p -> ps_name_s);
+										}
 
-								}		/* if (num_params > 0) */
-
+								}		/* if (strncmp (databases_group_s, param_name_s, l) == 0) */
 
 							FreeCopiedString (databases_group_s);
 						}		/* if (databases_group_s) */
@@ -204,7 +201,6 @@ bool GetPairedServiceParameterTypeForNamedParameter (Service *service_p, const c
 						{
 							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate memory for database group name \"%s\"", paired_service_p -> ps_server_name_s);
 						}
-
 
 					node_p = (PairedServiceNode *) (node_p -> psn_node.ln_next_p);
 				}		/* while (node_p) */
