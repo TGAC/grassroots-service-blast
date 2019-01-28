@@ -197,7 +197,7 @@ BLAST_SERVICE_LOCAL bool UpdateBlastServiceJob (ServiceJob *job_p);
  * successfully, <code>false</code> otherwise.
  * @memberof BlastServiceJob
  */
-BLAST_SERVICE_LOCAL bool ProcessLinkedServicesForBlastServiceJobOutput (Service *service_p, ServiceJob *job_p, LinkedService *linked_service_p);
+BLAST_SERVICE_LOCAL bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJob *job_p, LinkedService *linked_service_p);
 
 
 /**

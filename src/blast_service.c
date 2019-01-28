@@ -1395,7 +1395,7 @@ static void InitBlastService (Service *blast_service_p)
 	blast_service_p -> se_deserialise_job_json_fn = BuildBlastServiceJob;
 	blast_service_p -> se_serialise_job_json_fn = BuildBlastServiceJobJSON;
 
-	blast_service_p -> se_process_linked_services_fn = ProcessLinkedServicesForBlastServiceJobOutput;
+	blast_service_p -> se_process_linked_services_fn = ProcessLinkedServiceForBlastServiceJobOutput;
 }
 
 

@@ -468,7 +468,7 @@ bool UpdateBlastServiceJob (ServiceJob *job_p)
 
 
 
-bool ProcessLinkedServicesForBlastServiceJobOutput (Service * UNUSED_PARAM (service_p), ServiceJob *job_p, LinkedService *linked_service_p)
+bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJob *job_p, LinkedService *linked_service_p)
 {
 	bool success_flag = false;
 	BlastServiceJob *blast_job_p = (BlastServiceJob *) job_p;
