@@ -50,11 +50,11 @@ static const char * const BSJ_FACTORY_S = "factory";
 static const char * const BSJ_JOB_S = "job";
 
 
-static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked_service_p, ParameterSet *output_params_p);
+static bool ProcessResultForLinkedService (json_t *data_p, ServiceJob *job_p, LinkedService *linked_service_p, ParameterSet *output_params_p);
 
+static bool ProcessResultForMappedParametersLinkedService (json_t *data_p, LinkedService *linked_service_p, ParameterSet *output_params_p);
 
 static bool CalculateBlastServiceJobResults (ServiceJob *job_p);
-
 
 static void SetBlastServiceJobCallbacks (BlastServiceJob *blast_job_p);
 
@@ -505,7 +505,7 @@ bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJo
 
 															json_array_foreach (data_p, j, data_item_p)
 																{
-																	if (!ProcessResultForLinkedService (data_item_p, linked_service_p, output_params_p))
+																	if (!ProcessResultForLinkedService (data_item_p, job_p, linked_service_p, output_params_p))
 																		{
 																			success_flag = false;
 																		}
@@ -515,7 +515,7 @@ bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJo
 														}		/* if (json_is_array (data_p)) */
 													else
 														{
-															success_flag = ProcessResultForLinkedService (data_p, linked_service_p, output_params_p);
+															success_flag = ProcessResultForLinkedService (data_p, job_p, linked_service_p, output_params_p);
 														}
 
 												}		/* if (data_p) */
@@ -534,57 +534,6 @@ bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJo
 					PrintErrors (STM_LEVEL_WARNING,__FILE__, __LINE__, "Failed to get service \"%s\"", linked_service_p -> ls_output_service_s);
 				}
 		}
-
-	return success_flag;
-}
-
-
-static bool ProcessResultForLinkedService (json_t *data_p, LinkedService *linked_service_p, ParameterSet *output_params_p)
-{
-	bool success_flag = false;
-	json_t *reports_p = GetMarkupReports (data_p);
-
-	if (reports_p)
-		{
-			size_t i;
-			json_t *report_p;
-
-			json_array_foreach (reports_p, i, report_p)
-				{
-					const char *database_s = NULL;
-
-					if (GetAndAddDatabaseMappedParameter (linked_service_p, report_p, output_params_p, &database_s))
-						{
-							json_t *hits_p = GetHitsFromMarkedUpReport (report_p);
-
-							if (hits_p)
-								{
-									size_t j;
-									json_t *hit_p;
-
-									json_array_foreach (hits_p, j, hit_p)
-										{
-											json_t *hsps_p = json_object_get (hit_p, "hsps");
-
-											if (!GetAndAddScaffoldsParameter (linked_service_p, hit_p, output_params_p))
-												{
-													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
-												}
-
-											if (!GetAndAddSequencesParameter (linked_service_p, hit_p, output_params_p))
-												{
-													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
-												}
-
-										}		/* json_array_foreach (hits_p, l, hit_p) */
-
-								}		/* if (hits_p) */
-
-						}		/* if (GetAndAddDatabaseMappedParameter (linked_service_p, report_p, output_params_p, &database_s)) */
-
-				}		/* json_array_foreach (reports_p, k, report_p) */
-
-		}		/* if (reports_p) */
 
 	return success_flag;
 }
@@ -663,9 +612,80 @@ void BlastServiceJobCompleted (ServiceJob *job_p)
 }
 
 
+/*
+ * Static definitions
+ */
+
 static bool CalculateBlastServiceJobResults (ServiceJob *job_p)
 {
 	return DetermineBlastResult ((BlastServiceJob *) job_p);
 }
 
+
+static bool ProcessResultForLinkedService (json_t *data_p, ServiceJob *job_p, LinkedService *linked_service_p, ParameterSet *output_params_p)
+{
+	bool success_flag = false;
+
+	if (linked_service_p -> ls_generate_fn_s)
+		{
+			success_flag = RunCustomLinkedServiceGenerator (linked_service_p, data_p, job_p);
+		}
+	else
+		{
+			success_flag = ProcessResultForMappedParametersLinkedService (data_p, linked_service_p, output_params_p);
+		}
+
+	return success_flag;
+}
+
+
+static bool ProcessResultForMappedParametersLinkedService (json_t *data_p, LinkedService *linked_service_p, ParameterSet *output_params_p)
+{
+	bool success_flag = false;
+	json_t *reports_p = GetMarkupReports (data_p);
+
+	if (reports_p)
+		{
+			size_t i;
+			json_t *report_p;
+
+			json_array_foreach (reports_p, i, report_p)
+				{
+					const char *database_s = NULL;
+
+					if (GetAndAddDatabaseMappedParameter (linked_service_p, report_p, output_params_p, &database_s))
+						{
+							json_t *hits_p = GetHitsFromMarkedUpReport (report_p);
+
+							if (hits_p)
+								{
+									size_t j;
+									json_t *hit_p;
+
+									json_array_foreach (hits_p, j, hit_p)
+										{
+											json_t *hsps_p = json_object_get (hit_p, "hsps");
+
+											if (!GetAndAddScaffoldsParameter (linked_service_p, hit_p, output_params_p))
+												{
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
+												}
+
+											if (!GetAndAddSequencesParameter (linked_service_p, hit_p, output_params_p))
+												{
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__,  "Failed to add linked service for hit");
+												}
+
+										}		/* json_array_foreach (hits_p, l, hit_p) */
+
+								}		/* if (hits_p) */
+
+						}		/* if (GetAndAddDatabaseMappedParameter (linked_service_p, report_p, output_params_p, &database_s)) */
+
+				}		/* json_array_foreach (reports_p, k, report_p) */
+
+		}		/* if (reports_p) */
+
+	return success_flag;
+}
 

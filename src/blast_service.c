@@ -1383,6 +1383,21 @@ void ReleaseBlastService (Service *service_p)
 }
 
 
+
+bool PolymarkerServiceGenerator (struct LinkedService *linked_service_p, json_t *data_p, struct ServiceJob *job_p)
+{
+	bool success_flag = false;
+
+
+	PrintJSONToLog (STM_LEVEL_FINEST, __FILE__, __LINE__, data_p, "RunCustomLinkedServiceGenerator");
+
+
+	return success_flag;
+}
+
+
+
+
 /*
  * STATIC FUNCTIONS 
  */
