@@ -53,6 +53,7 @@ SRCS 	:= \
 	external_blast_tool_factory.cpp \
 	magic_blast_service.c \
 	paired_blast_service.c \
+	polymarker_linked_service.c \
 	strings_args_processor.cpp \
 	system_blast_tool.cpp \
 	system_blast_tool_factory.cpp 

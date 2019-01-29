@@ -34,6 +34,7 @@ extern "C"
 {
 #endif
 
+
 BLAST_SERVICE_LOCAL bool GetAndAddHitLocation (json_t *marked_up_result_p, const json_t *hsps_p, const char *hsp_from_key_s, const char *hsp_to_key_s, const char *strand_key_s, const char *child_key_s);
 
 

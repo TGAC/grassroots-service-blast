@@ -25,22 +25,14 @@
 #include <string.h>
 
 #include "blast_service_job.h"
+
+#define ALLOCATE_BLAST_SERVICE_JOB_MARKUP_KEYS_CONSTANTS (1)
+#include "blast_service_job_markup_keys.h"
 #include "blast_service_params.h"
 #include "string_utils.h"
 #include "regular_expressions.h"
 
 
-/*
- * STATIC VARIABLES
- */
-
-
-const char * const S_REPORTS_S = "reports";
-const char * const S_RESULTS_S = "blast_search_results";
-const char * const S_REPORT_RESULTS_S = "hits";
-
-const char * const S_DATATBASE_S = "database";
-const char * const S_DATATBASE_NAME_S = "database_name";
 
 
 /*
@@ -111,13 +103,13 @@ bool AddSequence (json_t *root_p, const char *key_s, const char *query_sequence_
 bool AddHitDetails (json_t *marked_up_result_p, const json_t *blast_hit_p, const DatabaseInfo *db_p)
 {
 	bool success_flag = false;
-	const json_t *hsps_p = json_object_get (blast_hit_p, "hsps");
+	const json_t *hsps_p = json_object_get (blast_hit_p, BSJMK_HSPS_S);
 
 	if (hsps_p)
 		{
 			if (PopulateMarkedUpHit	(marked_up_result_p, blast_hit_p, db_p))
 				{
-					json_t *marked_up_hsps_p = json_object_get (marked_up_result_p, "hsps");
+					json_t *marked_up_hsps_p = json_object_get (marked_up_result_p, BSJMK_HSPS_S);
 
 					if (marked_up_hsps_p)
 						{
@@ -168,7 +160,7 @@ bool AddHitDetails (json_t *marked_up_result_p, const json_t *blast_hit_p, const
 								}		/* if (json_is_array (hsps_p)) */
 
 
-						}		/* if (json_object_set_new (marked_up_result_p, "hsps", marked_up_hsps_p) == 0) */
+						}		/* if (json_object_set_new (marked_up_result_p, BSJMK_HSPS_S, marked_up_hsps_p) == 0) */
 					else
 						{
 							PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, marked_up_result_p, "Failed to set marked up hsps array for marked up hits");
@@ -217,7 +209,7 @@ bool AddHsp (json_t *marked_up_hsp_p, const json_t *hsp_p)
 																{
 																	const char *query_sequence_s = GetJSONString (hsp_p, "qseq");
 
-																	if (query_sequence_s && AddSequence (marked_up_hsp_p, "query_sequence", query_sequence_s))
+																	if (query_sequence_s && AddSequence (marked_up_hsp_p, BSJMK_QUERY_SEQUENCE_S, query_sequence_s))
 																		{
 																			const char *midline_s = GetJSONString (hsp_p, "midline");
 
@@ -244,7 +236,7 @@ bool AddHsp (json_t *marked_up_hsp_p, const json_t *hsp_p)
 																					PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, marked_up_hsp_p, "failed to add midline \"%s\"", midline_s ? midline_s : "NULL");
 																				}
 
-																		}		/* if (query_sequence_s && AddSequence (marked_up_hsp_p, "query_sequence", query_sequence_s)) */
+																		}		/* if (query_sequence_s && AddSequence (marked_up_hsp_p, BSJMK_QUERY_SEQUENCE_S, query_sequence_s)) */
 																	else
 																		{
 																			PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, marked_up_hsp_p, "failed to add query_sequence \"%s\"", query_sequence_s ? query_sequence_s : "NULL");
@@ -307,7 +299,7 @@ bool AddHitLocation (json_t *parent_p, const char *child_key_s, const int32 from
 
 	if (location_p)
 		{
-			if (AddFaldoTerminus (location_p, "faldo:begin", from, strand))
+			if (AddFaldoTerminus (location_p, BSJMK_FALDO_BEGIN_S, from, strand))
 				{
 					if (AddFaldoTerminus (location_p, "faldo:end", to, strand))
 						{
@@ -322,7 +314,7 @@ bool AddHitLocation (json_t *parent_p, const char *child_key_s, const int32 from
 
 						}		/* if (AddFaldoTerminus (location_p, "faldo:end", to, forward_strand_flag)) */
 
-				}		/* if (AddFaldoTerminus (location_p, "faldo:begin", from, forward_strand_flag)) */
+				}		/* if (AddFaldoTerminus (location_p, BSJMK_FALDO_BEGIN_S, from, forward_strand_flag)) */
 
 			json_decref (location_p);
 		}		/* if (location_p) */
@@ -445,14 +437,14 @@ bool AddFaldoTerminus (json_t *parent_json_p, const char *child_key_s, const int
 
 			if (success_flag)
 				{
-					if (json_object_set_new (faldo_p, "faldo:position", json_integer (position)) == 0)
+					if (json_object_set_new (faldo_p, BSJMK_FALDO_POSITION_S, json_integer (position)) == 0)
 						{
 							if (json_object_set_new (parent_json_p, child_key_s, faldo_p) == 0)
 								{
 									return true;
 								}
 
-						}		/* if (json_object_set_new (faldo_p, "faldo:position", json_integer (position)) */
+						}		/* if (json_object_set_new (faldo_p, BSJMK_FALDO_POSITION_S, json_integer (position)) */
 
 				}		/* if (json_array_append_new (type_array_p, json_string (strand_s)) == 0) */
 
@@ -568,7 +560,7 @@ bool GetAndAddDatabaseDetails (json_t *marked_up_result_p, const DatabaseInfo *d
 
 	if (database_p)
 		{
-			if (json_object_set_new (database_p, S_DATATBASE_NAME_S, json_string (db_p -> di_name_s)) == 0)
+			if (json_object_set_new (database_p, BSJMK_DATATBASE_NAME_S, json_string (db_p -> di_name_s)) == 0)
 				{
 					bool success_flag = true;
 
@@ -587,7 +579,7 @@ bool GetAndAddDatabaseDetails (json_t *marked_up_result_p, const DatabaseInfo *d
 
 					if (success_flag)
 						{
-							if (json_object_set_new (marked_up_result_p, S_DATATBASE_S , database_p) == 0)
+							if (json_object_set_new (marked_up_result_p, BSJMK_DATATBASE_S , database_p) == 0)
 								{
 									return true;
 								}
@@ -608,7 +600,7 @@ json_t *GetHitsFromMarkedUpReport (json_t *report_p)
 
 	if (report_p)
 		{
-			hits_p = json_object_get (report_p, S_REPORT_RESULTS_S);
+			hits_p = json_object_get (report_p, BSJMK_REPORT_RESULTS_S);
 		}
 
 	return hits_p;
@@ -653,7 +645,7 @@ json_t *ConvertBlastResultToGrassrootsMarkUp (const json_t *blast_job_output_p, 
 
 															if (marked_up_report_p)
 																{
-																	const json_t *blast_hits_p =  json_object_get (blast_result_search_p, "hits");
+																	const json_t *blast_hits_p =  json_object_get (blast_result_search_p, BSJMK_REPORT_RESULTS_S);
 
 																	if (blast_hits_p)
 																		{
@@ -662,7 +654,7 @@ json_t *ConvertBlastResultToGrassrootsMarkUp (const json_t *blast_job_output_p, 
 																					size_t j = 0;
 																					const size_t num_hits = json_array_size (blast_hits_p);
 
-																					json_t *marked_up_hits_p = json_object_get (marked_up_report_p, S_REPORT_RESULTS_S);
+																					json_t *marked_up_hits_p = json_object_get (marked_up_report_p, BSJMK_REPORT_RESULTS_S);
 
 																					success_flag = true;
 
@@ -758,13 +750,13 @@ json_t *GetInitialisedProcessedRequest (void)
 
 																	if (sequence_search_results_p)
 																		{
-																			if (json_object_set_new (root_p, S_RESULTS_S, sequence_search_results_p) == 0)
+																			if (json_object_set_new (root_p, BSJMK_RESULTS_S, sequence_search_results_p) == 0)
 																				{
 																					json_t *reports_p = json_array ();
 
 																					if (reports_p)
 																						{
-																							if (json_object_set_new (sequence_search_results_p, S_REPORTS_S, reports_p) == 0)
+																							if (json_object_set_new (sequence_search_results_p, BSJMK_REPORTS_S, reports_p) == 0)
 																								{
 																									return root_p;
 																								}
@@ -1136,7 +1128,7 @@ static bool AddGap (json_t *gaps_p, const int32 from, const int32 to)
 		{
 			if (json_object_set_new (gap_p, "@type", json_string ("gap")) == 0)
 				{
-					if (AddHitLocation (gap_p, "locus", from, to, ST_NONE))
+					if (AddHitLocation (gap_p, BSJMK_LOCUS_S, from, to, ST_NONE))
 						{
 							if (json_array_append_new (gaps_p, gap_p) == 0)
 								{
@@ -1168,7 +1160,7 @@ bool AddPolymorphism (json_t *marked_up_hsp_p, const char *hit_gap_start_p, cons
 			length = 1 + end_of_region - start_of_region;
 		}
 
-	polymorphisms_p = json_object_get (marked_up_hsp_p, "polymorphisms");
+	polymorphisms_p = json_object_get (marked_up_hsp_p, BSJMK_POLYMORPHISMS_S);
 
 	if (!polymorphisms_p)
 		{
@@ -1176,7 +1168,7 @@ bool AddPolymorphism (json_t *marked_up_hsp_p, const char *hit_gap_start_p, cons
 
 			if (polymorphisms_p)
 				{
-					if (json_object_set_new (marked_up_hsp_p, "polymorphisms", polymorphisms_p) != 0)
+					if (json_object_set_new (marked_up_hsp_p, BSJMK_POLYMORPHISMS_S, polymorphisms_p) != 0)
 						{
 							json_decref (polymorphisms_p);
 							polymorphisms_p = NULL;
@@ -1190,9 +1182,9 @@ bool AddPolymorphism (json_t *marked_up_hsp_p, const char *hit_gap_start_p, cons
 
 			if (polymorphism_p)
 				{
-					const char *type_s = (length == 1) ? "snp" : "mnp";
+					const char *type_s = (length == 1) ? BSJMK_SNP_S : BSJMK_MNP_S;
 
-					if (AddHitLocation (polymorphism_p, "locus", start_of_region, end_of_region, ST_NONE))
+					if (AddHitLocation (polymorphism_p, BSJMK_LOCUS_S, start_of_region, end_of_region, ST_NONE))
 						{
 							if (json_object_set_new (polymorphism_p, "@type", json_string (type_s)) == 0)
 								{
@@ -1200,11 +1192,11 @@ bool AddPolymorphism (json_t *marked_up_hsp_p, const char *hit_gap_start_p, cons
 
 									if (diff_p)
 										{
-											if (json_object_set_new (polymorphism_p, "sequence_difference", diff_p) == 0)
+											if (json_object_set_new (polymorphism_p, BSJMK_SEQUENCE_DIFFERENCE_S, diff_p) == 0)
 												{
-													if (AddSubsequenceMarkup (diff_p, "query", reference_gap_start_p, length))
+													if (AddSubsequenceMarkup (diff_p, BSJMK_QUERY_S, reference_gap_start_p, length))
 														{
-															if (AddSubsequenceMarkup (diff_p, "hit", hit_gap_start_p, length))
+															if (AddSubsequenceMarkup (diff_p, BSJMK_HIT_S, hit_gap_start_p, length))
 																{
 																	if (json_array_append_new (polymorphisms_p, polymorphism_p) == 0)
 																		{
@@ -1306,7 +1298,7 @@ bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const js
 bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p, ParameterSet *output_params_p)
 {
 	bool success_flag = false;
-	MappedParameter *mapped_param_p = GetMappedParameterByInputParamName (linked_service_p, "scaffold");
+	MappedParameter *mapped_param_p = GetMappedParameterByInputParamName (linked_service_p, BSJMK_SCAFFOLD_S);
 
 	if (mapped_param_p)
 		{
@@ -1327,7 +1319,7 @@ bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p
 									for (i = 0; i < num_scaffolds; ++ i)
 										{
 											const json_t *scaffold_p = json_array_get (scaffolds_p, i);
-											const char *scaffold_s = GetJSONString (scaffold_p, "scaffold");
+											const char *scaffold_s = GetJSONString (scaffold_p, BSJMK_SCAFFOLD_S);
 
 											if (scaffold_s)
 												{
@@ -1382,7 +1374,7 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 
 			if (param_p)
 				{
-					json_t *hsps_p = json_object_get (hit_p, "hsps");
+					json_t *hsps_p = json_object_get (hit_p, BSJMK_HSPS_S);
 
 					if (hsps_p)
 						{
@@ -1392,8 +1384,8 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 
 							json_array_foreach (hsps_p, k, hsp_p)
 								{
-									const char * const QUERY_SEQUENCE_KEY_S = "query_sequence";
-									const char * const POLYMORPHISMS_KEY_S = "polymorphisms";
+									const char * const QUERY_SEQUENCE_KEY_S = BSJMK_QUERY_SEQUENCE_S;
+									const char * const POLYMORPHISMS_KEY_S = BSJMK_POLYMORPHISMS_S;
 
 									const char *query_sequence_s = GetJSONString (hsp_p, QUERY_SEQUENCE_KEY_S);
 
@@ -1499,7 +1491,7 @@ bool GetAndAddScaffoldsFromHit (const json_t *hit_p, json_t *mark_up_p, const Da
 
 			if (scaffolds_array_p)
 				{
-					if (json_object_set_new (mark_up_p, "scaffolds", scaffolds_array_p) == 0)
+					if (json_object_set_new (mark_up_p, BSJMK_SCAFFOLDS_S, scaffolds_array_p) == 0)
 						{
 							StringListNode *node_p = (StringListNode *) (scaffolds_p -> ll_head_p);
 
@@ -1511,7 +1503,7 @@ bool GetAndAddScaffoldsFromHit (const json_t *hit_p, json_t *mark_up_p, const Da
 
 									if (scaffold_p)
 										{
-											if (json_object_set_new (scaffold_p, "scaffold", json_string (node_p -> sln_string_s)) == 0)
+											if (json_object_set_new (scaffold_p, BSJMK_SCAFFOLD_S, json_string (node_p -> sln_string_s)) == 0)
 												{
 													if (json_array_append_new (scaffolds_array_p, scaffold_p) != 0)
 														{
@@ -1539,7 +1531,7 @@ bool GetAndAddScaffoldsFromHit (const json_t *hit_p, json_t *mark_up_p, const Da
 									node_p = (StringListNode *) (node_p -> sln_node.ln_next_p);
 								}		/* while (node_p) */
 
-						}		/* if (json_object_set_new (mark_up_p, "scaffolds", scaffolds_array_p) == 0) */
+						}		/* if (json_object_set_new (mark_up_p, BSJMK_SCAFFOLDS_S, scaffolds_array_p) == 0) */
 
 				}		/* if (scaffolds_array_p) */
 
@@ -1557,12 +1549,11 @@ const json_t *GetScaffoldsForDatabaseHit (const json_t *hit_p)
 
 	if (hit_p)
 		{
-			scaffolds_p = json_object_get (hit_p, "scaffolds");
+			scaffolds_p = json_object_get (hit_p, BSJMK_SCAFFOLDS_S);
 		}
 
 	return scaffolds_p;
 }
-
 
 static const char *GetDatabaseName (const json_t *marked_up_report_p)
 {
@@ -1570,11 +1561,11 @@ static const char *GetDatabaseName (const json_t *marked_up_report_p)
 
 	if (marked_up_report_p)
 		{
-			const json_t *database_p = json_object_get (marked_up_report_p, S_DATATBASE_S);
+			const json_t *database_p = json_object_get (marked_up_report_p, BSJMK_DATATBASE_S);
 
 			if (database_p)
 				{
-					database_name_s = GetJSONString (database_p, S_DATATBASE_NAME_S);
+					database_name_s = GetJSONString (database_p, BSJMK_DATATBASE_NAME_S);
 				}
 		}
 
@@ -1586,7 +1577,7 @@ static bool AddSequenceOntologyTerms (json_t *context_p)
 {
 	bool success_flag = false;
 
-	if (AddOntologyContextTerm (context_p, "scaffold", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000148", true))
+	if (AddOntologyContextTerm (context_p, BSJMK_SCAFFOLD_S, "http://www.sequenceontology.org/browser/current_svn/term/SO:0000148", true))
 		{
 			if (AddOntologyContextTerm (context_p, "query_sequence", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000149", true))
 				{
@@ -1608,7 +1599,7 @@ static bool AddSequenceOntologyTerms (json_t *context_p)
 																				{
 																					if (AddOntologyContextTerm (context_p, "protein_match", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000349", false))
 																						{
-																							if (AddOntologyContextTerm (context_p, "sequence_difference", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000413", true))
+																							if (AddOntologyContextTerm (context_p, BSJMK_SEQUENCE_DIFFERENCE_S, "http://www.sequenceontology.org/browser/current_svn/term/SO:0000413", true))
 																								{
 																									if (AddOntologyContextTerm (context_p, "gap", "http://www.sequenceontology.org/browser/current_svn/term/SO:0000730", false))
 																										{
@@ -1637,7 +1628,7 @@ static bool AddEdamOntologyTerms (json_t *context_p)
 
 	if (AddOntologyContextTerm (context_p, "sequence_length", "http://edamontology.org/data_1249", false))
 		{
-			if (AddOntologyContextTerm (context_p, S_RESULTS_S, "http://edamontology.org/data_0857", true))
+			if (AddOntologyContextTerm (context_p, BSJMK_RESULTS_S, "http://edamontology.org/data_0857", true))
 				{
 					if (AddOntologyContextTerm (context_p, "database_metadata", "http://edamontology.org/data_0957", true))
 						{
@@ -1660,7 +1651,7 @@ static bool AddGenomicFeatureAndVariationOntologyTerms (json_t *context_p)
 {
 	bool success_flag = false;
 
-	if (AddOntologyContextTerm (context_p, "locus", "http://www.biointerchange.org/gfvo#Locus", true))
+	if (AddOntologyContextTerm (context_p, BSJMK_LOCUS_S, "http://www.biointerchange.org/gfvo#Locus", true))
 		{
 			success_flag = true;
 		}
@@ -1770,7 +1761,7 @@ static json_t *AddAndGetMarkedUpReport (json_t *markup_reports_p, const Database
 
 			if (results_p)
 				{
-					if (json_object_set_new (report_p, S_REPORT_RESULTS_S, results_p) == 0)
+					if (json_object_set_new (report_p, BSJMK_REPORT_RESULTS_S, results_p) == 0)
 						{
 							if (GetAndAddDatabaseDetails (report_p, database_p))
 								{
@@ -1826,11 +1817,11 @@ static const DatabaseInfo *GetDatabaseFromBlastResult (const json_t *blast_repor
 
 json_t *GetMarkupReports (json_t *markup_p)
 {
-	json_t *value_p = json_object_get (markup_p, S_RESULTS_S);
+	json_t *value_p = json_object_get (markup_p, BSJMK_RESULTS_S);
 
 	if (value_p)
 		{
-			value_p = json_object_get (value_p, S_REPORTS_S);
+			value_p = json_object_get (value_p, BSJMK_REPORTS_S);
 		}
 
 	return value_p;
@@ -1868,7 +1859,7 @@ static bool PopulateMarkedUpHit (json_t *marked_up_hit_p, const json_t *blast_hi
 
 											if (marked_up_hsps_p)
 												{
-													if (json_object_set_new (marked_up_hit_p, "hsps", marked_up_hsps_p) == 0)
+													if (json_object_set_new (marked_up_hit_p, BSJMK_HSPS_S, marked_up_hsps_p) == 0)
 														{
 															success_flag = true;
 														}
@@ -1929,7 +1920,7 @@ static bool AddQueryMasks (const json_t *blast_search_p, json_t *mark_up_p)
 														{
 															if (json_object_set_new (mask_p, "@type", json_string ("sequence_masking")) == 0)
 																{
-																	if (AddHitLocation (mask_p, "locus", from, to, ST_NONE))
+																	if (AddHitLocation (mask_p, BSJMK_LOCUS_S, from, to, ST_NONE))
 																		{
 																			if (json_array_append_new (masks_p, mask_p) == 0)
 																				{

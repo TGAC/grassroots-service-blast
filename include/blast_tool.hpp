@@ -289,7 +289,7 @@ extern "C"
  * @param tool_p The BlastTool to deallocate.
  * @memberof BlastTool
  */
-BLAST_SERVICE_API void FreeBlastTool (BlastTool *tool_p);
+BLAST_SERVICE_LOCAL void FreeBlastTool (BlastTool *tool_p);
 
 
 
@@ -301,7 +301,7 @@ BLAST_SERVICE_API void FreeBlastTool (BlastTool *tool_p);
  * otherwise.
  * @memberof BlastTool
  */
-BLAST_SERVICE_API OperationStatus RunBlast (BlastTool *tool_p);
+BLAST_SERVICE_LOCAL OperationStatus RunBlast (BlastTool *tool_p);
 
 /**
  * Get the current OperationStatus of a BlastTool.
@@ -310,7 +310,7 @@ BLAST_SERVICE_API OperationStatus RunBlast (BlastTool *tool_p);
  * @return The current OperationStatus.
  * @memberof BlastTool
  */
-BLAST_SERVICE_API OperationStatus GetBlastStatus (BlastTool *tool_p);
+BLAST_SERVICE_LOCAL OperationStatus GetBlastStatus (BlastTool *tool_p);
 
 
 /**
@@ -321,7 +321,7 @@ BLAST_SERVICE_API OperationStatus GetBlastStatus (BlastTool *tool_p);
  * otherwise.
  * @memberof BlastTool
  */
-BLAST_SERVICE_API bool IsBlastToolSynchronous (BlastTool *tool_p);
+BLAST_SERVICE_LOCAL bool IsBlastToolSynchronous (BlastTool *tool_p);
 
 
 #ifdef __cplusplus

@@ -267,6 +267,7 @@ BLAST_SERVICE_API ServicesArray *GetServices (UserDetails *user_p);
 BLAST_SERVICE_API void ReleaseServices (ServicesArray *services_p);
 
 
+
 /**
  * Run a Blast Service.
  *
@@ -547,9 +548,6 @@ BLAST_SERVICE_LOCAL const DatabaseInfo *GetMatchingDatabaseByFilename (const Bla
 
 
 BLAST_SERVICE_LOCAL void ReleaseBlastService (Service *service_p);
-
-
-BLAST_SERVICE_API bool PolymarkerServiceGenerator (struct LinkedService *linked_service_p, json_t *data_p, struct ServiceJob *job_p);
 
 
 
