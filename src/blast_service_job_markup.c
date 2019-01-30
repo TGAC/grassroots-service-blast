@@ -68,8 +68,6 @@ static bool PopulateMarkedUpHit (json_t *marked_up_hit_p, const json_t *blast_hi
 
 static bool AddQueryMasks (const json_t *blast_search_p, json_t *mark_up_p);
 
-static const char *GetDatabaseName (const json_t *marked_up_report_p);
-
 static bool AddSoftwareDetails (const json_t *blast_report_p, json_t *mark_up_p);
 
 static bool AddSoftwareVersion (const json_t *blast_report_p, json_t *software_mark_up_p);
@@ -1268,7 +1266,7 @@ bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const js
 
 	if (mapped_param_p)
 		{
-			const char *value_s = GetDatabaseName (report_p);
+			const char *value_s = GetDatabaseNameFromMarkedUpJob (report_p);
 
 			if (value_s)
 				{
@@ -1555,7 +1553,8 @@ const json_t *GetScaffoldsForDatabaseHit (const json_t *hit_p)
 	return scaffolds_p;
 }
 
-static const char *GetDatabaseName (const json_t *marked_up_report_p)
+
+const char *GetDatabaseNameFromMarkedUpJob (const json_t *marked_up_report_p)
 {
 	const char *database_name_s = NULL;
 

@@ -1,18 +1,18 @@
 /*
-** Copyright 2014-2018 The Earlham Institute
-**
-** Licensed under the Apache License, Version 2.0 (the "License");
-** you may not use this file except in compliance with the License.
-** You may obtain a copy of the License at
-**
-**     http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-*/
+ ** Copyright 2014-2018 The Earlham Institute
+ **
+ ** Licensed under the Apache License, Version 2.0 (the "License");
+ ** you may not use this file except in compliance with the License.
+ ** You may obtain a copy of the License at
+ **
+ **     http://www.apache.org/licenses/LICENSE-2.0
+ **
+ ** Unless required by applicable law or agreed to in writing, software
+ ** distributed under the License is distributed on an "AS IS" BASIS,
+ ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ** See the License for the specific language governing permissions and
+ ** limitations under the License.
+ */
 /*
  * polymarker_linked_service.c
  *
@@ -23,10 +23,12 @@
 #include <string.h>
 
 #include "polymarker_linked_service.h"
+#include "blast_service_job_markup.h"
 #include "blast_service_job_markup_keys.h"
 #include "string_utils.h"
 #include "linked_service.h"
-
+#include "provider.h"
+#include "grassroots_config.h"
 
 
 static int32 GetSNPIndex (const json_t *polymorphism_p);
@@ -37,7 +39,10 @@ static bool GetSNPBases (const json_t *polymorphism_p, char *query_base_p, char 
 
 static const char *GetSingleScaffold (const json_t *hit_p);
 
-static ParameterSet *CreatePolymarkerParameters (const char *sequence_s, const char *scaffold_s, const char *gene_s);
+static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *gene_s, const char *database_s);
+
+static const char *GetMappedDatabaseName (LinkedService *linked_service_p, const char *database_s);
+
 
 
 bool PolymarkerServiceGenerator (LinkedService *linked_service_p, json_t *data_p, struct ServiceJob *job_p)
@@ -62,109 +67,115 @@ bool PolymarkerServiceGenerator (LinkedService *linked_service_p, json_t *data_p
 
 							json_array_foreach (reports_p, i, report_p)
 								{
-									json_t *hits_p = json_object_get (report_p, BSJMK_REPORT_RESULTS_S);
+									const char *database_s = GetDatabaseNameFromMarkedUpJob (report_p);
 
-									if (hits_p)
+									if (database_s)
 										{
-											if (json_is_array (hits_p))
+											json_t *hits_p = json_object_get (report_p, BSJMK_REPORT_RESULTS_S);
+
+											if (hits_p)
 												{
-													size_t j;
-													json_t *hit_p;
-
-													json_array_foreach (hits_p, j, hit_p)
+													if (json_is_array (hits_p))
 														{
-															const char *scaffold_s = GetSingleScaffold (hit_p);
+															size_t j;
+															json_t *hit_p;
 
-															if (scaffold_s)
-																{
-																	json_t *hsps_p = json_object_get (hit_p, BSJMK_HSPS_S);
+															json_array_foreach (hits_p, j, hit_p)
+															{
+																const char *scaffold_s = GetSingleScaffold (hit_p);
 
-																	if (hsps_p)
-																		{
-																			if (json_is_array (hsps_p))
-																				{
-																					size_t k;
-																					json_t *hsp_p;
+																if (scaffold_s)
+																	{
+																		json_t *hsps_p = json_object_get (hit_p, BSJMK_HSPS_S);
 
-																					json_array_foreach (hsps_p, k, hsp_p)
-																						{
-																							const char *query_sequence_s = GetJSONString (hsp_p, BSJMK_QUERY_SEQUENCE_S);
+																		if (hsps_p)
+																			{
+																				if (json_is_array (hsps_p))
+																					{
+																						size_t k;
+																						json_t *hsp_p;
 
-																							json_t *polymorphisms_p = json_object_get (hsp_p, BSJMK_POLYMORPHISMS_S);
+																						json_array_foreach (hsps_p, k, hsp_p)
+																							{
+																								const char *query_sequence_s = GetJSONString (hsp_p, BSJMK_QUERY_SEQUENCE_S);
 
-																							if (polymorphisms_p)
-																								{
-																									if (json_is_array (polymorphisms_p))
-																										{
-																											size_t l;
-																											json_t *polymorphism_p;
+																								json_t *polymorphisms_p = json_object_get (hsp_p, BSJMK_POLYMORPHISMS_S);
 
-																											json_array_foreach (polymorphisms_p, l, polymorphism_p)
-																												{
-																													/*
-																													 * Polymarker requires a single SNP, so first let's check that it's not a MNP
-																													 */
-																													const char *type_s = GetJSONString (polymorphism_p, "@type");
+																								if (polymorphisms_p)
+																									{
+																										if (json_is_array (polymorphisms_p))
+																											{
+																												size_t l;
+																												json_t *polymorphism_p;
 
-																													if (type_s)
-																														{
-																															if (strcmp (type_s, BSJMK_SNP_S) == 0)
-																																{
-																																	int32 index = GetSNPIndex (polymorphism_p);
+																												json_array_foreach (polymorphisms_p, l, polymorphism_p)
+																													{
+																														/*
+																														 * Polymarker requires a single SNP, so first let's check that it's not a MNP
+																														 */
+																														 const char *type_s = GetJSONString (polymorphism_p, "@type");
 
-																																	if (index != -1)
-																																		{
-																																			char query_base = '\0';
-																																			char hit_base = '\0';
+																														if (type_s)
+																															{
+																																if (strcmp (type_s, BSJMK_SNP_S) == 0)
+																																	{
+																																		int32 index = GetSNPIndex (polymorphism_p);
 
-																																			if (GetSNPBases (polymorphism_p, &query_base, &hit_base))
-																																				{
-																																					char *sequence_s = GetSequence (query_sequence_s, query_base, hit_base, index);
+																																		if (index != -1)
+																																			{
+																																				char query_base = '\0';
+																																				char hit_base = '\0';
 
-																																					if (sequence_s)
-																																						{
-																																							ParameterSet *params_p = CreatePolymarkerParameters (sequence_s, scaffold_s, NULL);
+																																				if (GetSNPBases (polymorphism_p, &query_base, &hit_base))
+																																					{
+																																						char *sequence_s = GetSequence (query_sequence_s, query_base, hit_base, index);
 
-																																							if (params_p)
-																																								{
-																																									if (AddLinkedServiceToRequestJSON (polymorphism_p, linked_service_p, params_p))
-																																										{
-																																											success_flag = true;
-																																										}
+																																						if (sequence_s)
+																																							{
+																																								ParameterSet *params_p = CreatePolymarkerParameters (linked_service_p, sequence_s, scaffold_s, NULL, database_s);
 
-																																									FreeParameterSet (params_p);
-																																								}		/* if (params_p) */
+																																								if (params_p)
+																																									{
+																																										if (AddLinkedServiceToRequestJSON (polymorphism_p, linked_service_p, params_p))
+																																											{
+																																												success_flag = true;
+																																											}
 
-																																							FreeCopiedString (sequence_s);
-																																						}		/* if (sequence_s) */
+																																										FreeParameterSet (params_p);
+																																									}		/* if (params_p) */
 
-																																				}		/* if (GetSNPBases (polymorphism_p, query_base, hit_base)) */
+																																								FreeCopiedString (sequence_s);
+																																							}		/* if (sequence_s) */
 
-																																		}		/* if (index != -1) */
+																																					}		/* if (GetSNPBases (polymorphism_p, query_base, hit_base)) */
 
-																																}		/* if (strcmp (type_s, BSJMK_SNP_S) == 0) */
+																																			}		/* if (index != -1) */
 
-																														}		/* if (type_s) */
+																																	}		/* if (strcmp (type_s, BSJMK_SNP_S) == 0) */
 
-																												}		/* json_array_foreach (polymorphisms_p, l, polymorphism_p) */
+																															}		/* if (type_s) */
 
-																										}		/* if (json_is_array (polymorphisms_p)) */
+																													}		/* json_array_foreach (polymorphisms_p, l, polymorphism_p) */
 
-																								}		/* if (polymorphisms_p) */
+																											}		/* if (json_is_array (polymorphisms_p)) */
 
-																						}		/* json_array_foreach (hsps_p, j, hsp_p) */
+																									}		/* if (polymorphisms_p) */
 
-																				}		/* if (json_is_array (hsps_p)) */
+																							}		/* json_array_foreach (hsps_p, j, hsp_p) */
 
-																		}		/* if (hsps_p) */
+																					}		/* if (json_is_array (hsps_p)) */
 
-																}		/* if (scaffold_s) */
+																			}		/* if (hsps_p) */
 
-														}		/* json_array_foreach (hits_p, j, hit_p) */
+																	}		/* if (scaffold_s) */
 
-												}		/* if (json_is_array (hits_p)) */
+															}		/* json_array_foreach (hits_p, j, hit_p) */
 
-										}		/* if (hits_p) */
+														}		/* if (json_is_array (hits_p)) */
+
+												}		/* if (hits_p) */
+
+										}		/* if (database_s) */
 
 								}		/* json_array_foreach (reports_p, i, report_p) */
 
@@ -178,7 +189,7 @@ bool PolymarkerServiceGenerator (LinkedService *linked_service_p, json_t *data_p
 }
 
 
-static ParameterSet *CreatePolymarkerParameters (const char *sequence_s, const char *scaffold_s, const char *gene_s)
+static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *gene_s, const char *database_s)
 {
 	ParameterSet *polymarker_params_p = AllocateParameterSet ("Polymarker Parameters", "Polymarker parameters generated as a Linked Service from the BLAST services");
 
@@ -209,13 +220,36 @@ static ParameterSet *CreatePolymarkerParameters (const char *sequence_s, const c
 
 							if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Chromosome", "Chromosome", "Chromosome", def, PL_ALL)) != NULL)
 								{
-									return polymarker_params_p;
+									const char *full_db_s = GetMappedDatabaseName (linked_service_p, database_s);
+
+									if (full_db_s)
+										{
+											def.st_boolean_value = true;
+
+											if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_BOOLEAN, full_db_s, full_db_s, full_db_s, def, PL_ALL)) != NULL)
+												{
+													return polymarker_params_p;
+												}
+										}
 								}
 						}
 				}		/* if (success_flag) */
 
 			FreeParameterSet (polymarker_params_p);
 		}		/*if (polymarker_params_p) */
+
+	return NULL;
+}
+
+
+static const char *GetMappedDatabaseName (LinkedService *linked_service_p, const char *database_s)
+{
+	MappedParameter *db_mapped_param_p = GetMappedParameterByInputParamName (linked_service_p, database_s);
+
+	if (db_mapped_param_p)
+		{
+			return db_mapped_param_p -> mp_output_param_s;
+		}
 
 	return NULL;
 }

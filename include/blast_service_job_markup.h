@@ -77,6 +77,10 @@ BLAST_SERVICE_LOCAL bool GetAndAddNucleotidePolymorphisms (json_t *marked_up_hsp
 
 BLAST_SERVICE_LOCAL bool AddPolymorphism (json_t *marked_up_hsp_p, const char *hit_gap_start_p, const char *reference_gap_start_p, const uint32 start_of_region, const uint32 end_of_region);
 
+
+BLAST_SERVICE_LOCAL const char *GetDatabaseNameFromMarkedUpJob (const json_t *marked_up_report_p);
+
+
 /**
  * Add the marked-up data for a High-scoring Segment Pair (HSP) to a
  * marked-up hit.
