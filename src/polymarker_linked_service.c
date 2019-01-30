@@ -252,7 +252,10 @@ static char *GetSequence (const char *original_sequence_s, const char query_base
 
 	if (index < (int32) l)
 		{
-			sequence_s = (char *) AllocMemory ((l + 4) * sizeof (char));
+			/*
+			 * 4 for A -> [A/G] and 1 for the null terminating byte
+			 */
+			sequence_s = (char *) AllocMemory ((l + 5) * sizeof (char));
 
 			if (sequence_s)
 				{
