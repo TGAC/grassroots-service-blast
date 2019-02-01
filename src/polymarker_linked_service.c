@@ -29,6 +29,14 @@
 #include "linked_service.h"
 #include "provider.h"
 #include "grassroots_config.h"
+#include "streams.h"
+
+
+#ifdef _DEBUG
+	#define POLYMARKER_LINKED_SERVICE_DEBUG	(STM_LEVEL_FINE)
+#else
+	#define POLYMARKER_LINKED_SERVICE_DEBUG	(STM_LEVEL_NONE)
+#endif
 
 
 static int32 GetSNPIndex (const json_t *polymorphism_p);
@@ -39,18 +47,32 @@ static bool GetSNPBases (const json_t *polymorphism_p, char *query_base_p, char 
 
 static const char *GetSingleScaffold (const json_t *hit_p);
 
-static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *chromosome_s, const char *database_s);
+static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *chromosome_s, const char *database_s, const size_t query_sequence_length);
 
 static const char *GetMappedDatabaseName (LinkedService *linked_service_p, const char *database_s);
+
+static uint32 GetPolymarkerMinSequenceLength (const LinkedService *linked_service_p);
+
+static bool ProcessPolymorphism (LinkedService *linked_service_p, json_t *polymorphism_p, const char *query_sequence_s, const char *scaffold_s, const char *database_s, const size_t query_sequence_length);
 
 
 
 bool PolymarkerServiceGenerator (LinkedService *linked_service_p, json_t *data_p, struct ServiceJob *job_p)
 {
 	bool success_flag = false;
+
 	char *key_s = ConcatenateVarargsStrings (BSJMK_RESULTS_S, ".", BSJMK_REPORTS_S, NULL);
 
-	PrintJSONToLog (STM_LEVEL_FINEST, __FILE__, __LINE__, data_p, "RunCustomLinkedServiceGenerator");
+	/*
+	 * Polymarker currently requires the sequence to be at least 50 characters long.
+	 * This might change in the future so rather than hard-code this in, read the current limit
+	 * from the blast service config.
+	 */
+	const uint32 min_sequence_length = GetPolymarkerMinSequenceLength (linked_service_p);
+
+	#if POLYMARKER_LINKED_SERVICE_DEBUG >= STM_LEVEL_FINER
+	PrintJSONToLog (STM_LEVEL_FINEST, __FILE__, __LINE__, data_p, "PolymarkerServiceGenerator");
+	#endif
 
 	if (key_s)
 		{
@@ -81,95 +103,65 @@ bool PolymarkerServiceGenerator (LinkedService *linked_service_p, json_t *data_p
 															json_t *hit_p;
 
 															json_array_foreach (hits_p, j, hit_p)
-															{
-																const char *scaffold_s = GetSingleScaffold (hit_p);
+																{
+																	const char *scaffold_s = GetSingleScaffold (hit_p);
 
-																if (scaffold_s)
-																	{
-																		json_t *hsps_p = json_object_get (hit_p, BSJMK_HSPS_S);
+																	if (scaffold_s)
+																		{
+																			json_t *hsps_p = json_object_get (hit_p, BSJMK_HSPS_S);
 
-																		if (hsps_p)
-																			{
-																				if (json_is_array (hsps_p))
-																					{
-																						size_t k;
-																						json_t *hsp_p;
+																			if (hsps_p)
+																				{
+																					if (json_is_array (hsps_p))
+																						{
+																							size_t k;
+																							json_t *hsp_p;
 
-																						json_array_foreach (hsps_p, k, hsp_p)
-																							{
-																								const char *query_sequence_s = GetJSONString (hsp_p, BSJMK_QUERY_SEQUENCE_S);
+																							json_array_foreach (hsps_p, k, hsp_p)
+																								{
+																									const char *query_sequence_s = GetJSONString (hsp_p, BSJMK_QUERY_SEQUENCE_S);
 
-																								json_t *polymorphisms_p = json_object_get (hsp_p, BSJMK_POLYMORPHISMS_S);
+																									if (query_sequence_s)
+																										{
+																											const size_t query_sequence_length = strlen (query_sequence_s);
 
-																								if (polymorphisms_p)
-																									{
-																										if (json_is_array (polymorphisms_p))
-																											{
-																												size_t l;
-																												json_t *polymorphism_p;
+																											if (query_sequence_length >= min_sequence_length)
+																												{
+																													json_t *polymorphisms_p = json_object_get (hsp_p, BSJMK_POLYMORPHISMS_S);
 
-																												json_array_foreach (polymorphisms_p, l, polymorphism_p)
-																													{
-																														/*
-																														 * Polymarker requires a single SNP, so first let's check that it's not a MNP
-																														 */
-																														 const char *type_s = GetJSONString (polymorphism_p, "@type");
+																													if (polymorphisms_p)
+																														{
+																															if (json_is_array (polymorphisms_p))
+																																{
+																																	size_t l;
+																																	json_t *polymorphism_p;
 
-																														if (type_s)
-																															{
-																																if (strcmp (type_s, BSJMK_SNP_S) == 0)
-																																	{
-																																		int32 index = GetSNPIndex (polymorphism_p);
+																																	json_array_foreach (polymorphisms_p, l, polymorphism_p)
+																																		{
+																																			if (ProcessPolymorphism (linked_service_p, polymorphism_p, query_sequence_s, scaffold_s, database_s, query_sequence_length))
+																																				{
+																																					success_flag = true;
+																																				}
 
-																																		if (index != -1)
-																																			{
-																																				char query_base = '\0';
-																																				char hit_base = '\0';
+																																		}		/* json_array_foreach (polymorphisms_p, l, polymorphism_p) */
 
-																																				if (GetSNPBases (polymorphism_p, &query_base, &hit_base))
-																																					{
-																																						char *sequence_s = GetSequence (query_sequence_s, query_base, hit_base, index);
+																																}		/* if (json_is_array (polymorphisms_p)) */
 
-																																						if (sequence_s)
-																																							{
-																																								ParameterSet *params_p = CreatePolymarkerParameters (linked_service_p, sequence_s, scaffold_s, NULL, database_s);
+																														}		/* if (polymorphisms_p) */
 
-																																								if (params_p)
-																																									{
-																																										if (AddLinkedServiceToRequestJSON (polymorphism_p, linked_service_p, params_p))
-																																											{
-																																												success_flag = true;
-																																											}
+																												}		/* if (query_sequence_length >= min_sequence_length) */
 
-																																										FreeParameterSet (params_p);
-																																									}		/* if (params_p) */
+																										}		/* if (query_sequence_s) */
 
-																																								FreeCopiedString (sequence_s);
-																																							}		/* if (sequence_s) */
+																								}		/* json_array_foreach (hsps_p, j, hsp_p) */
 
-																																					}		/* if (GetSNPBases (polymorphism_p, query_base, hit_base)) */
+																						}		/* if (json_is_array (hsps_p)) */
 
-																																			}		/* if (index != -1) */
+																				}		/* if (hsps_p) */
 
-																																	}		/* if (strcmp (type_s, BSJMK_SNP_S) == 0) */
+																		}		/* if (scaffold_s) */
 
-																															}		/* if (type_s) */
-
-																													}		/* json_array_foreach (polymorphisms_p, l, polymorphism_p) */
-
-																											}		/* if (json_is_array (polymorphisms_p)) */
-
-																									}		/* if (polymorphisms_p) */
-
-																							}		/* json_array_foreach (hsps_p, j, hsp_p) */
-
-																					}		/* if (json_is_array (hsps_p)) */
-
-																			}		/* if (hsps_p) */
-
-																	}		/* if (scaffold_s) */
-
-															}		/* json_array_foreach (hits_p, j, hit_p) */
+																}		/* json_array_foreach (hits_p, j, hit_p) */
 
 														}		/* if (json_is_array (hits_p)) */
 
@@ -189,7 +181,72 @@ bool PolymarkerServiceGenerator (LinkedService *linked_service_p, json_t *data_p
 }
 
 
-static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *chromosome_s, const char *database_s)
+static bool ProcessPolymorphism (LinkedService *linked_service_p, json_t *polymorphism_p, const char *query_sequence_s, const char *scaffold_s, const char *database_s, const size_t query_sequence_length)
+{
+	bool success_flag = false;
+	/*
+	 * Polymarker requires a single SNP, so first let's check that it's not a MNP
+	 */
+	const char *type_s = GetJSONString (polymorphism_p, "@type");
+
+	if (type_s)
+		{
+			if (strcmp (type_s, BSJMK_SNP_S) == 0)
+				{
+					int32 index = GetSNPIndex (polymorphism_p);
+
+					if (index != -1)
+						{
+							char query_base = '\0';
+							char hit_base = '\0';
+
+							if (GetSNPBases (polymorphism_p, &query_base, &hit_base))
+								{
+									char *sequence_s = GetSequence (query_sequence_s, query_base, hit_base, index);
+
+									if (sequence_s)
+										{
+											ParameterSet *params_p = CreatePolymarkerParameters (linked_service_p, sequence_s, scaffold_s, NULL, database_s, query_sequence_length);
+
+											if (params_p)
+												{
+													if (AddLinkedServiceToRequestJSON (polymorphism_p, linked_service_p, params_p))
+														{
+															success_flag = true;
+														}
+
+													FreeParameterSet (params_p);
+												}		/* if (params_p) */
+
+												FreeCopiedString (sequence_s);
+										}		/* if (sequence_s) */
+
+								}		/* if (GetSNPBases (polymorphism_p, query_base, hit_base)) */
+
+						}		/* if (index != -1) */
+
+				}		/* if (strcmp (type_s, BSJMK_SNP_S) == 0) */
+
+		}		/* if (type_s) */
+
+	return success_flag;
+}
+
+
+static uint32 GetPolymarkerMinSequenceLength (const LinkedService *linked_service_p)
+{
+	uint32 length = 0;
+
+	if (linked_service_p -> ls_config_p)
+		{
+			GetJSONInteger (linked_service_p -> ls_config_p, "primer3_min_sequence_length", (int *) &length);
+		}
+
+	return length;
+}
+
+
+static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *chromosome_s, const char *database_s, const size_t query_sequence_length)
 {
 	ParameterSet *polymarker_params_p = AllocateParameterSet ("Polymarker Parameters", "Polymarker parameters generated as a Linked Service from the BLAST services");
 
@@ -228,7 +285,25 @@ static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p
 
 											if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_BOOLEAN, full_db_s, full_db_s, full_db_s, def, PL_ALL)) != NULL)
 												{
-													return polymarker_params_p;
+													/*
+													 * Since we know the length of the query sequence, make sure that it is a valid
+													 * size for primer3.
+													 */
+													def.st_ulong_value = query_sequence_length;
+
+													if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_UNSIGNED_INT, "Product size range min", "Product size range min", "Product size range min", def, PL_ADVANCED)) != NULL)
+														{
+															/*
+															 * Make sure the max product size is large enough,
+															 * for the sake or argument multiply the sequence length by 3
+															 */
+															def.st_ulong_value = 3 * query_sequence_length;
+
+															if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_UNSIGNED_INT, "Product size range max", "Product size range max", "Product size range max", def, PL_ADVANCED)) != NULL)
+																{
+																	return polymarker_params_p;
+																}
+														}
 												}
 										}
 								}
