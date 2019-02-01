@@ -39,7 +39,7 @@ static bool GetSNPBases (const json_t *polymorphism_p, char *query_base_p, char 
 
 static const char *GetSingleScaffold (const json_t *hit_p);
 
-static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *gene_s, const char *database_s);
+static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *chromosome_s, const char *database_s);
 
 static const char *GetMappedDatabaseName (LinkedService *linked_service_p, const char *database_s);
 
@@ -189,7 +189,7 @@ bool PolymarkerServiceGenerator (LinkedService *linked_service_p, json_t *data_p
 }
 
 
-static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *gene_s, const char *database_s)
+static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p, const char *sequence_s, const char *scaffold_s, const char *chromosome_s, const char *database_s)
 {
 	ParameterSet *polymarker_params_p = AllocateParameterSet ("Polymarker Parameters", "Polymarker parameters generated as a Linked Service from the BLAST services");
 
@@ -200,11 +200,11 @@ static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p
 			bool success_flag = true;
 			InitSharedType (&def);
 
-			if (gene_s)
+			if (chromosome_s)
 				{
-					def.st_string_value_s = (char *) gene_s;
+					def.st_string_value_s = (char *) chromosome_s;
 
-					if (! (param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Gene", "Gene", "Gene", def, PL_ALL)))
+					if (! (param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Chromosome", "Chromosome", "Chromosome", def, PL_ALL)))
 						{
 							success_flag =  false;
 						}
@@ -218,7 +218,7 @@ static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p
 						{
 							def.st_string_value_s = (char *) scaffold_s;
 
-							if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Chromosome", "Chromosome", "Chromosome", def, PL_ALL)) != NULL)
+							if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Gene", "Gene", "Gene", def, PL_ALL)) != NULL)
 								{
 									const char *full_db_s = GetMappedDatabaseName (linked_service_p, database_s);
 
