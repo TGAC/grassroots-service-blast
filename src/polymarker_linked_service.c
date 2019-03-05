@@ -202,32 +202,70 @@ static bool ProcessPolymorphism (LinkedService *linked_service_p, json_t *polymo
 
 							if (GetSNPBases (polymorphism_p, &query_base, &hit_base))
 								{
-									char *sequence_s = GetSequence (query_sequence_s, query_base, hit_base, index);
+									/*
+									 * Make sure that it isn't an insertion/deletion as polymarker doesn't work with those
+									 */
+									const char * const VALID_BASES_S = "ACTGactg";
 
-									if (sequence_s)
+									if ((strchr (VALID_BASES_S, query_base)) && (strchr (VALID_BASES_S, hit_base)))
 										{
-											ParameterSet *params_p = CreatePolymarkerParameters (linked_service_p, sequence_s, scaffold_s, NULL, database_s, query_sequence_length);
+											char *sequence_s = GetSequence (query_sequence_s, query_base, hit_base, index);
 
-											if (params_p)
+											if (sequence_s)
 												{
-													if (AddLinkedServiceToRequestJSON (polymorphism_p, linked_service_p, params_p))
+													/*
+													 * Make sure that the sequence doesn't contain any gaps as polymarker doesn't work with those
+													 */
+													const size_t matching_length = strspn (query_sequence_s, VALID_BASES_S);
+
+													if (matching_length == query_sequence_length)
 														{
-															success_flag = true;
-														}
+															ParameterSet *params_p = CreatePolymarkerParameters (linked_service_p, sequence_s, scaffold_s, NULL, database_s, query_sequence_length);
 
-													FreeParameterSet (params_p);
-												}		/* if (params_p) */
+															if (params_p)
+																{
+																	if (AddLinkedServiceToRequestJSON (polymorphism_p, linked_service_p, params_p))
+																		{
+																			success_flag = true;
+																		}
+																	else
+																		{
+																			PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, polymorphism_p, "AddLinkedServiceToRequestJSON failed");
+																		}
 
-												FreeCopiedString (sequence_s);
-										}		/* if (sequence_s) */
+																	FreeParameterSet (params_p);
+																}		/* if (params_p) */
+															else
+																{
+																	PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, polymorphism_p, "CreatePolymarkerParameters failed for sequence \"%s\", scaffold \"%s\", database \"%s\" query_sequence_length " SIZET_FMT, sequence_s, scaffold_s, database_s, query_sequence_length);
+																}
+
+														}		/* if (matching_length == seq_length) */
+
+													FreeCopiedString (sequence_s);
+												}		/* if (sequence_s) */
+
+										}		/* if ((strchr (VALID_BASES_S, query_base)) && (strchr (VALID_BASES_S, hit_base))) */
 
 								}		/* if (GetSNPBases (polymorphism_p, query_base, hit_base)) */
+							else
+								{
+									PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, polymorphism_p, "GetSNPBases failed");
+								}
 
 						}		/* if (index != -1) */
+					else
+						{
+							PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, polymorphism_p, "GetSNPIndex failed");
+						}
 
 				}		/* if (strcmp (type_s, BSJMK_SNP_S) == 0) */
 
 		}		/* if (type_s) */
+	else
+		{
+			PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, polymorphism_p, "Failed to find \"@type\"");
+		}
 
 	return success_flag;
 }
