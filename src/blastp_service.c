@@ -248,13 +248,13 @@ bool ParseBlastPParameters (const BlastServiceData * UNUSED_PARAM (data_p), Para
 
 static const char *GetProteinBlastServiceName (Service * UNUSED_PARAM (service_p))
 {
- 	return "BlastP service";
+ 	return "BlastP";
 }
 
 
 static const char *GetProteinBlastServiceDescription (Service * UNUSED_PARAM (service_p))
 {
-	return "A service to search protein databases with protein queries";
+	return "Search protein databases with protein queries";
 }
 
 

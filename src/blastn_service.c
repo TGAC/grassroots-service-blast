@@ -109,13 +109,13 @@ Service *GetBlastNService (void)
 
 static const char *GetBlastNServiceName (Service * UNUSED_PARAM (service_p))
 {
-	return "BlastN service";
+	return "BlastN";
 }
 
 
 static const char *GetBlastNServiceDescription (Service * UNUSED_PARAM (service_p))
 {
-	return "A service to search nucleotide databases with nucleotide queries";
+	return "Search nucleotide databases with nucleotide queries";
 }
 
 

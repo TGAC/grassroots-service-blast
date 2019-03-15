@@ -122,13 +122,13 @@ Service *GetMagicBlastService (void)
 
 static const char *GetMagicBlastServiceName (Service * UNUSED_PARAM (service_p))
 {
- 	return "Magic-Blast service";
+ 	return "Magic-Blast";
 }
 
 
 static const char *GetMagicBlastServiceDescription (Service * UNUSED_PARAM (service_p))
 {
-	return "A service for mapping large next-generation RNA or DNA sequencing runs against a whole genome or transcriptome";
+	return "Mapping large next-generation RNA or DNA sequencing runs against a whole genome or transcriptome";
 }
 
 

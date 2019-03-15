@@ -114,13 +114,13 @@ Service *GetBlastXService (void)
 
 static const char *GetBlastXServiceName (Service * UNUSED_PARAM (service_p))
 {
- 	return "BlastX service";
+ 	return "BlastX";
 }
 
 
 static const char *GetBlastXServiceDescription (Service * UNUSED_PARAM (service_p))
 {
-	return "A service to search protein databases with nucleotide queries";
+	return "Search protein databases with nucleotide queries";
 }
 
 
