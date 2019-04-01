@@ -61,6 +61,8 @@ static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, Para
 static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
 
 
+
+
 /*******************************/
 /******* API DEFINITIONS *******/
 /*******************************/
@@ -90,7 +92,8 @@ Service *GetBlastNService (void)
 														 true,
 														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p,
-														 GetBlastNServiceMetadata))
+														 GetBlastNServiceMetadata,
+														 GetBlastIndexingData))
 						{
 							if (GetBlastServiceConfig (data_p))
 								{

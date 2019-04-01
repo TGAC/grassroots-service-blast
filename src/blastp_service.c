@@ -105,7 +105,8 @@ Service *GetBlastPService (void)
 														 true,
 														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p,
-														 GetBlastPServiceMetadata))
+														 GetBlastPServiceMetadata,
+														 GetBlastIndexingData))
 						{
 							if (GetBlastServiceConfig (data_p))
 								{

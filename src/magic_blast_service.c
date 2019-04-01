@@ -103,7 +103,8 @@ Service *GetMagicBlastService (void)
 																 true,
 																 SY_SYNCHRONOUS,
 																 (ServiceData *) data_p,
-																 GetMagicBlastServiceMetadata))
+																 GetMagicBlastServiceMetadata,
+																 GetBlastIndexingData))
 						{
 							if (GetBlastServiceConfig (data_p))
 								{

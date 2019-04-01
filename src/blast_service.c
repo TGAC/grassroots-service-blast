@@ -1460,6 +1460,16 @@ const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_
 }
 
 
+json_t *GetBlastIndexingData (struct Service *service_p)
+{
+	json_t *res_p = NULL;
+
+
+	return res_p;
+}
+
+
+
 static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p, ServiceJobSetIterator *iterator_p)
 {
 	/*
