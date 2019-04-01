@@ -224,6 +224,9 @@ BLAST_SERVICE_PREFIX const char *BS_DEFAULT_OUTPUT_FORMAT_S BLAST_SERVICE_VAL ("
 /** The prefix to use for the ParameterGroup names for available databases from all of the connected servers. */
 BLAST_SERVICE_PREFIX const char *BS_DATABASE_GROUP_NAME_S BLAST_SERVICE_VAL ("Available Databases");
 
+
+BLAST_SERVICE_PREFIX const char *BS_DATABASES_S BLAST_SERVICE_VAL ("databases");
+
 /**
  * The configuration key used to declare which type of BlastTool to use.
  */

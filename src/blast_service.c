@@ -56,6 +56,8 @@ static bool PreRunJobs (BlastServiceData *blast_data_p);
 
 static bool CleanupAsyncBlastService (void *data_p);
 
+static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p);
+
 
 /*
  * API FUNCTIONS
@@ -1143,7 +1145,7 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 			if (data_p -> bsd_working_dir_s)
 				{
-					json_t *value_p = json_object_get (blast_config_p, "databases");
+					json_t *value_p = json_object_get (blast_config_p, BS_DATABASES_S);
 
 					if (value_p)
 						{
@@ -1462,12 +1464,84 @@ const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_
 
 json_t *GetBlastIndexingData (struct Service *service_p)
 {
-	json_t *res_p = NULL;
+	json_t *res_p = GetBaseServiceDataAsJSON (service_p, NULL);
 
+	if (res_p)
+		{
+			json_t *databases_json_p = json_array ();
 
-	return res_p;
+			if (databases_json_p)
+				{
+					if (json_object_set_new (res_p, BS_DATABASES_S, databases_json_p) == 0)
+						{
+							BlastServiceData *data_p = (BlastServiceData *) (service_p -> se_data_p);
+							DatabaseInfo *database_p = data_p -> bsd_databases_p;
+							bool success_flag = true;
+
+							if (database_p && success_flag)
+								{
+									if (AddDatabaseForIndexing (database_p, databases_json_p))
+										{
+											++ database_p;
+										}
+									else
+										{
+											success_flag = false;
+										}
+								}		/* if (database_p) */
+
+							if (success_flag)
+								{
+									return res_p;
+								}
+
+						}		/* if (json_object_set_new (res_p, BS_DATABASES_S, databases_json_p) == 0) */
+					else
+						{
+							json_decref (databases_json_p);
+						}
+
+				}		/* if (databases_json_p) */
+
+			json_decref (res_p);
+		}		/* if (res_p) */
+
+	return NULL;
 }
 
+
+static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p)
+{
+	json_t *db_json_p = json_object ();
+
+	if (db_json_p)
+		{
+			if (SetJSONString (db_json_p, CONTEXT_PREFIX_SCHEMA_ORG_S "name", db_p -> di_name_s))
+				{
+					bool success_flag = true;
+
+					if (db_p -> di_description_s)
+						{
+							if (!SetJSONString (db_json_p, CONTEXT_PREFIX_SCHEMA_ORG_S "description", db_p -> di_description_s))
+								{
+									success_flag = false;
+								}
+						}
+
+					if (success_flag)
+						{
+							if (json_array_append_new (json_p, db_json_p) == 0)
+								{
+									return true;
+								}
+						}
+				}
+
+			json_decref (db_json_p);
+		}		/* if (db_json_p) */
+
+	return false;
+}
 
 
 static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *input_filename_s, BlastAppParameters *app_params_p, ServiceJobSetIterator *iterator_p)
