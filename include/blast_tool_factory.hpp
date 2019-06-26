@@ -28,10 +28,10 @@
 #ifndef SERVICES_BLAST_INCLUDE_BLAST_TOOL_FACTORY_HPP_
 #define SERVICES_BLAST_INCLUDE_BLAST_TOOL_FACTORY_HPP_
 
-#include "../../blast-service/include/blast_service.h"
-#include "../../blast-service/include/blast_service_api.h"
-#include "../../blast-service/include/blast_service_job.h"
-#include "../../blast-service/include/blast_tool.hpp"
+#include "blast_service.h"
+#include "blast_service_api.h"
+#include "blast_service_job.h"
+#include "blast_tool.hpp"
 #include "jansson.h"
 
 

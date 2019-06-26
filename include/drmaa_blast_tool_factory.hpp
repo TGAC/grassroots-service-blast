@@ -29,7 +29,7 @@
 #define SERVICES_BLAST_INCLUDE_DRMAA_BLAST_TOOL_FACTORY_HPP_
 
 
-#include "../../blast-service/include/external_blast_tool_factory.hpp"
+#include "external_blast_tool_factory.hpp"
 
 /**
  * The base class for generating DrmaaBlastTools.

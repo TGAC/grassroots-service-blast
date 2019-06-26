@@ -28,7 +28,7 @@
 #ifndef SERVER_SRC_SERVICES_BLAST_INCLUDE_BYTE_BUFFER_ARGS_PROCESSOR_HPP_
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_BYTE_BUFFER_ARGS_PROCESSOR_HPP_
 
-#include "../../blast-service/include/args_processor.hpp"
+#include "args_processor.hpp"
 #include "byte_buffer.h"
 
 

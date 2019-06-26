@@ -27,7 +27,7 @@
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_ASYNC_SYSTEM_BLAST_TOOL_HPP_
 
 
-#include "../../blast-service/include/system_blast_tool.hpp"
+#include "system_blast_tool.hpp"
 #include "count_async_task.h"
 #include "system_async_task.h"
 

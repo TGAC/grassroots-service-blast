@@ -31,7 +31,7 @@
 
 
 #include "pthread.h"
-#include "../../blast-service/include/system_blast_tool.hpp"
+#include "system_blast_tool.hpp"
 
 /**
  * A class that will run Blast within a pthread.

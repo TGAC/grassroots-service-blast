@@ -28,7 +28,7 @@
 #ifndef SERVER_SRC_SERVICES_BLAST_INCLUDE_ARGS_PROCESSOR_HPP_
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_ARGS_PROCESSOR_HPP_
 
-#include "../../blast-service/include/blast_service_api.h"
+#include "blast_service_api.h"
 
 
 #ifdef __cplusplus

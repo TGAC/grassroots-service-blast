@@ -28,7 +28,7 @@
 #ifndef SERVER_SRC_SERVICES_BLAST_INCLUDE_STRINGS_ARGS_PROCESSOR_HPP_
 #define SERVER_SRC_SERVICES_BLAST_INCLUDE_STRINGS_ARGS_PROCESSOR_HPP_
 
-#include "../../blast-service/include/args_processor.hpp"
+#include "args_processor.hpp"
 
 /**
  * An ArgsProcessor that adds all of its values to an array of strings.
