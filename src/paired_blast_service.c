@@ -278,10 +278,11 @@ char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32
 
 																			if (service_p)
 																				{
-																					const char *service_name_s = GetServiceName (blast_data_p -> bsd_base_data.sd_service_p);
+																					const char *service_name_s = GetServiceName (service_p);
 
 																					if (service_name_s)
 																						{
+																							GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
 																							json_t *res_p = MakeRemotePairedServiceCall (service_name_s, param_set_p, uri_s, NULL);
 
 																							if (res_p)
