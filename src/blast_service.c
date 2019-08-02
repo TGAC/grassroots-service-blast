@@ -828,7 +828,8 @@ OperationStatus GetBlastServiceStatus (Service *service_p, const uuid_t job_id)
 
 	if (!job_p)
 		{
-			JobsManager *jobs_manager_p = GetJobsManager ();
+			GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+			JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
 
 			if (jobs_manager_p)
 				{
@@ -1663,7 +1664,8 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 										case OS_PENDING:
 										case OS_STARTED:
 											{
-												JobsManager *jobs_manager_p = GetJobsManager ();
+												GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+												JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
 
 												if (jobs_manager_p)
 													{

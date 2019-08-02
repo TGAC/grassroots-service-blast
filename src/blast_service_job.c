@@ -479,7 +479,8 @@ bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJo
 		{
 			UserDetails *user_p = NULL;
 			Resource *resource_p = NULL;
-			Service *output_service_p = GetServiceByName (linked_service_p -> ls_output_service_s);
+			GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+			Service *output_service_p = GetServiceByName (grassroots_p, linked_service_p -> ls_output_service_s);
 
 			if (output_service_p)
 				{
@@ -541,7 +542,8 @@ bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJo
 
 void BlastServiceJobCompleted (ServiceJob *job_p)
 {
-	JobsManager *manager_p = GetJobsManager ();
+	GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (job_p -> sj_service_p);
+	JobsManager *manager_p = GetJobsManager (grassroots_p);
 
 	#if BLAST_SERVICE_JOB_DEBUG >= STM_LEVEL_FINEST
 		{

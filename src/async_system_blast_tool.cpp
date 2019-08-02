@@ -160,7 +160,8 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 		{
 			if (SetSystemAsyncTaskCommand	(asbt_task_p, command_line_s))
 				{
-					JobsManager *manager_p = GetJobsManager ();
+					GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (bt_job_p -> bsj_job.sj_service_p);
+					JobsManager *manager_p = GetJobsManager (grassroots_p);
 
 					#if ASYNC_SYSTEM_BLAST_TOOL_DEBUG >= STM_LEVEL_FINE
 					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
@@ -310,7 +311,8 @@ OperationStatus AsyncSystemBlastTool :: GetStatus (bool update_flag)
 char *AsyncSystemBlastTool :: GetResults (BlastFormatter *formatter_p)
 {
 	char *results_s = ExternalBlastTool :: GetResults (formatter_p);
-	JobsManager *jobs_manager_p = GetJobsManager ();
+	GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (bt_service_data_p -> bsd_base_data.sd_service_p);
+	JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
 
 	/*
 	 * Remove the ServiceJob from the JobsManager
