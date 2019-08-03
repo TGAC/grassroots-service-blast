@@ -27,7 +27,7 @@
 
 #include "service_job_set_iterator.h"
 #include "string_utils.h"
-#include "grassroots_config.h"
+#include "grassroots_server.h"
 #include "temp_file.hpp"
 #include "json_tools.h"
 #include "blast_formatter.h"
@@ -640,7 +640,8 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * const param_set_p, Service *service_p, BlastServiceData *data_p)
 {
-	char *group_s = GetLocalDatabaseGroupName ();
+	GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+	char *group_s = GetLocalDatabaseGroupName (grassroots_p);
 
 	if (db_p)
 		{

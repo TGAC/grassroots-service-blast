@@ -28,7 +28,7 @@
 #include "string_utils.h"
 #include "linked_service.h"
 #include "provider.h"
-#include "grassroots_config.h"
+#include "grassroots_server.h"
 #include "streams.h"
 
 

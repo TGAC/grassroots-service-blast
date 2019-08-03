@@ -352,7 +352,7 @@ BLAST_SERVICE_LOCAL bool GetProgramSelectionParameterTypeForNamedParameter (cons
 BLAST_SERVICE_LOCAL bool GetProteinGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
 
 
-BLAST_SERVICE_LOCAL char *GetLocalDatabaseGroupName (void);
+BLAST_SERVICE_LOCAL char *GetLocalDatabaseGroupName (GrassrootsServer *grassroots_p);
 
 
 BLAST_SERVICE_LOCAL char *GetFullyQualifiedDatabaseName (const char *group_s, const char *db_s);

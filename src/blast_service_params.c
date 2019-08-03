@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "provider.h"
-#include "grassroots_config.h"
+#include "grassroots_server.h"
 #include "string_utils.h"
 #include "streams.h"
 #include "service.h"
@@ -129,7 +129,8 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 		{
 			ParameterGroup *group_p = NULL;
 			const DatabaseInfo *db_p = data_p -> bsd_databases_p;
-			char *group_s = GetLocalDatabaseGroupName ();
+			GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (data_p -> bsd_base_data.sd_service_p);
+			char *group_s = GetLocalDatabaseGroupName (grassroots_p);
 
 			group_p = CreateAndAddParameterGroupToParameterSet (group_s ? group_s : BS_DATABASE_GROUP_NAME_S, false, & (data_p -> bsd_base_data), param_set_p);
 
@@ -178,7 +179,8 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 bool GetDatabaseParameterTypeForNamedParameter (BlastServiceData *data_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = false;
-	char *group_s = GetLocalDatabaseGroupName ();
+	GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (data_p -> bsd_base_data.sd_service_p);
+	char *group_s = GetLocalDatabaseGroupName (grassroots_p);
 	const DatabaseInfo *db_p = data_p -> bsd_databases_p;
 
 	if (db_p)
@@ -540,20 +542,16 @@ bool GetProteinGeneralAlgorithmParameterTypeForNamedParameter (const char *param
 
 
 
-char *GetLocalDatabaseGroupName (void)
+char *GetLocalDatabaseGroupName (GrassrootsServer *grassroots_p)
 {
 	char *group_s = NULL;
-	const json_t *provider_p = GetGlobalConfigValue (SERVER_PROVIDER_S);
+	const char *provider_s = GetServerProviderName (grassroots_p);
 
-	if (provider_p)
+	if (provider_s)
 		{
-			const char *provider_s = GetProviderName (provider_p);
+			group_s = CreateGroupName (provider_s);
+		}
 
-			if (provider_s)
-				{
-					group_s = CreateGroupName (provider_s);
-				}
-		}		/* if (provider_p) */
 
 	return group_s;
 }
