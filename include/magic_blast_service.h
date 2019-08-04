@@ -24,7 +24,7 @@ extern "C"
  * @ingroup blast_service
  */
 
-BLAST_SERVICE_LOCAL Service *GetMagicBlastService (void);
+BLAST_SERVICE_LOCAL Service *GetMagicBlastService (GrassrootsServer *grassroots_p);
 
 
 #ifdef __cplusplus

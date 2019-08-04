@@ -29,7 +29,7 @@ extern "C"
  * @ingroup blast_service
  */
 
-BLAST_SERVICE_LOCAL Service *GetBlastPService (void);
+BLAST_SERVICE_LOCAL Service *GetBlastPService (GrassrootsServer *grassroots_p);
 
 
 BLAST_SERVICE_LOCAL bool AddProteinBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p);

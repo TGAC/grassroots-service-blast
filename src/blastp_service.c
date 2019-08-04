@@ -81,7 +81,7 @@ static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, 
 /*******************************/
 
 
-Service *GetBlastPService (void)
+Service *GetBlastPService (GrassrootsServer *grassroots_p)
 {
 	Service *protein_blast_service_p = (Service *) AllocMemory (sizeof (Service));
 
@@ -106,7 +106,8 @@ Service *GetBlastPService (void)
 														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p,
 														 GetBlastPServiceMetadata,
-														 GetBlastIndexingData))
+														 GetBlastIndexingData,
+														 grassroots_p))
 						{
 							if (GetBlastServiceConfig (data_p))
 								{

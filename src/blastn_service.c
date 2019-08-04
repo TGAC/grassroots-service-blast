@@ -68,7 +68,7 @@ static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_
 /*******************************/
 
 
-Service *GetBlastNService (void)
+Service *GetBlastNService (GrassrootsServer *grassroots_p)
 {
 	Service *nucleotide_blast_service_p = (Service *) AllocMemory (sizeof (Service));
 
@@ -93,7 +93,8 @@ Service *GetBlastNService (void)
 														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p,
 														 GetBlastNServiceMetadata,
-														 GetBlastIndexingData))
+														 GetBlastIndexingData,
+														 grassroots_p))
 						{
 							if (GetBlastServiceConfig (data_p))
 								{

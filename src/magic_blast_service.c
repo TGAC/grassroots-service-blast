@@ -78,7 +78,7 @@ static bool GetMagicBlastServiceParameterTypeForNamedParameter (Service *service
  * API DEFINITIONS
  */
 
-Service *GetMagicBlastService (void)
+Service *GetMagicBlastService (GrassrootsServer *grassroots_p)
 {
 	Service *service_p = NULL;
 	Service *magic_blast_service_p = (Service *) AllocMemory (sizeof (Service));
@@ -104,7 +104,8 @@ Service *GetMagicBlastService (void)
 																 SY_SYNCHRONOUS,
 																 (ServiceData *) data_p,
 																 GetMagicBlastServiceMetadata,
-																 GetBlastIndexingData))
+																 GetBlastIndexingData,
+																 grassroots_p))
 						{
 							if (GetBlastServiceConfig (data_p))
 								{

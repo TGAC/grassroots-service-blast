@@ -71,7 +71,7 @@ static bool GetBlastXServiceParameterTypeForNamedParameter (Service *service_p, 
 /*******************************/
 
 
-Service *GetBlastXService (void)
+Service *GetBlastXService (GrassrootsServer *grassroots_p)
 {
 	Service *blastx_service_p = (Service *) AllocMemory (sizeof (Service));
 
@@ -96,7 +96,8 @@ Service *GetBlastXService (void)
 														 SY_SYNCHRONOUS,
 														 (ServiceData *) data_p,
 														 GetBlastXServiceMetadata,
-														 GetBlastIndexingData))
+														 GetBlastIndexingData,
+														 grassroots_p))
 						{
 							if (GetBlastServiceConfig (data_p))
 								{

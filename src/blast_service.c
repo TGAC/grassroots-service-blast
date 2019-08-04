@@ -62,7 +62,7 @@ static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p);
 /*
  * API FUNCTIONS
  */
-ServicesArray *GetServices (UserDetails * UNUSED_PARAM (user_p))
+ServicesArray *GetServices (UserDetails * UNUSED_PARAM (user_p), GrassrootsServer *grassroots_p)
 {
 	ServicesArray *services_array_p = NULL;
 	const uint32 NUM_SERVICES = 4;
@@ -72,10 +72,10 @@ ServicesArray *GetServices (UserDetails * UNUSED_PARAM (user_p))
 
 	memset (services_pp, 0, NUM_SERVICES * (sizeof (Service *)));
 
-	*services_pp = GetBlastNService ();
-	* (services_pp + 1) = GetBlastPService ();
-	* (services_pp + 2) = GetBlastXService ();
-	* (services_pp + 3) = GetMagicBlastService ();
+	*services_pp = GetBlastNService (grassroots_p);
+	* (services_pp + 1) = GetBlastPService (grassroots_p);
+	* (services_pp + 2) = GetBlastXService (grassroots_p);
+	* (services_pp + 3) = GetMagicBlastService (grassroots_p);
 
 
 	/*
