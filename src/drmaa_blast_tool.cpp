@@ -61,7 +61,8 @@ DrmaaBlastTool :: DrmaaBlastTool (BlastServiceJob *job_p, const char *name_s, co
 : ExternalBlastTool (job_p, name_s, factory_s, data_p, blast_program_name_s, async_flag)
 {
 	const char *error_s = 0;
-	DrmaaTool *drmaa_tool_p = AllocateDrmaaTool (blast_program_name_s, job_p -> bsj_job.sj_id);
+	GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (job_p -> bsj_job.sj_service_p);
+	DrmaaTool *drmaa_tool_p = AllocateDrmaaTool (blast_program_name_s, job_p -> bsj_job.sj_id, grassroots_p);
 
 	if (drmaa_tool_p)
 		{
@@ -116,7 +117,8 @@ DrmaaBlastTool :: DrmaaBlastTool (BlastServiceJob *job_p, const BlastServiceData
 
 	if (drmaa_json_p)
 		{
-			dbt_drmaa_tool_p = ConvertDrmaaToolFromJSON (drmaa_json_p);
+			GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (job_p -> bsj_job.sj_service_p);
+			dbt_drmaa_tool_p = ConvertDrmaaToolFromJSON (drmaa_json_p, grassroots_p);
 
 			if (dbt_drmaa_tool_p)
 				{
