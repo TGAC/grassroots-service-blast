@@ -1480,17 +1480,27 @@ json_t *GetBlastIndexingData (struct Service *service_p)
 							DatabaseInfo *database_p = data_p -> bsd_databases_p;
 							bool success_flag = true;
 
-							if (database_p && success_flag)
+							while (database_p && success_flag)
 								{
-									if (AddDatabaseForIndexing (database_p, databases_json_p))
+									if (database_p -> di_name_s)
 										{
-											++ database_p;
+											if (AddDatabaseForIndexing (database_p, databases_json_p))
+												{
+													++ database_p;
+												}
+											else
+												{
+													success_flag = false;
+												}
+
 										}
 									else
 										{
-											success_flag = false;
+											database_p = NULL;
 										}
-								}		/* if (database_p) */
+
+
+								}		/* while (database_p && success_flag) */
 
 							if (success_flag)
 								{
