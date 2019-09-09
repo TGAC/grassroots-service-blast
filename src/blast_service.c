@@ -40,7 +40,7 @@
 #include "blast_service_params.h"
 #include "blast_service_job_markup.h"
 
-#include "servers_pool.h"
+#include "servers_manager.h"
 #include "remote_parameter_details.h"
 #include "audit.h"
 

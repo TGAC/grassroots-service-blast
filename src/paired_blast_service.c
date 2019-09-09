@@ -28,7 +28,7 @@
 #include "blast_service_job.h"
 #include "blast_service_params.h"
 #include "typedefs.h"
-#include "servers_pool.h"
+#include "servers_manager.h"
 #include "parameter.h"
 #include "parameter_group.h"
 #include "json_tools.h"
