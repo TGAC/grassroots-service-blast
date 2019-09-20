@@ -237,13 +237,18 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add error to job", job_p -> bsj_job.sj_name_s);
 												}
 
+											SetServiceJobStatus (& (job_p -> bsj_job), OS_FAILED_TO_START);
+
 											while ((job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator)) != NULL)
 												{
 													if (!AddErrorToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
 														{
 															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add error to job", job_p -> bsj_job.sj_name_s);
 														}
+
+													SetServiceJobStatus (& (job_p -> bsj_job), OS_FAILED_TO_START);
 												}
+
 										}
 
 								}
@@ -1065,7 +1070,8 @@ ServiceJob *BuildBlastServiceJob (struct Service *service_p, const json_t *servi
 
 	if (IsRemoteServiceJobJSON (service_job_json_p))
 		{
-			RemoteServiceJob *remote_job_p = GetRemoteServiceJobFromJSON (service_job_json_p);
+			GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+			RemoteServiceJob *remote_job_p = GetRemoteServiceJobFromJSON (service_job_json_p, grassroots_p);
 
 			if (remote_job_p)
 				{
