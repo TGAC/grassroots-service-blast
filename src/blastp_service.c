@@ -355,6 +355,7 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 	bool success_flag = false;
 	Parameter *param_p = NULL;
 	SharedType def;
+	uint32 def_value;
 	const char *descriptions_ss [] =
 		{
 			"No composition-based statistics",
@@ -363,8 +364,8 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 			"Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally"
 		};
 
-
-	def.st_ulong_value = 2;
+	def_value = 2;
+	def.st_ulong_value_p == &def_value;
 
 	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_COMP_BASED_STATS.npt_type, S_COMP_BASED_STATS.npt_name_s, "Compositional adjustments", "Matrix adjustment method to compensate for amino acid composition of sequences.", def, PL_ADVANCED)) != NULL)
 		{
@@ -372,9 +373,10 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 
 			success_flag = true;
 
+			def.st_ulong_value_p == &i;
+
 			for (i = 0; i < S_NUM_COMP_BASED_STATS; ++ i)
 				{
-					def.st_ulong_value = i;
 
 					if (!CreateAndAddParameterOptionToParameter (param_p, def, * (descriptions_ss + i)))
 						{

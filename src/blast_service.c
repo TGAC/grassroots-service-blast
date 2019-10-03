@@ -662,7 +662,7 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 							if (param_p)
 								{
 									/* Is the database selected to search against? */
-									if (param_p -> pa_current_value.st_boolean_value)
+									if (CompareSharedTypeBooleanValue (& (param_p -> pa_current_value), true))
 										{
 											BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (service_p, db_p, data_p);
 
