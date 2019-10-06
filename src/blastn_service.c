@@ -250,12 +250,12 @@ static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 
 	def_score = 2;
-	def.st_ulong_value_p = &def_score;
+	def.st_ulong_value = def_score;
 
 	if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_type, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", def, PL_ADVANCED)) != NULL)
 		{
 			def_score = 3;
-			def.st_ulong_value_p = &def_score;
+			def.st_ulong_value = def_score;
 
 			if ((param_p = EasyCreateAndAddParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_type, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", def, PL_ADVANCED)) != NULL)
 				{

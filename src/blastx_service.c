@@ -214,7 +214,7 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 
 	/* default to Standard */
 	def_value = 1;
-	def.st_ulong_value_p = &def_value;
+	def.st_ulong_value = def_value;
 
 	param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_GENETIC_CODE.npt_type, S_GENETIC_CODE.npt_name_s, "Genetic code", "Genetic code to use to translate query", def, PL_ADVANCED);
 
@@ -226,7 +226,7 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 
 			for (i = 0; i < NUM_GENETIC_CODES; ++ i)
 				{
-					def.st_ulong_value_p = (uint32 *) (values_p + i);
+					def.st_ulong_value = * (values_p + i);
 
 					if (!CreateAndAddParameterOptionToParameter (param_p, def, * (descriptions_ss + i)))
 						{

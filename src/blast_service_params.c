@@ -142,7 +142,7 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 						{
 							if (db_p -> di_type == db_type)
 								{
-									def.st_boolean_value_p = (bool *) & (db_p -> di_active_flag);
+									def.st_boolean_value = db_p -> di_active_flag;
 
 									char *db_s = GetFullyQualifiedDatabaseName (group_s ? group_s : BS_DATABASE_GROUP_NAME_S, db_p -> di_name_s);
 
@@ -322,11 +322,11 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 							const char *subrange_s = "Coordinates for a subrange of the query sequence. The BLAST search will apply only to the residues in the range. Valid sequence coordinates are from 1 to the sequence length. Set either From or To to 0 to ignore the range. The range includes the residue at the To coordinate.";
 							uint32 def_value = 0;
 
-							def.st_ulong_value_p = &def_value;
+							def.st_ulong_value = def_value;
 
 							if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_FROM.npt_type, BS_SUBRANGE_FROM.npt_name_s, "From", subrange_s, def, PL_ADVANCED)) != NULL)
 								{
-									def.st_ulong_value_p = &def_value;
+									def.st_ulong_value = def_value;
 
 									if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_TO.npt_type, BS_SUBRANGE_TO.npt_name_s, "To", subrange_s, def, PL_ADVANCED)) != NULL)
 										{
@@ -390,17 +390,17 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("General Algorithm Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 	uint32 def_ulong_value = 5;
 
-	def.st_ulong_value_p = &def_ulong_value;
+	def.st_ulong_value = def_ulong_value;
 
 	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MAX_TARGET_SEQS.npt_type, S_MAX_TARGET_SEQS.npt_name_s, "Max target sequences", "Select the maximum number of aligned sequences to display (the actual number of alignments may be greater than this).", def, level)) != NULL)
 		{
 			double64 def_threshold = 10.0;
-			def.st_data_value_p = &def_threshold;
+			def.st_data_value = def_threshold;
 
 			if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_EXPECT_THRESHOLD.npt_type, S_EXPECT_THRESHOLD.npt_name_s, "Expect threshold", "Expected number of chance matches in a random model", def, level)) != NULL)
 				{
 					def_ulong_value = 0;
-					def.st_ulong_value_p = &def_ulong_value;
+					def.st_ulong_value = def_ulong_value;
 
 					if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), data_p, param_set_p, group_p)) != NULL)
 						{
@@ -490,7 +490,7 @@ bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSe
 	SharedType def;
 	Parameter *param_p;
 
-	def.st_ulong_value_p = (uint32 *) callback_data_p;
+	def.st_ulong_value = * ((uint32 *) callback_data_p);
 
 	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_WORD_SIZE.npt_type, BS_WORD_SIZE.npt_name_s, "Word size", "Expected number of chance matches in a random model", def, PL_ADVANCED)) != NULL)
 		{
