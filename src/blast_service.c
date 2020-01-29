@@ -168,7 +168,7 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 	 */
 
 	/* Are we retrieving previously run jobs? */
-	if (GetParameterValueFromParameterSet (param_set_p, BS_JOB_ID.npt_name_s, &param_value, true))
+	if (GetCurrentParameterValueFromParameterSet (param_set_p, BS_JOB_ID.npt_name_s, &param_value))
 		{
 			if (!IsStringEmpty (param_value.st_string_value_s))
 				{
@@ -282,7 +282,7 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 
 			InitSharedType (&param_value);
 
-			if (GetParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &param_value, true))
+			if (GetCurrentParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &param_value))
 				{
 					int8 code = GetOutputFormatCodeForString (param_value.st_string_value_s);
 
@@ -443,7 +443,7 @@ TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_di
 	InitSharedType (&value);
 
 	/* Input query */
-	if (GetParameterValueFromParameterSet (params_p, BS_INPUT_QUERY.npt_name_s, &value, true))
+	if (GetCurrentParameterValueFromParameterSet (params_p, BS_INPUT_QUERY.npt_name_s, &value))
 		{
 			char *sequence_s = value.st_string_value_s;
 

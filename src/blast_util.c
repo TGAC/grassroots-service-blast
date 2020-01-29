@@ -141,7 +141,7 @@ bool AddArgsPairFromStringParameter (const ParameterSet *params_p, const char * 
 
 	InitSharedType (&value);
 
-	if (GetParameterValueFromParameterSet (params_p, param_name_s, &value, true))
+	if (GetCurrentParameterValueFromParameterSet (params_p, param_name_s, &value))
 		{
 			success_flag = AddArgsPair (key_s, value.st_string_value_s, ap_p);
 		}

@@ -249,7 +249,7 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 
 	InitSharedType (&value);
 
-	if (GetParameterValueFromParameterSet (params_p, BS_TASK.npt_name_s, &value, true))
+	if (GetCurrentParameterValueFromParameterSet (params_p, BS_TASK.npt_name_s, &value))
 		{
 			if (AddBlastArgsPair ("task", value.st_string_value_s))
 				{
@@ -270,7 +270,7 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 													 */
 													InitSharedType (&value);
 
-													if (GetParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &value, true))
+													if (GetCurrentParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &value))
 														{
 															int8 code = GetOutputFormatCodeForString (value.st_string_value_s);
 															bt_output_format = BS_DEFAULT_OUTPUT_FORMAT;
@@ -325,11 +325,11 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 													if (success_flag)
 														{
 															/* Query Location */
-															if (GetParameterValueFromParameterSet (params_p, BS_SUBRANGE_FROM.npt_name_s, &value, true))
+															if (GetCurrentParameterValueFromParameterSet (params_p, BS_SUBRANGE_FROM.npt_name_s, &value))
 																{
 																	uint32 from = value.st_ulong_value;
 
-																	if (GetParameterValueFromParameterSet (params_p, BS_SUBRANGE_TO.npt_name_s, &value, true))
+																	if (GetCurrentParameterValueFromParameterSet (params_p, BS_SUBRANGE_TO.npt_name_s, &value))
 																		{
 																			uint32 to = value.st_ulong_value;
 
