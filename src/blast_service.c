@@ -766,7 +766,7 @@ ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_
 
 											if (param_p)
 												{
-													if (param_p -> pa_type == PT_BOOLEAN)
+													if (IsBooleanParameter (param_p))
 														{
 															/* Set the matching databases to active */
 															bool active_flag = false;
@@ -778,7 +778,7 @@ ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_
 																	matched_db_flag = true;
 																}
 
-															if (!SetParameterValue (param_p, &active_flag, true))
+															if (!SetBooleanParameterCurrentValue (param_p, &active_flag))
 																{
 																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set Parameter \"%s\" to true", param_p -> pa_name_s);
 																}

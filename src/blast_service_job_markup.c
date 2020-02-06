@@ -1270,12 +1270,7 @@ bool GetAndAddDatabaseMappedParameter (LinkedService *linked_service_p, const js
 
 			if (value_s)
 				{
-					SharedType value;
-
-					InitSharedType (&value);
-					value.st_string_value_s = (char *) value_s;
-
-					if (SetMappedParameterValue (mapped_param_p, output_params_p, &value))
+					if (SetMappedStringParameterValue (mapped_param_p, output_params_p, value_s))
 						{
 							*database_ss = value_s;
 							success_flag = true;
