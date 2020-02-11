@@ -44,6 +44,8 @@
 #include "remote_parameter_details.h"
 #include "audit.h"
 
+#include "string_parameter.h"
+#include "boolean_parameter.h"
 
 
 /***************************************/
@@ -158,9 +160,7 @@ void ReleaseBlastServiceParameters (Service * UNUSED_PARAM (service_p), Paramete
 ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *  UNUSED_PARAM (user_p), ProvidersStateTable *providers_p, BlastAppParameters *app_params_p)
 {
 	BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
-	SharedType param_value;
-
-	InitSharedType (&param_value);
+	const char *input_value_s = NULL;
 
 	/*
 	 * We will check for all of our parameters, such as previous job ids, etc. first, until
@@ -168,11 +168,11 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 	 */
 
 	/* Are we retrieving previously run jobs? */
-	if (GetCurrentParameterValueFromParameterSet (param_set_p, BS_JOB_ID.npt_name_s, &param_value))
+	if (GetCurrentStringParameterValueFromParameterSet (param_set_p, BS_JOB_ID.npt_name_s, &input_value_s))
 		{
-			if (!IsStringEmpty (param_value.st_string_value_s))
+			if (!IsStringEmpty (input_value_s))
 				{
-					service_p -> se_jobs_p  = CreateJobsForPreviousResults (param_set_p, param_value.st_string_value_s, blast_data_p);
+					service_p -> se_jobs_p  = CreateJobsForPreviousResults (param_set_p, input_value_s, blast_data_p);
 				}
 		}		/* if (GetParameterValueFromParameterSet (param_set_p, BS_JOB_ID.npt_name_s, &param_value, true)) */
 
@@ -277,22 +277,24 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 
 	if (ids_p)
 		{
-			SharedType param_value;
+			const char *fmt_code_s = NULL;
 			uint32 output_format_code = BS_DEFAULT_OUTPUT_FORMAT;
 
-			InitSharedType (&param_value);
 
-			if (GetCurrentParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &param_value))
+			if (GetCurrentStringParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &fmt_code_s))
 				{
-					int8 code = GetOutputFormatCodeForString (param_value.st_string_value_s);
+					if (fmt_code_s)
+						{
+							int8 code = GetOutputFormatCodeForString (fmt_code_s);
 
-					if (code != -1)
-						{
-							output_format_code = (uint32) code;
-						}
-					else
-						{
-							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Couldn't get requested output format from \"%s\", using " UINT32_FMT " instead", param_value.st_string_value_s, output_format_code);
+							if (code != -1)
+								{
+									output_format_code = (uint32) code;
+								}
+							else
+								{
+									PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Couldn't get requested output format from \"%s\", using " UINT32_FMT " instead", fmt_code_s, output_format_code);
+								}
 						}
 				}
 			else
@@ -329,7 +331,7 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 				}
 			else
 				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get ServiceJobSet for previously run blast job \"%s\"", param_value.st_string_value_s);
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get ServiceJobSet for previously run blast job \"%s\"", ids_s);
 				}
 
 			FreeLinkedList (ids_p);
@@ -438,15 +440,12 @@ bool GetBaseBlastServiceParameterTypeForNamedParameter (Service *service_p, cons
 TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_directory_s, const uuid_t id)
 {
 	TempFile *input_file_p = NULL;
-	SharedType value;
+	const char *sequence_s = NULL;
 
-	InitSharedType (&value);
 
 	/* Input query */
-	if (GetCurrentParameterValueFromParameterSet (params_p, BS_INPUT_QUERY.npt_name_s, &value))
+	if (GetCurrentStringParameterValueFromParameterSet (params_p, BS_INPUT_QUERY.npt_name_s, &sequence_s))
 		{
-			char *sequence_s = value.st_string_value_s;
-
 			if (!IsStringEmpty (sequence_s))
 				{
 					input_file_p = TempFile :: GetTempFile (working_directory_s, id, BS_INPUT_SUFFIX_S);
@@ -477,8 +476,6 @@ TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_di
 						{
 							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Blast service failed to open temp file for query \"%s\"", sequence_s);
 						}
-
-
 
 				}		/* if (!IsStringEmpty (sequence_s)) */
 			else
@@ -656,13 +653,13 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 
 					if (full_db_name_s)
 						{
-							Parameter *param_p = GetParameterFromParameterSetByName (param_set_p, full_db_name_s);
+							const bool *db_flag_p = NULL;
 
 							/* Do we have a matching parameter? */
-							if (param_p)
+							if (GetCurrentBooleanParameterValueFromParameterSet (param_set_p, full_db_name_s, &db_flag_p))
 								{
 									/* Is the database selected to search against? */
-									if (param_p -> pa_current_value.st_boolean_value)
+									if ((db_flag_p != NULL) && (*db_flag_p == true))
 										{
 											BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (service_p, db_p, data_p);
 
@@ -679,9 +676,8 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create ServiceJob for \"%s\"", db_p -> di_name_s);
 												}
 
-										}		/* if (param_p -> pa_current_value.st_boolean_value) */
-
-								}		/* if (param_p) */
+										}
+								}		/* if (GetCurrentBooleanParameterValueFromParameterSet (param_set_p, full_db_name_s, &db_flag_p)) */
 
 							FreeCopiedString (full_db_name_s);
 						}		/* if (full_db_name_s) */
@@ -778,7 +774,7 @@ ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_
 																	matched_db_flag = true;
 																}
 
-															if (!SetBooleanParameterCurrentValue (param_p, &active_flag))
+															if (!SetBooleanParameterCurrentValue ((BooleanParameter *) param_p, &active_flag))
 																{
 																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set Parameter \"%s\" to true", param_p -> pa_name_s);
 																}
