@@ -55,7 +55,7 @@ extern "C"
 BLAST_SERVICE_LOCAL bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_params_p);
 
 
-BLAST_SERVICE_LOCAL bool GetPairedServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+BLAST_SERVICE_LOCAL bool GetPairedServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
 /**

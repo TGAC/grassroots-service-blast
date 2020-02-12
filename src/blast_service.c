@@ -413,7 +413,7 @@ bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *para
 
 
 
-bool GetBaseBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+bool GetBaseBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 

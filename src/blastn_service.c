@@ -39,13 +39,13 @@ static const BlastTask s_tasks_p [S_NUM_TASKS] =
 };
 
 
-static const char *GetBlastNServiceName (Service *service_p);
+static const char *GetBlastNServiceName (const Service *service_p);
 
-static const char *GetBlastNServiceDescription (Service *service_p);
+static const char *GetBlastNServiceDescription (const Service *service_p);
 
 static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
 
-static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+static bool GetBlastNServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
@@ -111,13 +111,13 @@ Service *GetBlastNService (GrassrootsServer *grassroots_p)
 
 
 
-static const char *GetBlastNServiceName (Service * UNUSED_PARAM (service_p))
+static const char *GetBlastNServiceName (const Service * UNUSED_PARAM (service_p))
 {
 	return "BlastN";
 }
 
 
-static const char *GetBlastNServiceDescription (Service * UNUSED_PARAM (service_p))
+static const char *GetBlastNServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "Search nucleotide databases with nucleotide queries";
 }
@@ -197,7 +197,7 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource * 
 
 
 
-static bool GetBlastNServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+static bool GetBlastNServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 

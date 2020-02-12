@@ -357,7 +357,7 @@ BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p,
 BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p);
 
 
-BLAST_SERVICE_LOCAL bool GetBaseBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+BLAST_SERVICE_LOCAL bool GetBaseBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
 /**

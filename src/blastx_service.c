@@ -31,6 +31,8 @@
 #include "blast_util.h"
 #include "blastp_service.h"
 
+#include "unsigned_int_parameter.h"
+
 
 /*******************************/
 /***** STATIC DECLARATIONS *****/
@@ -48,9 +50,9 @@ static const BlastTask s_tasks_p [S_NUM_TASKS] =
 };
 
 
-static const char *GetBlastXServiceName (Service *service_p);
+static const char *GetBlastXServiceName (const Service *service_p);
 
-static const char *GetBlastXServiceDescription (Service *service_p);
+static const char *GetBlastXServiceDescription (const Service *service_p);
 
 static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
 
@@ -63,7 +65,7 @@ static bool ParseBlastXParameters (const BlastServiceData *data_p, ParameterSet 
 
 static ServiceMetadata *GetBlastXServiceMetadata (Service *service_p);
 
-static bool GetBlastXServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+static bool GetBlastXServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
 /*******************************/
@@ -114,13 +116,13 @@ Service *GetBlastXService (GrassrootsServer *grassroots_p)
 
 
 
-static const char *GetBlastXServiceName (Service * UNUSED_PARAM (service_p))
+static const char *GetBlastXServiceName (const Service * UNUSED_PARAM (service_p))
 {
  	return "BlastX";
 }
 
 
-static const char *GetBlastXServiceDescription (Service * UNUSED_PARAM (service_p))
+static const char *GetBlastXServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "Search protein databases with nucleotide queries";
 }
@@ -135,7 +137,7 @@ static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource * 
 
 
 
-static bool GetBlastXServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+static bool GetBlastXServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 
@@ -179,7 +181,6 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 {
 	Parameter *param_p = NULL;
 	bool success_flag = false;
-	SharedType def;
 	const uint32 NUM_GENETIC_CODES = 20;
 	uint32 def_value;
 
@@ -207,16 +208,11 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 			"Pachysolen tannophilus Nuclear (26)"
 		};
 
-	const uint32 values_p [NUM_GENETIC_CODES] = { 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 26 };
-
-
-	InitSharedType (&def);
 
 	/* default to Standard */
 	def_value = 1;
-	def.st_ulong_value = def_value;
 
-	param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_GENETIC_CODE.npt_type, S_GENETIC_CODE.npt_name_s, "Genetic code", "Genetic code to use to translate query", def, PL_ADVANCED);
+	param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_GENETIC_CODE.npt_name_s, "Genetic code", "Genetic code to use to translate query", &def_value, PL_ADVANCED);
 
 	if (param_p)
 		{
@@ -224,13 +220,11 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 
 			success_flag = true;
 
-			for (i = 0; i < NUM_GENETIC_CODES; ++ i)
+			for (i = 1; i <= NUM_GENETIC_CODES; ++ i)
 				{
-					def.st_ulong_value = * (values_p + i);
-
-					if (!CreateAndAddParameterOptionToParameter (param_p, def, * (descriptions_ss + i)))
+					if (!CreateAndAddUnsignedIntParameterOption ((UnsignedIntParameter *) param_p, i, * (descriptions_ss + i)))
 						{
-							i = NUM_GENETIC_CODES;
+							i = NUM_GENETIC_CODES + 1;
 							success_flag = false;
 						}
 				}

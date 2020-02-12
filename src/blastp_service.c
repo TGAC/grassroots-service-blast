@@ -58,9 +58,9 @@ static const char *S_MATRICES_SS [S_NUM_MATRICES] =
 static const uint32 S_NUM_COMP_BASED_STATS = 4;
 
 
-static const char *GetProteinBlastServiceName (Service *service_p);
+static const char *GetProteinBlastServiceName (const Service *service_p);
 
-static const char *GetProteinBlastServiceDescription (Service *service_p);
+static const char *GetProteinBlastServiceDescription (const Service *service_p);
 
 
 static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
@@ -76,7 +76,7 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 
 static ServiceMetadata *GetBlastPServiceMetadata (Service *service_p);
 
-static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+static bool GetBlastPServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
 
@@ -162,7 +162,7 @@ ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const cha
 
 
 
-static bool GetBlastPServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+static bool GetBlastPServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 
@@ -252,13 +252,13 @@ bool ParseBlastPParameters (const BlastServiceData * UNUSED_PARAM (data_p), Para
 }
 
 
-static const char *GetProteinBlastServiceName (Service * UNUSED_PARAM (service_p))
+static const char *GetProteinBlastServiceName (const Service * UNUSED_PARAM (service_p))
 {
  	return "BlastP";
 }
 
 
-static const char *GetProteinBlastServiceDescription (Service * UNUSED_PARAM (service_p))
+static const char *GetProteinBlastServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "Search protein databases with protein queries";
 }
@@ -316,21 +316,19 @@ static bool AddMatrixParameter (BlastServiceData *data_p, ParameterSet *param_se
 {
 	bool success_flag = false;
 	Parameter *param_p = NULL;
-	SharedType def;
-	uint32 i;
 
 	/* set BLOSUM62 as default */
-	def.st_string_value_s = (char *) (* (S_MATRICES_SS + 4));
+	const char *def_s = (* (S_MATRICES_SS + 4));
 
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MATRIX.npt_type, S_MATRIX.npt_name_s, "Matrix", "The Scoring matrix to use", def, PL_ADVANCED)) != NULL)
+	if ((param_p = EasyCreateAndAddStringParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_MATRIX.npt_type, S_MATRIX.npt_name_s, "Matrix", "The Scoring matrix to use", def_s, PL_ADVANCED)) != NULL)
 		{
+			uint32 i;
+
 			success_flag = true;
 
 			for (i = 0; i < S_NUM_MATRICES; ++ i)
 				{
-					def.st_string_value_s = (char *) (* (S_MATRICES_SS + i));
-
-					if (!CreateAndAddParameterOptionToParameter (param_p, def, NULL))
+					if (!CreateAndAddStringParameterOption ((StringParameter *) param_p, * (S_MATRICES_SS + i), * (S_MATRICES_SS + i)))
 						{
 							i = S_NUM_MATRICES;
 							success_flag = false;
@@ -358,8 +356,7 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 {
 	bool success_flag = false;
 	Parameter *param_p = NULL;
-	SharedType def;
-	uint32 def_value;
+	uint32 def_value = 2;
 	const char *descriptions_ss [] =
 		{
 			"No composition-based statistics",
@@ -368,21 +365,14 @@ static bool AddCompositionalAdjustmentsParameter (BlastServiceData *data_p, Para
 			"Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally"
 		};
 
-	def_value = 2;
-	def.st_ulong_value = def_value;
-
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_COMP_BASED_STATS.npt_type, S_COMP_BASED_STATS.npt_name_s, "Compositional adjustments", "Matrix adjustment method to compensate for amino acid composition of sequences.", def, PL_ADVANCED)) != NULL)
+	if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_COMP_BASED_STATS.npt_name_s, "Compositional adjustments", "Matrix adjustment method to compensate for amino acid composition of sequences.", &def_value, PL_ADVANCED)) != NULL)
 		{
 			uint32 i = 0;
-
 			success_flag = true;
-
-			def.st_ulong_value = i;
 
 			for (i = 0; i < S_NUM_COMP_BASED_STATS; ++ i)
 				{
-
-					if (!CreateAndAddParameterOptionToParameter (param_p, def, * (descriptions_ss + i)))
+					if (!CreateAndAddUnsignedIntParameterOption ((UnsignedIntParameter *) param_p, i, * (descriptions_ss + i)))
 						{
 							i = S_NUM_COMP_BASED_STATS;
 							success_flag = false;

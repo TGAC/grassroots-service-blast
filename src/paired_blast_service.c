@@ -35,6 +35,10 @@
 #include "service_job.h"
 #include "remote_service_job.h"
 
+#include "boolean_parameter.h"
+#include "string_parameter.h"
+
+
 #ifdef _DEBUG
 	#define PAIRED_BLAST_SERVICE_DEBUG	(STM_LEVEL_FINER)
 #else
@@ -150,7 +154,7 @@ bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_para
 }
 
 
-bool GetPairedServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+bool GetPairedServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = false;
 
@@ -266,9 +270,9 @@ char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32
 
 											if (param_p)
 												{
-													if (SetParameterValue (param_p, remote_job_id_s, true))
+													if (SetStringParameterCurrentValue ((StringParameter *) param_p, remote_job_id_s))
 														{
-															param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), blast_data_p, param_set_p, group_p);
+															param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, BOF_GRASSROOTS, blast_data_p, param_set_p, group_p);
 
 															if (param_p)
 																{
@@ -297,7 +301,7 @@ char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32
 																								}		/* if (res_p) */
 																							else
 																								{
-																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "MakeRemotePairedServiceCall to \"%s\" at \"%s\" with param set to \"%s\" returned NULL", service_name_s, uri_s, param_p -> pa_current_value.st_string_value_s);
+																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "MakeRemotePairedServiceCall to \"%s\" at \"%s\" with param set to \"%s\" returned NULL", service_name_s, uri_s, remote_job_id_s);
 																								}
 
 																						}		/* if (service_name_s) */

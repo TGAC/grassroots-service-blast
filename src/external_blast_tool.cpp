@@ -32,6 +32,10 @@
 #include "temp_file.hpp"
 #include "math_utils.h"
 
+
+#include "unsigned_int_parameter.h"
+#include "string_parameter.h"
+
 const char * const ExternalBlastTool :: EBT_INPUT_SUFFIX_S = ".input";
 const char * const ExternalBlastTool :: EBT_LOG_SUFFIX_S = ".log";
 
@@ -245,161 +249,167 @@ char *ExternalBlastTool :: GetResults (BlastFormatter *formatter_p)
 bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParameters *app_params_p)
 {
 	bool success_flag = false;
-	SharedType value;
+	const char *task_s = NULL;
 
-	InitSharedType (&value);
-
-	if (GetCurrentParameterValueFromParameterSet (params_p, BS_TASK.npt_name_s, &value))
+	if (GetCurrentStringParameterValueFromParameterSet (params_p, BS_TASK.npt_name_s, &task_s))
 		{
-			if (AddBlastArgsPair ("task", value.st_string_value_s))
+			if (task_s)
 				{
-					ArgsProcessor *args_processor_p = GetArgsProcessor ();
-
-					if (GetAndAddBlastArgs (params_p, BS_MAX_SEQUENCES.npt_name_s, false, args_processor_p))
+					if (AddBlastArgsPair ("task", task_s))
 						{
-							if (AddBlastArgsPair ("db", bt_name_s))
+							ArgsProcessor *args_processor_p = GetArgsProcessor ();
+
+							if (GetAndAddBlastArgs (params_p, BS_MAX_SEQUENCES.npt_name_s, false, args_processor_p))
 								{
-									if (ParseBlastAppParameters (app_params_p, bt_service_data_p, params_p, args_processor_p))
+									if (AddBlastArgsPair ("db", bt_name_s))
 										{
-											/* Expect threshold */
-											if (GetAndAddBlastArgs (params_p, BS_EXPECT_THRESHOLD.npt_name_s, false, args_processor_p))
+											if (ParseBlastAppParameters (app_params_p, bt_service_data_p, params_p, args_processor_p))
 												{
-													/* Output Format
-													 * If we have a BlastFormatter then the output is always set to 11 which is ASN and
-													 * from that we can convert into any other format using a BlastFormatter tool
-													 */
-													InitSharedType (&value);
-
-													if (GetCurrentParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &value))
+													/* Expect threshold */
+													if (GetAndAddBlastArgs (params_p, BS_EXPECT_THRESHOLD.npt_name_s, false, args_processor_p))
 														{
-															int8 code = GetOutputFormatCodeForString (value.st_string_value_s);
-															bt_output_format = BS_DEFAULT_OUTPUT_FORMAT;
+															/* Output Format
+															 * If we have a BlastFormatter then the output is always set to 11 which is ASN and
+															 * from that we can convert into any other format using a BlastFormatter tool
+															 */
+															const char *out_fmt_s = NULL;
 
-															if (code != -1)
+															if (GetCurrentStringParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &out_fmt_s))
 																{
-																	bt_output_format = (uint32) code;
-																}
-															else
-																{
+																	bt_output_format = BS_DEFAULT_OUTPUT_FORMAT;
 
-																}
-
-															if (bt_service_data_p -> bsd_formatter_p)
-																{
-																	success_flag = AddBlastArgsPair (BS_OUTPUT_FORMAT.npt_name_s, BS_DEFAULT_OUTPUT_FORMAT_S);
-																}
-															else
-																{
-																	char *value_s = NULL;
-
-																	/*
-																	 * If we are producing grassroots mark up, get the results
-																	 * in json file format as that is the format that we will
-																	 * convert from.
-																	 */
-																	if (bt_output_format == BOF_GRASSROOTS)
+																	if (out_fmt_s)
 																		{
-																			bt_output_format = BOF_SINGLE_FILE_JSON_BLAST;
+																			int8 code = GetOutputFormatCodeForString (out_fmt_s);
+
+																			if (code != -1)
+																				{
+																					bt_output_format = (uint32) code;
+																				}
+																			else
+																				{
+
+																				}
 																		}
 
-																	value_s = ConvertIntegerToString (bt_output_format);
-
-																	if (value_s)
+																	if (bt_service_data_p -> bsd_formatter_p)
 																		{
-																			success_flag = AddBlastArgsPair (BS_OUTPUT_FORMAT.npt_name_s, value_s);
-																			FreeCopiedString (value_s);
-																		}		/* if (value_s) */
+																			success_flag = AddBlastArgsPair (BS_OUTPUT_FORMAT.npt_name_s, BS_DEFAULT_OUTPUT_FORMAT_S);
+																		}
 																	else
 																		{
-																			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to convert output format \"" UINT32_FMT "\" to string", bt_output_format);
-																		}
+																			char *value_s = NULL;
 
-																	}
-
-														}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_OUTPUT_FORMAT, &value, true)) */
-													else
-														{
-															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get output format");
-														}
-
-													if (success_flag)
-														{
-															/* Query Location */
-															if (GetCurrentParameterValueFromParameterSet (params_p, BS_SUBRANGE_FROM.npt_name_s, &value))
-																{
-																	uint32 from = value.st_ulong_value;
-
-																	if (GetCurrentParameterValueFromParameterSet (params_p, BS_SUBRANGE_TO.npt_name_s, &value))
-																		{
-																			uint32 to = value.st_ulong_value;
-
-																			if ((from != 0) && (to != 0))
+																			/*
+																			 * If we are producing grassroots mark up, get the results
+																			 * in json file format as that is the format that we will
+																			 * convert from.
+																			 */
+																			if (bt_output_format == BOF_GRASSROOTS)
 																				{
-																					ByteBuffer *buffer_p = AllocateByteBuffer (1024);
+																					bt_output_format = BOF_SINGLE_FILE_JSON_BLAST;
+																				}
 
-																					if (buffer_p)
+																			value_s = ConvertIntegerToString (bt_output_format);
+
+																			if (value_s)
+																				{
+																					success_flag = AddBlastArgsPair (BS_OUTPUT_FORMAT.npt_name_s, value_s);
+																					FreeCopiedString (value_s);
+																				}		/* if (value_s) */
+																			else
+																				{
+																					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to convert output format \"" UINT32_FMT "\" to string", bt_output_format);
+																				}
+
+																			}
+
+																}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_OUTPUT_FORMAT, &value, true)) */
+															else
+																{
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get output format");
+																}
+
+															if (success_flag)
+																{
+																	/* Query Location */
+																	const uint32 *from_p = NULL;
+																	if (GetCurrentUnsignedIntParameterValueFromParameterSet (params_p, BS_SUBRANGE_FROM.npt_name_s, &from_p))
+																		{
+																			const uint32 *to_p = NULL;
+
+																			if (GetCurrentUnsignedIntParameterValueFromParameterSet (params_p, BS_SUBRANGE_TO.npt_name_s, &to_p))
+																				{
+																					if (from_p && to_p)
 																						{
-																							char *from_s = ConvertIntegerToString (from);
+																							ByteBuffer *buffer_p = AllocateByteBuffer (1024);
 
-																							if (from_s)
+																							if (buffer_p)
 																								{
-																									char *to_s = ConvertIntegerToString (to);
+																									char *from_s = ConvertIntegerToString (*from_p);
 
-																									if (to_s)
+																									if (from_s)
 																										{
-																											if (AppendStringsToByteBuffer (buffer_p, from_s, "-", to_s, NULL))
+																											char *to_s = ConvertIntegerToString (*to_p);
+
+																											if (to_s)
 																												{
-																													const char *query_loc_s = GetByteBufferData (buffer_p);
-
-																													if (!AddBlastArgsPair ("query_loc", query_loc_s))
+																													if (AppendStringsToByteBuffer (buffer_p, from_s, "-", to_s, NULL))
 																														{
-																															success_flag = false;
+																															const char *query_loc_s = GetByteBufferData (buffer_p);
+
+																															if (!AddBlastArgsPair ("query_loc", query_loc_s))
+																																{
+																																	success_flag = false;
+																																}
 																														}
-																												}
 
-																											FreeCopiedString (to_s);
-																										}		/* if (to_s) */
+																													FreeCopiedString (to_s);
+																												}		/* if (to_s) */
 
-																									FreeCopiedString (from_s);
-																								}		/* if (from_s) */
+																											FreeCopiedString (from_s);
+																										}		/* if (from_s) */
 
-																							FreeByteBuffer (buffer_p);
-																						}		/* if (buffer_p) */
+																									FreeByteBuffer (buffer_p);
+																								}		/* if (buffer_p) */
 
-																				}		/* if ((from != 0) && (to != 0)) */
+																						}		/* if ((from != 0) && (to != 0)) */
 
-																		}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_SUBRANGE_TO, &to, true)) */
+																				}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_SUBRANGE_TO, &to, true)) */
 
-																}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_SUBRANGE_FROM, &value, true)) */
+																		}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_SUBRANGE_FROM, &value, true)) */
 
-														}		/*  if (success_flag) */
-													else
-														{
-															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set output format");
-														}
+																}		/*  if (success_flag) */
+															else
+																{
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set output format");
+																}
 
 
-												}		/* if (AddBlastArgsPairFromIntegerParameter (params_p, TAG_BLAST_EXPECT_THRESHOLD, "-evalue", true)) */
+														}		/* if (AddBlastArgsPairFromIntegerParameter (params_p, TAG_BLAST_EXPECT_THRESHOLD, "-evalue", true)) */
 
-										}		/* if (bt_app_params_p -> ParseParametersToByteBuffer (bt_service_data_p, params_p, ebt_buffer_p)) */
+												}		/* if (bt_app_params_p -> ParseParametersToByteBuffer (bt_service_data_p, params_p, ebt_buffer_p)) */
 
-								}		/* if (AddBlastArgsPair ("-db", bt_job_p -> sj_name_s))*/
+										}		/* if (AddBlastArgsPair ("-db", bt_job_p -> sj_name_s))*/
+									else
+										{
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set database name");
+										}
+
+								}		/* if (AddABlastrgsPair ("-num_alignments", "5")) */
 							else
 								{
-									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set database name");
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add num_alignments parameter");
 								}
 
-						}		/* if (AddABlastrgsPair ("-num_alignments", "5")) */
+						}		/* if (AddBlastArgsPair ("-task", BS_TASK.npt_name_s)) */
 					else
 						{
-							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add num_alignments parameter");
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add task parameter");
 						}
 
-				}		/* if (AddBlastArgsPair ("-task", BS_TASK.npt_name_s)) */
-			else
-				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add task parameter");
 				}
+
 
 		}		/* if (GetParameterValueFromParameterSet (params_p, BS_TASK.npt_name_s, &value, true)) */
 	else

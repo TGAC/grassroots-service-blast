@@ -33,6 +33,11 @@
 #include "service.h"
 
 
+#include "boolean_parameter.h"
+#include "unsigned_int_parameter.h"
+#include "double_parameter.h"
+#include "string_parameter.h"
+
 
 static NamedParameterType S_MAX_TARGET_SEQS = { "max_target_seqs", PT_UNSIGNED_INT };
 //static NamedParameterType S_SHORT_QUERIES = { "max_target_seqs", PT_UNSIGNED_INT };
@@ -244,20 +249,20 @@ int8 GetOutputFormatCodeForString (const char *output_format_s)
 }
 
 
-Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const char *default_format_s, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
+Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
 {
-	Parameter *param_p = EasyCreateAndAddStringParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_type, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", default_format_s, PL_ADVANCED);
+	Parameter *param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", &default_format, PL_ADVANCED);
 
 	if (param_p)
 		{
 			uint32 i;
 			bool success_flag = true;
 
-			for (i = 0; i < num_formats; ++ i)
+			for (i = 1; i < num_formats + 1; ++ i)
 				{
-					if (!CreateAndAddStringParameterOption ((StringParameter *) param_p, * (formats_ss + i), * (formats_ss + i)))
+					if (!CreateAndAddUnsignedIntParameterOption ((UnsignedIntParameter *) param_p, i, * (formats_ss + i)))
 						{
-							i = BOF_NUM_TYPES;
+							i = num_formats + 1;
 							success_flag = false;
 						}
 				}
@@ -294,7 +299,7 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 
 							if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_FROM.npt_name_s, "From", subrange_s, NULL, PL_ADVANCED)) != NULL)
 								{
-									if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_TO.npt_type, BS_SUBRANGE_TO.npt_name_s, "To", subrange_s, NULL, PL_ADVANCED)) != NULL)
+									if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_TO.npt_name_s, "To", subrange_s, NULL, PL_ADVANCED)) != NULL)
 										{
 											if (callback_fn)
 												{
@@ -361,7 +366,7 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 
 			if ((param_p = EasyCreateAndAddDoubleParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_EXPECT_THRESHOLD.npt_type, S_EXPECT_THRESHOLD.npt_name_s, "Expect threshold", "Expected number of chance matches in a random model", &def_threshold, level)) != NULL)
 				{
-					if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, * (BSP_OUTPUT_FORMATS_SS + BOF_GRASSROOTS), data_p, param_set_p, group_p)) != NULL)
+					if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, BOF_GRASSROOTS, data_p, param_set_p, group_p)) != NULL)
 						{
 							if (callback_fn)
 								{

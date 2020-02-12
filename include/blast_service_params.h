@@ -311,7 +311,7 @@ BLAST_SERVICE_LOCAL Parameter *SetUpPreviousJobUUIDParameter (const BlastService
  * @return The output format Parameter or <code>NULL</code> upon error.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const char *default_format_s, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
+BLAST_SERVICE_LOCAL Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
 
 /**

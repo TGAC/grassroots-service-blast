@@ -15,6 +15,11 @@
 #include "blast_util.h"
 
 
+#include "boolean_parameter.h"
+#include "double_parameter.h"
+#include "string_parameter.h"
+
+
 /*
  * STATIC DECLARATIONS
  */
@@ -58,9 +63,9 @@ const char *S_OUTPUT_FORMATS_SS [MBOF_NUM_TYPES] =
 
 
 
-static const char *GetMagicBlastServiceName (Service *service_p);
+static const char *GetMagicBlastServiceName (const Service *service_p);
 
-static const char *GetMagicBlastServiceDescription (Service *service_p);
+static const char *GetMagicBlastServiceDescription (const Service *service_p);
 
 static ServiceJobSet *RunMagicBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
@@ -70,9 +75,8 @@ static bool ParseMagicBlastParameters (const BlastServiceData *data_p, Parameter
 
 static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p));
 
-static bool AddFormattingOptionsParameters (ParameterSet *param_set_p, BlastServiceData *data_p);
 
-static bool GetMagicBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p);
+static bool GetMagicBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 /*
  * API DEFINITIONS
@@ -122,13 +126,13 @@ Service *GetMagicBlastService (GrassrootsServer *grassroots_p)
 
 
 
-static const char *GetMagicBlastServiceName (Service * UNUSED_PARAM (service_p))
+static const char *GetMagicBlastServiceName (const Service * UNUSED_PARAM (service_p))
 {
  	return "Magic-Blast";
 }
 
 
-static const char *GetMagicBlastServiceDescription (Service * UNUSED_PARAM (service_p))
+static const char *GetMagicBlastServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "Mapping large next-generation RNA or DNA sequencing runs against a whole genome or transcriptome";
 }
@@ -140,18 +144,13 @@ static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resourc
 	BlastServiceData *data_p = (BlastServiceData *) service_p -> se_data_p;
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Query Sequence Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 	Parameter *param_p;
-	SharedType def;
+	bool def = false;
 
-	InitSharedType (&def);
-
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_type, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", def, PL_ALL)) != NULL)
+	if ((param_p = EasyCreateAndAddBooleanParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", &def, PL_ALL)) != NULL)
 		{
-			if ((param_p = SetUpOutputFormatParameter (S_OUTPUT_FORMATS_SS, MBOF_NUM_TYPES, * (S_OUTPUT_FORMATS_SS + MBOF_SAM), data_p, param_set_p, group_p)) != NULL)
+			if ((param_p = SetUpOutputFormatParameter (S_OUTPUT_FORMATS_SS, MBOF_NUM_TYPES, MBOF_SAM, data_p, param_set_p, group_p)) != NULL)
 				{
-					if (AddFormattingOptionsParameters (param_set_p, data_p))
-						{
-							return param_set_p;
-						}
+					return param_set_p;
 				}
 
 		}		/* if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_type, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", def, PL_ALL)) != NULL) */
@@ -163,7 +162,7 @@ static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resourc
 
 
 
-static bool GetMagicBlastServiceParameterTypeForNamedParameter (Service *service_p, const char *param_name_s, ParameterType *pt_p)
+static bool GetMagicBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = true;
 
@@ -174,24 +173,6 @@ static bool GetMagicBlastServiceParameterTypeForNamedParameter (Service *service
 	else
 		{
 			success_flag = false;
-		}
-
-	return success_flag;
-}
-
-
-static bool AddFormattingOptionsParameters (ParameterSet *param_set_p, BlastServiceData *data_p)
-{
-	bool success_flag = false;
-	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Formatting Options", false, & (data_p -> bsd_base_data), param_set_p);
-	Parameter *param_p;
-	SharedType def;
-
-	InitSharedType (&def);
-
-	if ((param_p = EasyCreateAndAddParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_type, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", def, PL_ALL)) != NULL)
-		{
-			success_flag = true;
 		}
 
 	return success_flag;

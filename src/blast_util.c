@@ -27,6 +27,12 @@
 #include "math_utils.h"
 #include "string_utils.h"
 
+#include "boolean_parameter.h"
+#include "double_parameter.h"
+#include "signed_int_parameter.h"
+#include "string_parameter.h"
+#include "unsigned_int_parameter.h"
+
 
 bool AddArgsPair (const char *key_s, const char *value_s, ArgsProcessor *ap_p)
 {
@@ -70,65 +76,75 @@ bool AddBlastArgs (const Parameter *param_p, ArgsProcessor *ap_p)
 {
 	bool success_flag = false;
 
-	switch (param_p -> pa_type)
+	if (IsStringParameter (param_p))
 		{
-			case PT_STRING:
-			case PT_DIRECTORY:
-			case PT_FILE_TO_READ:
-			case PT_FILE_TO_WRITE:
-			case PT_LARGE_STRING:
-			case PT_KEYWORD:
-			case PT_PASSWORD:
-				success_flag = AddArgsPair (param_p -> pa_name_s, param_p -> pa_current_value.st_string_value_s, ap_p);
-				break;
+			StringParameter *str_param_p = (StringParameter *) param_p;
+			const char *value_s = GetStringParameterCurrentValue (str_param_p);
 
-			case PT_SIGNED_INT:
-			case PT_NEGATIVE_INT:
+			if (value_s)
 				{
-					char *value_s = ConvertIntegerToString (param_p -> pa_current_value.st_long_value);
+					success_flag = AddArgsPair (param_p -> pa_name_s, value_s, ap_p);
+				}
+		}
+	else if (IsSignedIntParameter (param_p))
+		{
+			SignedIntParameter *int_param_p = (SignedIntParameter *) param_p;
+			const int32 *value_p = GetSignedIntParameterCurrentValue (int_param_p);
+
+			if (value_p)
+				{
+					char *value_s = ConvertIntegerToString (*value_p);
 
 					if (value_s)
 						{
 							success_flag = AddArgsPair (param_p -> pa_name_s, value_s, ap_p);
 							FreeCopiedString (value_s);
-						}		/* if (value_s) */
-				}
-				break;
+						}
+				}		/* if (value_s) */
+		}
+	else if (IsUnsignedIntParameter (param_p))
+		{
+			UnsignedIntParameter *int_param_p = (UnsignedIntParameter *) param_p;
+			const uint32 *value_p = GetUnsignedIntParameterCurrentValue (int_param_p);
 
-			case PT_UNSIGNED_INT:
+			if (value_p)
 				{
-					char *value_s = ConvertIntegerToString (param_p -> pa_current_value.st_ulong_value);
+					char *value_s = ConvertUnsignedIntegerToString (*value_p);
 
 					if (value_s)
 						{
 							success_flag = AddArgsPair (param_p -> pa_name_s, value_s, ap_p);
 							FreeCopiedString (value_s);
-						}		/* if (value_s) */
-				}
-				break;
+						}
+				}		/* if (value_s) */
+		}
+	else if (IsDoubleParameter (param_p))
+		{
+			DoubleParameter *dbl_param_p = (DoubleParameter *) param_p;
+			const double64 *value_p = GetDoubleParameterCurrentValue (dbl_param_p);
 
-			case PT_SIGNED_REAL:
-			case PT_UNSIGNED_REAL:
+			if (value_p)
 				{
-					char *value_s = ConvertDoubleToString (param_p -> pa_current_value.st_data_value);
+					char *value_s = ConvertDoubleToString (*value_p);
 
 					if (value_s)
 						{
 							success_flag = AddArgsPair (param_p -> pa_name_s, value_s, ap_p);
 							FreeCopiedString (value_s);
-						}		/* if (value_s) */
+						}
+				}		/* if (value_s) */
+		}
+	else if (IsBooleanParameter (param_p))
+		{
+			BooleanParameter *bool_param_p = (BooleanParameter *) param_p;
+			const bool *value_p = GetBooleanParameterCurrentValue (bool_param_p);
 
-				}
-				break;
+			if (value_p)
+				{
+					success_flag = ap_p -> AddArg (param_p -> pa_name_s, *value_p);
+				}		/* if (value_s) */
 
-			case PT_BOOLEAN:
-				success_flag = ap_p -> AddArg (param_p -> pa_name_s, true);
-				break;
-
-			default:
-				break;
-
-		}		/* switch (param_p -> pa_type) */
+		}
 
 	return success_flag;
 }
@@ -137,13 +153,11 @@ bool AddBlastArgs (const Parameter *param_p, ArgsProcessor *ap_p)
 bool AddArgsPairFromStringParameter (const ParameterSet *params_p, const char * const param_name_s, const char *key_s, ArgsProcessor *ap_p,  const bool required_flag)
 {
 	bool success_flag = !required_flag;
-	SharedType value;
+	const char *value_s = NULL;
 
-	InitSharedType (&value);
-
-	if (GetCurrentParameterValueFromParameterSet (params_p, param_name_s, &value))
+	if (GetCurrentStringParameterValueFromParameterSet (params_p, param_name_s, &value_s))
 		{
-			success_flag = AddArgsPair (key_s, value.st_string_value_s, ap_p);
+			success_flag = AddArgsPair (key_s, value_s, ap_p);
 		}
 
 	return success_flag;
