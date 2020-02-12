@@ -31,6 +31,9 @@
 #include "grassroots_server.h"
 #include "streams.h"
 
+#include "boolean_parameter.h"
+#include "string_parameter.h"
+#include "unsigned_int_parameter.h"
 
 #ifdef _DEBUG
 	#define POLYMARKER_LINKED_SERVICE_DEBUG	(STM_LEVEL_FINE)
@@ -290,16 +293,12 @@ static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p
 
 	if (polymarker_params_p)
 		{
-			SharedType def;
 			Parameter *param_p = NULL;
 			bool success_flag = true;
-			InitSharedType (&def);
 
 			if (chromosome_s)
 				{
-					def.st_string_value_s = (char *) chromosome_s;
-
-					if (! (param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Chromosome", "Chromosome", "Chromosome", def, PL_ALL)))
+					if (! (param_p = EasyCreateAndAddStringParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Chromosome", "Chromosome", "Chromosome", chromosome_s, PL_ALL)))
 						{
 							success_flag =  false;
 						}
@@ -307,37 +306,33 @@ static ParameterSet *CreatePolymarkerParameters (LinkedService *linked_service_p
 
 			if (success_flag)
 				{
-					def.st_string_value_s = (char *) sequence_s;
-
-					if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_LARGE_STRING, "Sequence", "Sequence", "Sequence", def, PL_ALL)) != NULL)
+					if ((param_p = EasyCreateAndAddStringParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_LARGE_STRING, "Sequence", "Sequence", "Sequence", sequence_s, PL_ALL)) != NULL)
 						{
-							def.st_string_value_s = (char *) scaffold_s;
-
-							if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Gene", "Gene", "Gene", def, PL_ALL)) != NULL)
+							if ((param_p = EasyCreateAndAddStringParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_STRING, "Gene", "Gene", "Gene", scaffold_s, PL_ALL)) != NULL)
 								{
 									const char *full_db_s = GetMappedDatabaseName (linked_service_p, database_s);
 
 									if (full_db_s)
 										{
-											def.st_boolean_value = true;
+											bool b = true;
 
-											if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_BOOLEAN, full_db_s, full_db_s, full_db_s, def, PL_ALL)) != NULL)
+											if ((param_p = EasyCreateAndAddBooleanParameterToParameterSet (NULL, polymarker_params_p, NULL, full_db_s, full_db_s, full_db_s, &b, PL_ALL)) != NULL)
 												{
 													/*
 													 * Since we know the length of the query sequence, make sure that it is a valid
 													 * size for primer3.
 													 */
-													def.st_ulong_value = query_sequence_length;
+													uint32 def_length = query_sequence_length;
 
-													if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_UNSIGNED_INT, "Product size range min", "Product size range min", "Product size range min", def, PL_ADVANCED)) != NULL)
+													if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (NULL, polymarker_params_p, NULL, "Product size range min", "Product size range min", "Product size range min", &def_length, PL_ADVANCED)) != NULL)
 														{
 															/*
 															 * Make sure the max product size is large enough,
 															 * for the sake or argument multiply the sequence length by 3
 															 */
-															def.st_ulong_value = 3 * query_sequence_length;
+															def_length *= 3;
 
-															if ((param_p = EasyCreateAndAddParameterToParameterSet (NULL, polymarker_params_p, NULL, PT_UNSIGNED_INT, "Product size range max", "Product size range max", "Product size range max", def, PL_ADVANCED)) != NULL)
+															if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (NULL, polymarker_params_p, NULL, "Product size range max", "Product size range max", "Product size range max", &def_length, PL_ADVANCED)) != NULL)
 																{
 																	return polymarker_params_p;
 																}

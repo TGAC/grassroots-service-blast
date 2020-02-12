@@ -37,6 +37,7 @@
 
 #include "boolean_parameter.h"
 #include "string_parameter.h"
+#include "unsigned_int_parameter.h"
 
 
 #ifdef _DEBUG
@@ -98,10 +99,7 @@ bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_para
 										{
 											ParameterNode *src_node_p = (ParameterNode *) (db_group_p -> pg_params_p -> ll_head_p);
 											ParameterGroup *dest_group_p = CreateAndAddParameterGroupToParameterSet (databases_group_s, false, service_p -> se_data_p, internal_params_p);
-											SharedType def;
 											uint32 num_added_dbs = 0;
-
-											InitSharedType (&def);
 
 											while (src_node_p)
 												{
@@ -113,9 +111,16 @@ bool AddPairedServiceParameters (Service *service_p, ParameterSet *internal_para
 
 													if (db_s)
 														{
-															def.st_boolean_value = external_param_p -> pa_current_value.st_boolean_value;
+															const bool *b_p = NULL;
 
-															param_p = CreateAndAddParameterToParameterSet (service_p -> se_data_p, internal_params_p, dest_group_p, PT_BOOLEAN, false, external_param_p -> pa_name_s, external_param_p -> pa_display_name_s, external_param_p -> pa_description_s, NULL, def, NULL, NULL, PL_ALL, NULL);
+															if (IsBooleanParameter (external_param_p))
+																{
+																	BooleanParameter *bool_param_p = (BooleanParameter *) external_param_p;
+
+																	b_p = GetBooleanParameterCurrentValue (bool_param_p);
+																}
+
+															param_p = EasyCreateAndAddBooleanParameterToParameterSet (service_p -> se_data_p, internal_params_p, dest_group_p, external_param_p -> pa_name_s, external_param_p -> pa_display_name_s, external_param_p -> pa_description_s, b_p, PL_ALL);
 
 															if (param_p)
 																{
@@ -276,7 +281,7 @@ char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32
 
 															if (param_p)
 																{
-																	if (SetParameterValue (param_p, &output_format_code, true))
+																	if (SetUnsignedIntParameterCurrentValue ((UnsignedIntParameter *) param_p, &output_format_code))
 																		{
 																			Service *service_p = blast_data_p -> bsd_base_data.sd_service_p;
 
