@@ -220,11 +220,11 @@ static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, Paramete
 
 			success_flag = true;
 
-			for (i = 1; i <= NUM_GENETIC_CODES; ++ i)
+			for (i = 0; i < NUM_GENETIC_CODES; ++ i)
 				{
-					if (!CreateAndAddUnsignedIntParameterOption ((UnsignedIntParameter *) param_p, i, * (descriptions_ss + i)))
+					if (!CreateAndAddUnsignedIntParameterOption ((UnsignedIntParameter *) param_p, i + 1, * (descriptions_ss + i)))
 						{
-							i = NUM_GENETIC_CODES + 1;
+							i = NUM_GENETIC_CODES;
 							success_flag = false;
 						}
 				}
