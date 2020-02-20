@@ -115,13 +115,6 @@ extern const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES];
 /* Grassroots params */
 
 /**
- * The Blast Service NamedParameterType for specifying the input filename.
- *
- * @ingroup blast_service
- */
-BLAST_SERVICE_PREFIX NamedParameterType BS_INPUT_FILE BLAST_SERVICE_STRUCT_VAL ("input_file", PT_FILE_TO_READ);
-
-/**
  * The Blast Service NamedParameterType for specifying previous job UUIDs.
  *
  * @ingroup blast_service

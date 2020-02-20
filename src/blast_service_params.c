@@ -287,28 +287,27 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Query Sequence Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 
 
-	if ((param_p = EasyCreateAndAddStringParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_INPUT_FILE.npt_type, BS_INPUT_FILE.npt_name_s, "Input", "The input file to read", NULL, PL_ADVANCED)) != NULL)
+	if ((param_p = SetUpPreviousJobUUIDParameter (data_p, param_set_p, group_p)) != NULL)
 		{
-			if ((param_p = SetUpPreviousJobUUIDParameter (data_p, param_set_p, group_p)) != NULL)
+			if ((param_p = EasyCreateAndAddStringParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_INPUT_QUERY.npt_type, BS_INPUT_QUERY.npt_name_s, "Query Sequence(s)", "Query sequence(s) to be used for a BLAST search should be pasted in the 'Search' text area. "
+																													"It accepts a number of different types of input and automatically determines the format or the input."
+																													" To allow this feature there are certain conventions required with regard to the input of identifiers (e.g., accessions or gi's)", NULL, PL_ALL))  != NULL)
 				{
-					if ((param_p = EasyCreateAndAddStringParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_INPUT_QUERY.npt_type, BS_INPUT_QUERY.npt_name_s, "Query Sequence(s)", "Query sequence(s) to be used for a BLAST search should be pasted in the 'Search' text area. "
-																															"It accepts a number of different types of input and automatically determines the format or the input."
-																															" To allow this feature there are certain conventions required with regard to the input of identifiers (e.g., accessions or gi's)", NULL, PL_ALL))  != NULL)
-						{
-							const char *subrange_s = "Coordinates for a subrange of the query sequence. The BLAST search will apply only to the residues in the range. Valid sequence coordinates are from 1 to the sequence length. Set either From or To to 0 to ignore the range. The range includes the residue at the To coordinate.";
+					param_p -> pa_required_flag = true;
 
-							if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_FROM.npt_name_s, "From", subrange_s, NULL, PL_ADVANCED)) != NULL)
+					const char *subrange_s = "Coordinates for a subrange of the query sequence. The BLAST search will apply only to the residues in the range. Valid sequence coordinates are from 1 to the sequence length. Set either From or To to 0 to ignore the range. The range includes the residue at the To coordinate.";
+
+					if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_FROM.npt_name_s, "From", subrange_s, NULL, PL_ADVANCED)) != NULL)
+						{
+							if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_TO.npt_name_s, "To", subrange_s, NULL, PL_ADVANCED)) != NULL)
 								{
-									if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_TO.npt_name_s, "To", subrange_s, NULL, PL_ADVANCED)) != NULL)
+									if (callback_fn)
 										{
-											if (callback_fn)
-												{
-													success_flag = callback_fn (data_p, param_set_p, group_p, callback_data_p);
-												}
-											else
-												{
-													success_flag = true;
-												}
+											success_flag = callback_fn (data_p, param_set_p, group_p, callback_data_p);
+										}
+									else
+										{
+											success_flag = true;
 										}
 								}
 						}
@@ -323,11 +322,7 @@ bool GetQuerySequenceParameterTypeForNamedParameter (const char *param_name_s, P
 {
 	bool success_flag = true;
 
-	if (strcmp (param_name_s, BS_INPUT_FILE.npt_name_s) == 0)
-		{
-			*pt_p = BS_INPUT_FILE.npt_type;
-		}
-	else if (strcmp (param_name_s, BS_JOB_ID.npt_name_s) == 0)
+	if (strcmp (param_name_s, BS_JOB_ID.npt_name_s) == 0)
 		{
 			*pt_p = BS_JOB_ID.npt_type;
 		}
