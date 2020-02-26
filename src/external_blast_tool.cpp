@@ -376,8 +376,16 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 																						}		/* if ((from != 0) && (to != 0)) */
 
 																				}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_SUBRANGE_TO, &to, true)) */
+																			else
+																				{
+																					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Setting TAG_BLAST_SUBRANGE_TO failed");
+																				}
 
 																		}		/* if (GetParameterValueFromParameterSet (params_p, TAG_BLAST_SUBRANGE_FROM, &value, true)) */
+																	else
+																		{
+																			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Setting TAG_BLAST_SUBRANGE_FROM failed");
+																		}
 
 																}		/*  if (success_flag) */
 															else
@@ -387,8 +395,16 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 
 
 														}		/* if (AddBlastArgsPairFromIntegerParameter (params_p, TAG_BLAST_EXPECT_THRESHOLD, "-evalue", true)) */
+													else
+														{
+															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add expect threshold");
+														}
 
 												}		/* if (bt_app_params_p -> ParseParametersToByteBuffer (bt_service_data_p, params_p, ebt_buffer_p)) */
+											else
+												{
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "bt_app_params_p -> ParseParametersToByteBuffer failed");
+												}
 
 										}		/* if (AddBlastArgsPair ("-db", bt_job_p -> sj_name_s))*/
 									else
