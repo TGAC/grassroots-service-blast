@@ -46,6 +46,7 @@
 
 #include "string_parameter.h"
 #include "boolean_parameter.h"
+#include "unsigned_int_parameter.h"
 
 
 /***************************************/
@@ -277,24 +278,14 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 
 	if (ids_p)
 		{
-			const char *fmt_code_s = NULL;
+			const uint32 *fmt_code_p = NULL;
 			uint32 output_format_code = BS_DEFAULT_OUTPUT_FORMAT;
 
-
-			if (GetCurrentStringParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &fmt_code_s))
+			if (GetCurrentUnsignedIntParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &fmt_code_p))
 				{
-					if (fmt_code_s)
+					if (fmt_code_p)
 						{
-							int8 code = GetOutputFormatCodeForString (fmt_code_s);
-
-							if (code != -1)
-								{
-									output_format_code = (uint32) code;
-								}
-							else
-								{
-									PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Couldn't get requested output format from \"%s\", using " UINT32_FMT " instead", fmt_code_s, output_format_code);
-								}
+							output_format_code = *fmt_code_p;
 						}
 				}
 			else
