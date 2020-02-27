@@ -15,6 +15,7 @@
 #include "blast_util.h"
 
 #include "unsigned_int_parameter.h"
+#include "signed_int_parameter.h"
 
 
 /*******************************/
@@ -245,16 +246,14 @@ static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_
 	bool success_flag = false;
 	Parameter *param_p = NULL;
 	ServiceData *service_data_p = & (data_p -> bsd_base_data);
-	uint32 def_score;
+	const uint32 def_reward = 2;
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 
-	def_score = 2;
-
-	if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", &def_score, PL_ADVANCED)) != NULL)
+	if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", &def_reward, PL_ADVANCED)) != NULL)
 		{
-			def_score = 3;
+			const int def_penalty = -3;
 
-			if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", &def_score, PL_ADVANCED)) != NULL)
+			if ((param_p = EasyCreateAndAddSignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_type, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", &def_penalty, PL_ADVANCED)) != NULL)
 				{
 					success_flag = true;
 				}

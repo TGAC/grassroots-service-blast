@@ -272,24 +272,17 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 															 * If we have a BlastFormatter then the output is always set to 11 which is ASN and
 															 * from that we can convert into any other format using a BlastFormatter tool
 															 */
-															const char *out_fmt_s = NULL;
+															const uint32 *out_fmt_p = NULL;
 
-															if (GetCurrentStringParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &out_fmt_s))
+															if (GetCurrentUnsignedIntParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &out_fmt_p))
 																{
-																	bt_output_format = BS_DEFAULT_OUTPUT_FORMAT;
-
-																	if (out_fmt_s)
+																	if (out_fmt_p)
 																		{
-																			int8 code = GetOutputFormatCodeForString (out_fmt_s);
-
-																			if (code != -1)
-																				{
-																					bt_output_format = (uint32) code;
-																				}
-																			else
-																				{
-
-																				}
+																			bt_output_format = *out_fmt_p;
+																		}
+																	else
+																		{
+																			bt_output_format = BS_DEFAULT_OUTPUT_FORMAT;
 																		}
 
 																	if (bt_service_data_p -> bsd_formatter_p)
