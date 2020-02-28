@@ -434,7 +434,7 @@ bool AddErrorToBlastServiceJob (BlastServiceJob *job_p)
 
 	if (log_s)
 		{
-			if (AddErrorToServiceJob (& (job_p -> bsj_job), ERROR_S, log_s))
+			if (AddErrorMessageToServiceJob (& (job_p -> bsj_job), ERROR_S, log_s))
 				{
 					success_flag = true;
 				}

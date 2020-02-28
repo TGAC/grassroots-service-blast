@@ -233,7 +233,7 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create input temp file for blast tool \"%s\" in \"%s\"", job_p -> bsj_job.sj_name_s, blast_data_p -> bsd_working_dir_s);
 
 											/* Since we couldn't save the input sequence, all jobs need to be set to have an error status */
-											if (!AddErrorToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
+											if (!AddErrorMessageToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add error to job", job_p -> bsj_job.sj_name_s);
 												}
@@ -242,7 +242,7 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 
 											while ((job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator)) != NULL)
 												{
-													if (!AddErrorToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
+													if (!AddErrorMessageToServiceJob (& (job_p -> bsj_job), JOB_ERRORS_S, error_s))
 														{
 															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add error to job", job_p -> bsj_job.sj_name_s);
 														}
@@ -345,12 +345,12 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 
 							if (errors_s)
 								{
-									added_error_flag = AddErrorToServiceJob (job_p, ids_s, errors_s);
+									added_error_flag = AddErrorMessageToServiceJob (job_p, ids_s, errors_s);
 									FreeCopiedString (errors_s);
 								}
 							else
 								{
-									added_error_flag = AddErrorToServiceJob (job_p, ids_s, "Failed to parse uuids");
+									added_error_flag = AddErrorMessageToServiceJob (job_p, ids_s, "Failed to parse uuids");
 								}
 
 							if (!added_error_flag)
@@ -585,7 +585,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 									if (error_s)
 										{
-											if (!AddErrorToServiceJob (job_p, job_id_s, error_s))
+											if (!AddErrorMessageToServiceJob (job_p, job_id_s, error_s))
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create json error string for \"%s\"", job_id_s);
 												}
