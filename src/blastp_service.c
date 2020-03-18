@@ -62,6 +62,7 @@ static const char *GetProteinBlastServiceName (const Service *service_p);
 
 static const char *GetProteinBlastServiceDescription (const Service *service_p);
 
+static const char *GetProteinBlastServiceAlias (const Service *service_p);
 
 static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
@@ -98,6 +99,7 @@ Service *GetBlastPService (GrassrootsServer *grassroots_p)
 					if (InitialiseService (protein_blast_service_p,
 														 GetProteinBlastServiceName,
 														 GetProteinBlastServiceDescription,
+														 GetProteinBlastServiceAlias,
 														 NULL,
 														 RunProteinBlastService,
 														 IsResourceForBlastService,
@@ -263,6 +265,11 @@ static const char *GetProteinBlastServiceDescription (const Service * UNUSED_PAR
 	return "Search protein databases with protein queries";
 }
 
+
+static const char *GetProteinBlastServiceAlias (const Service * UNUSED_PARAM (service_p))
+{
+	return (BS_GROUP_ALIAS_PREFIX_S "blastp");
+}
 
 
 static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))

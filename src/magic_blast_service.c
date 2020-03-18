@@ -67,6 +67,9 @@ static const char *GetMagicBlastServiceName (const Service *service_p);
 
 static const char *GetMagicBlastServiceDescription (const Service *service_p);
 
+static const char *GetMagicBlastServiceAlias (const Service *service_p);
+
+
 static ServiceJobSet *RunMagicBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
 static ServiceMetadata *GetMagicBlastServiceMetadata (Service *service_p);
@@ -96,6 +99,7 @@ Service *GetMagicBlastService (GrassrootsServer *grassroots_p)
 					if (InitialiseService (magic_blast_service_p,
 																 GetMagicBlastServiceName,
 																 GetMagicBlastServiceDescription,
+																 GetMagicBlastServiceAlias,
 																 NULL,
 																 RunMagicBlastService,
 																 IsResourceForBlastService,
@@ -135,6 +139,12 @@ static const char *GetMagicBlastServiceName (const Service * UNUSED_PARAM (servi
 static const char *GetMagicBlastServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "Mapping large next-generation RNA or DNA sequencing runs against a whole genome or transcriptome";
+}
+
+
+static const char *GetMagicBlastServiceAlias (const Service * UNUSED_PARAM (service_p))
+{
+	return (BS_GROUP_ALIAS_PREFIX_S "magic_blast");
 }
 
 

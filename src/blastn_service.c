@@ -44,6 +44,8 @@ static const char *GetBlastNServiceName (const Service *service_p);
 
 static const char *GetBlastNServiceDescription (const Service *service_p);
 
+static const char *GetBlastNServiceAlias (const Service *service_p);
+
 static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
 
 static bool GetBlastNServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
@@ -82,6 +84,7 @@ Service *GetBlastNService (GrassrootsServer *grassroots_p)
 					if (InitialiseService (nucleotide_blast_service_p,
 														 GetBlastNServiceName,
 														 GetBlastNServiceDescription,
+														 GetBlastNServiceAlias,
 														 NULL,
 														 RunNucleotideBlastService,
 														 IsResourceForBlastService,
@@ -121,6 +124,12 @@ static const char *GetBlastNServiceName (const Service * UNUSED_PARAM (service_p
 static const char *GetBlastNServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "Search nucleotide databases with nucleotide queries";
+}
+
+
+static const char *GetBlastNServiceAlias (const Service * UNUSED_PARAM (service_p))
+{
+	return (BS_GROUP_ALIAS_PREFIX_S "blastn");
 }
 
 

@@ -54,6 +54,8 @@ static const char *GetBlastXServiceName (const Service *service_p);
 
 static const char *GetBlastXServiceDescription (const Service *service_p);
 
+static const char *GetBlastXServiceAlias (const Service *service_p);
+
 static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
 
 static ServiceJobSet *RunBlastXService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
@@ -86,6 +88,7 @@ Service *GetBlastXService (GrassrootsServer *grassroots_p)
 					if (InitialiseService (blastx_service_p,
 														 GetBlastXServiceName,
 														 GetBlastXServiceDescription,
+														 GetBlastXServiceAlias,
 														 NULL,
 														 RunBlastXService,
 														 IsResourceForBlastService,
@@ -125,6 +128,12 @@ static const char *GetBlastXServiceName (const Service * UNUSED_PARAM (service_p
 static const char *GetBlastXServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "Search protein databases with nucleotide queries";
+}
+
+
+static const char *GetBlastXServiceAlias (const Service * UNUSED_PARAM (service_p))
+{
+	return (BS_GROUP_ALIAS_PREFIX_S "blastx");
 }
 
 
