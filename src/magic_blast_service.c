@@ -144,7 +144,7 @@ static const char *GetMagicBlastServiceDescription (const Service * UNUSED_PARAM
 
 static const char *GetMagicBlastServiceAlias (const Service * UNUSED_PARAM (service_p))
 {
-	return (BS_GROUP_ALIAS_PREFIX_S "magic_blast");
+	return (BS_GROUP_ALIAS_PREFIX_S SERVICE_GROUP_ALIAS_SEPARATOR "magic_blast");
 }
 
 

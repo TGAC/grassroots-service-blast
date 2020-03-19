@@ -245,7 +245,7 @@ BLAST_SERVICE_PREFIX const char *BS_APP_NAME_S BLAST_SERVICE_VAL ("blast_app_typ
 
 
 /** The prefix to use for Blast Service aliases. */
-#define BS_GROUP_ALIAS_PREFIX_S "blast/"
+#define BS_GROUP_ALIAS_PREFIX_S "blast"
 
 
 #ifdef __cplusplus

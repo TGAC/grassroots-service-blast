@@ -268,7 +268,7 @@ static const char *GetProteinBlastServiceDescription (const Service * UNUSED_PAR
 
 static const char *GetProteinBlastServiceAlias (const Service * UNUSED_PARAM (service_p))
 {
-	return (BS_GROUP_ALIAS_PREFIX_S "blastp");
+	return (BS_GROUP_ALIAS_PREFIX_S SERVICE_GROUP_ALIAS_SEPARATOR "blastp");
 }
 
 

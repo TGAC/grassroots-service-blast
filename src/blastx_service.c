@@ -133,7 +133,7 @@ static const char *GetBlastXServiceDescription (const Service * UNUSED_PARAM (se
 
 static const char *GetBlastXServiceAlias (const Service * UNUSED_PARAM (service_p))
 {
-	return (BS_GROUP_ALIAS_PREFIX_S "blastx");
+	return (BS_GROUP_ALIAS_PREFIX_S SERVICE_GROUP_ALIAS_SEPARATOR "blastx");
 }
 
 
