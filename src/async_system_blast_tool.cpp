@@ -215,7 +215,7 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 
 			if (log_s)
 				{
-					if (!AddErrorMessageToServiceJob (& (bt_job_p -> bsj_job), ERROR_S, log_s))
+					if (!AddGeneralErrorMessageToServiceJob (& (bt_job_p -> bsj_job), log_s))
 						{
 							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add error \"%s\" to service job");
 						}
