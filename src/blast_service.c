@@ -350,7 +350,7 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 								}
 							else
 								{
-									added_error_flag = AddParameterErrorMessageToServiceJob (job_p, BS_JOB_ID.npt_name_s, BS_JOB_ID.npt_type,, "Failed to parse uuids");
+									added_error_flag = AddParameterErrorMessageToServiceJob (job_p, BS_JOB_ID.npt_name_s, BS_JOB_ID.npt_type, "Failed to parse uuids");
 								}
 
 							if (!added_error_flag)
