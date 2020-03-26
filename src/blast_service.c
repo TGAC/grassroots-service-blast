@@ -49,6 +49,13 @@
 #include "unsigned_int_parameter.h"
 
 
+#ifdef _DEBUG
+	#define BLAST_SERVICE_DEBUG (STM_LEVEL_FINEST)
+#else
+	#define BLAST_SERVICE_DEBUG (STM_LEVEL_NONE)
+#endif
+
+
 /***************************************/
 
 static void InitBlastService (Service *blast_service_p);
@@ -163,6 +170,11 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 	BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
 	const char *input_value_s = NULL;
 
+	#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
+	PrintErrors (STM_LEVEL_FINEST, __FILE__, __LINE__,  "Running the blast service with data at %.16X", blast_data_p);
+	#endif
+
+
 	/*
 	 * We will check for all of our parameters, such as previous job ids, etc. first, until
 	 * we are left with the blast-specific parameters
@@ -175,6 +187,18 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 				{
 					service_p -> se_jobs_p  = CreateJobsForPreviousResults (param_set_p, input_value_s, blast_data_p);
 				}
+
+			/*
+			 * Since we are just checking the status of already running jobs,
+			 * we are not running any jobs with this Service instance, so
+			 * we can label it as running synchronously if it is not already
+			 */
+
+			if (service_p -> se_synchronous != SY_SYNCHRONOUS)
+				{
+					service_p -> se_synchronous = SY_SYNCHRONOUS;
+				}
+
 		}		/* if (GetParameterValueFromParameterSet (param_set_p, BS_JOB_ID.npt_name_s, &param_value, true)) */
 
 	if (! (service_p -> se_jobs_p))
@@ -1046,6 +1070,11 @@ BlastServiceData *AllocateBlastServiceData (Service * UNUSED_PARAM (blast_servic
 			data_p -> bsd_task_manager_p = NULL;
 		}
 
+
+	#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
+	PrintErrors (STM_LEVEL_FINEST, __FILE__, __LINE__,  "Allocating the blast service data at %.16X", data_p);
+	#endif
+
 	return data_p;
 }
 
@@ -1295,6 +1324,10 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 void FreeBlastServiceData (BlastServiceData *data_p)
 {
+	#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
+	PrintErrors (STM_LEVEL_FINEST, __FILE__, __LINE__,  "Freeing the blast service data at %.16X", data_p);
+	#endif
+
 	if (data_p -> bsd_databases_p)
 		{
 			FreeMemory (data_p -> bsd_databases_p);
