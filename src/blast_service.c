@@ -360,7 +360,7 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 
 			if (jobs_p)
 				{
-					ServiceJob *job_p = CreateAndAddServiceJobToService (service_p, ids_s, "Failed UUID lookup", NULL, NULL, NULL, false);
+					ServiceJob *job_p = CreateAndAddServiceJobToService (service_p, ids_s, "Failed UUID lookup", NULL, NULL, NULL);
 
 					if (job_p)
 						{
@@ -521,7 +521,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 				{
 					ServiceJob *job_p = (ServiceJob *) blast_job_p;
 
-					if (AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
+					if (AddServiceJobToService (service_p, (ServiceJob *) job_p))
 						{
 							uuid_t job_id;
 							StringListNode *node_p = (StringListNode *) (ids_p -> ll_head_p);
@@ -678,15 +678,7 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 										{
 											BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (service_p, db_p, data_p);
 
-											if (job_p)
-												{
-													if (!AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
-														{
-															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add ServiceJob to the ServiceJobSet for \"%s\"", db_p -> di_name_s);
-															FreeBlastServiceJob (& (job_p -> bsj_job));
-														}
-												}
-											else
+											if (!job_p)
 												{
 													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create ServiceJob for \"%s\"", db_p -> di_name_s);
 												}
@@ -1087,7 +1079,7 @@ ServiceJob *BuildBlastServiceJob (struct Service *service_p, const json_t *servi
 	if (IsRemoteServiceJobJSON (service_job_json_p))
 		{
 			GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
-			RemoteServiceJob *remote_job_p = GetRemoteServiceJobFromJSON (service_job_json_p, grassroots_p);
+			RemoteServiceJob *remote_job_p = GetRemoteServiceJobFromJSON (service_job_json_p, service_p, grassroots_p);
 
 			if (remote_job_p)
 				{

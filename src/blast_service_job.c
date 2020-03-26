@@ -201,7 +201,7 @@ BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, Bla
 
 					memset (blast_job_p, 0, sizeof (BlastServiceJob));
 
-					if (InitServiceJobFromJSON (& (blast_job_p -> bsj_job), job_json_p, grassroots_p))
+					if (InitServiceJobFromJSON (& (blast_job_p -> bsj_job), job_json_p, config_p -> bsd_base_data.sd_service_p, grassroots_p))
 						{
 							const char *factory_name_s = GetJSONString (blast_job_json_p, BSJ_FACTORY_S);
 
