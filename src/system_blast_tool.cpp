@@ -193,9 +193,6 @@ OperationStatus SystemBlastTool :: Run ()
 }
 
 
-
-
-
 OperationStatus SystemBlastTool :: GetStatus (bool update_flag)
 {
 	OperationStatus status = OS_ERROR;

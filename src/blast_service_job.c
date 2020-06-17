@@ -219,7 +219,20 @@ BlastServiceJob *GetBlastServiceJobFromJSON (const json_t *blast_job_json_p, Bla
 
 													if (tool_p)
 														{
+															OperationStatus status = GetServiceJobStatus (& (blast_job_p -> bsj_job));
+
 															blast_job_p -> bsj_tool_p = tool_p;
+
+															if (status == OS_ERROR)
+																{
+																	if (! (tool_p -> AddErrorDetails ()))
+																		{
+																			char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+																			ConvertUUIDToString (blast_job_p -> bsj_job.sj_id, uuid_s);
+																			PrintLog (BLAST_SERVICE_JOB_DEBUG, __FILE__, __LINE__, "AddErrorDetails failed for \"%s\"", uuid_s);
+																		}
+																}
 
 															SetBlastServiceJobCallbacks (blast_job_p);
 

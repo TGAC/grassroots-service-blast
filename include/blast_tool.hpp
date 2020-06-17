@@ -165,6 +165,10 @@ public:
 	 */
 	virtual char *GetLog () = 0;
 
+
+	virtual bool AddErrorDetails ();
+
+
 	/**
 	 * Get the uuid for the ServiceJob that this BlastTool
 	 * is linked with.
@@ -253,7 +257,6 @@ protected:
 	 * otherwise.
 	 */
 	virtual bool AddToJSON (json_t *root_p);
-
 
 private:
 	static const char * const BT_NAME_S;

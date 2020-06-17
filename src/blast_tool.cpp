@@ -273,3 +273,36 @@ bool BlastTool :: AddToJSON (json_t *root_p)
 	return success_flag;
 }
 
+
+
+
+bool BlastTool :: AddErrorDetails ()
+{
+	bool success_flag = false;
+	char *log_s = GetLog ();
+
+	if (log_s)
+		{
+			if (AddGeneralErrorMessageToServiceJob (& (bt_job_p -> bsj_job), log_s))
+				{
+					success_flag = true;
+				}
+			else
+				{
+					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add error \"%s\" to service job", log_s);
+				}
+
+			FreeCopiedString (log_s);
+		}		/* if (log_s) */
+	else
+		{
+			char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+			ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
+
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "GetLog () failed for \"%s\"", uuid_s);
+		}
+
+	return success_flag;
+}
+

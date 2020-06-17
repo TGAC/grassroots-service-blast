@@ -564,6 +564,7 @@ bool ExternalBlastTool :: AddToJSON (json_t *root_p)
 }
 
 
+
 char *ExternalBlastTool :: GetLog ()
 {
 	char *log_file_s = NULL;

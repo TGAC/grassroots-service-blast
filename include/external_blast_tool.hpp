@@ -148,6 +148,7 @@ public:
 	 */
 	virtual char *GetLog ();
 
+
 protected:
 
 	/**

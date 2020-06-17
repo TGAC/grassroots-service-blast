@@ -185,6 +185,11 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 		{
 			if (!IsStringEmpty (input_value_s))
 				{
+					if (service_p -> se_synchronous != SY_SYNCHRONOUS)
+						{
+							service_p -> se_synchronous = SY_SYNCHRONOUS;
+						}
+
 					service_p -> se_jobs_p  = CreateJobsForPreviousResults (param_set_p, input_value_s, blast_data_p);
 				}
 
@@ -194,10 +199,6 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 			 * we can label it as running synchronously if it is not already
 			 */
 
-			if (service_p -> se_synchronous != SY_SYNCHRONOUS)
-				{
-					service_p -> se_synchronous = SY_SYNCHRONOUS;
-				}
 
 		}		/* if (GetParameterValueFromParameterSet (param_set_p, BS_JOB_ID.npt_name_s, &param_value, true)) */
 
