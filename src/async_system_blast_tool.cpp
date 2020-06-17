@@ -167,6 +167,11 @@ OperationStatus AsyncSystemBlastTool :: Run ()
 					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "About to run SystemBlastTool with \"%s\"", command_line_s);
 					#endif
 
+					if (!SaveCommandLine (command_line_s))
+						{
+							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to save command line \"%s\" to file", command_line_s);
+						}
+
 					if (AddServiceJobToJobsManager (manager_p, bt_job_p -> bsj_job.sj_id, (ServiceJob *) bt_job_p))
 						{
 							status = OS_PENDING;

@@ -125,6 +125,7 @@ protected:
 	 */
 	bool Init (const char *prog_s);
 
+	bool SaveCommandLine (const char *command_line_s);
 
 };
 

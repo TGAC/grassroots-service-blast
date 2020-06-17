@@ -516,7 +516,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 	if (jobs_p)
 		{
-			BlastServiceJob *blast_job_p = AllocateBlastServiceJob (jobs_p -> sjs_service_p, "Previous Blast Results", NULL, NULL, blast_data_p);
+			BlastServiceJob *blast_job_p = AllocateBlastServiceJob (jobs_p -> sjs_service_p, "Previous Blast Results", NULL, "Previous Blast Results", blast_data_p);
 
 			if (blast_job_p)
 				{

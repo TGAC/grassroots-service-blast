@@ -133,6 +133,50 @@ ArgsProcessor *SystemBlastTool :: GetArgsProcessor ()
 }
 
 
+bool SystemBlastTool :: SaveCommandLine (const char *command_line_s)
+{
+	bool success_flag = false;
+	char *job_command_s = GetJobFilename (NULL, ".command");
+
+	if (job_command_s)
+		{
+			FILE *command_f = fopen (job_command_s, "w");
+
+			if (command_f)
+				{
+					if (fprintf (command_f, "%s\n", command_line_s) > 0)
+						{
+							success_flag = true;
+						}
+					else
+						{
+							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to write \%s\" to  command file \"%s\"", command_line_s, job_command_s);
+						}
+
+					if (fclose (command_f) != 0)
+						{
+							PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to close command file \"%s\"", job_command_s);
+						}
+				}
+			else
+				{
+					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to open command file \"%s\"", job_command_s);
+				}
+
+			FreeCopiedString (job_command_s);
+		}
+	else
+		{
+			char uuid_s [UUID_STRING_BUFFER_SIZE];
+			ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
+
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to create job filename for ", uuid_s);
+		}
+
+	return success_flag;
+}
+
+
 OperationStatus SystemBlastTool :: Run ()
 {
 	int res;
@@ -145,6 +189,11 @@ OperationStatus SystemBlastTool :: Run ()
 	#endif
 
 	status = OS_STARTED;
+
+	if (!SaveCommandLine (command_line_s))
+		{
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to save command line \"%s\" to file", command_line_s);
+		}
 
 	res = system (command_line_s);
 
