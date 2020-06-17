@@ -293,8 +293,6 @@ bool AddQuerySequenceParams (BlastServiceData *data_p, ParameterSet *param_set_p
 																													"It accepts a number of different types of input and automatically determines the format or the input."
 																													" To allow this feature there are certain conventions required with regard to the input of identifiers (e.g., accessions or gi's)", NULL, PL_ALL))  != NULL)
 				{
-					param_p -> pa_required_flag = true;
-
 					const char *subrange_s = "Coordinates for a subrange of the query sequence. The BLAST search will apply only to the residues in the range. Valid sequence coordinates are from 1 to the sequence length. Set either From or To to 0 to ignore the range. The range includes the residue at the To coordinate.";
 
 					if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, BS_SUBRANGE_FROM.npt_name_s, "From", subrange_s, NULL, PL_ADVANCED)) != NULL)
