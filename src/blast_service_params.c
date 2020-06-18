@@ -71,6 +71,96 @@ const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES] =
 };
 
 
+static const size_t S_NUM_TASKS = 4;
+
+
+
+static const BlastTaskDefaults s_megablast_defaults =
+{
+		/* uint32 btd_word_size; */
+		28,
+
+		/* uint32 btd_gapopen; */
+		0,
+
+		/* uint32 btd_gapextend; */
+		0,
+
+		/* uint32 btd_reward; */
+		1,
+
+		/* int32 btd_penalty; */
+		-2
+};
+
+static const BlastTaskDefaults s_blastn_defaults =
+{
+		/* uint32 btd_word_size; */
+		11,
+
+		/* uint32 btd_gapopen; */
+		5,
+
+		/* uint32 btd_gapextend; */
+		2,
+
+		/* uint32 btd_reward; */
+		2,
+
+		/* int32 btd_penalty; */
+		-3
+};
+
+
+static const BlastTaskDefaults s_blastn_short_defaults =
+{
+		/* uint32 btd_word_size; */
+		7,
+
+		/* uint32 btd_gapopen; */
+		5,
+
+		/* uint32 btd_gapextend; */
+		2,
+
+		/* uint32 btd_reward; */
+		1,
+
+		/* int32 btd_penalty; */
+		-3
+};
+
+static const BlastTaskDefaults s_dc_megablast_defaults =
+{
+		/* uint32 btd_word_size; */
+		11,
+
+		/* uint32 btd_gapopen; */
+		5,
+
+		/* uint32 btd_gapextend; */
+		2,
+
+		/* uint32 btd_reward; */
+		2,
+
+		/* int32 btd_penalty; */
+		-3
+};
+
+
+static const BlastTask s_tasks_p [S_NUM_TASKS] =
+{
+	{ "megablast", "megablast: Traditional megablast used to find very similar (e.g., intraspecies or closely related species) sequences", s_megablast_defaults },
+  { "dc-megablast", "Discontiguous megablast used to find more distant (e.g., interspecies) sequences", s_dc_megablast_defaults },
+  { "blastn", "The traditional program used for inter-species comparison", s_blastn_defaults },
+  { "blastn-short", "Optimized for sequences shorter than 30 nucelotides", s_blastn_short_defaults }
+};
+
+
+
+static BlastTask *GetBlastTaskFromResource (Resource *resource_p, const NamedParameterType trial_param_type);
+
 
 
 /**************************************************/
@@ -424,7 +514,15 @@ bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet
 						}
 				}
 
-			if (!success_flag)
+			if (success_flag)
+				{
+					/*
+					 * Since each of the tasks have different defaults, we
+					 * need to update the default values when the task is changed
+					 */
+					param_p -> pa_refresh_service_flag = true;
+				}
+			else
 				{
 					DetachParameter (param_set_p, param_p);
 					FreeParameter (param_p);
@@ -527,5 +625,81 @@ const char *GetLocalDatabaseName (const char *fully_qualified_db_s)
 }
 
 
+
+BlastTask *GetDefaultBlastTaskFromResource (void)
+{
+	return s_tasks_p;
+}
+
+
+BlastTask *GetBlastTaskFromResource (Resource *resource_p, const NamedParameterType task_param_type)
+{
+	if (resource_p && (resource_p -> re_data_p))
+		{
+			const json_t *param_set_json_p = json_object_get (resource_p -> re_data_p, PARAM_SET_KEY_S);
+
+			if (param_set_json_p)
+				{
+					json_t *params_json_p = json_object_get (param_set_json_p, PARAM_SET_PARAMS_S);
+
+					if (params_json_p)
+						{
+							const size_t num_entries = json_array_size (params_json_p);
+							size_t i;
+
+							for (i = 0; i < num_entries; ++ i)
+								{
+									const json_t *param_json_p = json_array_get (params_json_p, i);
+									const char *name_s = GetJSONString (param_json_p, PARAM_NAME_S);
+
+									if (name_s)
+										{
+											if (strcmp (name_s, BS_TASK.npt_name_s) == 0)
+												{
+													const char *task_s = GetJSONString (param_json_p, PARAM_CURRENT_VALUE_S);
+
+													if (task_s)
+														{
+															BlastTask *task_p = s_tasks_p;
+															size_t j = S_NUM_TASKS;
+
+															while (j > 0)
+																{
+																	if (strcmp (task_s, task_p -> bt_name_s) == 0)
+																		{
+																			return task_p;
+																		}
+
+																	-- j;
+																	++ task_p;
+																}
+
+														}
+													else
+														{
+															PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, param_json_p, "Failed to get \"%s\" from \"%s\"", PARAM_CURRENT_VALUE_S, trial_id_param_s);
+														}
+
+													/* force exit from loop */
+													i = num_entries;
+												}
+										}		/* if (name_s) */
+
+								}
+						}
+					else
+						{
+							PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, param_set_json_p, "Failed to get params with key \"%s\"", PARAM_SET_PARAMS_S);
+						}
+				}
+			else
+				{
+					PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, resource_p -> re_data_p, "Failed to get param set with key \"%s\"", PARAM_SET_KEY_S);
+				}
+
+		}		/* if (resource_p && (resource_p -> re_data_p)) */
+
+	return NULL;
+}
 
 

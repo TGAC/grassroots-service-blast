@@ -28,18 +28,6 @@ static NamedParameterType S_MISMATCH_SCORE = { "penalty", PT_NEGATIVE_INT };
 
 
 
-static const size_t S_NUM_TASKS = 5;
-
-static const BlastTask s_tasks_p [S_NUM_TASKS] =
-{
-  { "megablast", "megablast: Traditional megablast used to find very similar (e.g., intraspecies or closely related species) sequences" },
-  { "dc-megablast", "dc-megablast: Discontiguous megablast used to find more distant (e.g., interspecies) sequences" },
-  { "blastn", "blastn: Traditional BLASTN requiring an exact match of 11" },
-  { "blastn-short", "blastn-short: BLASTN program optimized for sequences shorter than 50 bases" },
-  { "rmblastn", "rmblastn: BLASTN with complexity adjusted scoring and masklevel" },
-};
-
-
 static const char *GetBlastNServiceName (const Service *service_p);
 
 static const char *GetBlastNServiceDescription (const Service *service_p);
@@ -55,9 +43,9 @@ static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSe
 static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p);
 
 
-static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p);
+static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p, BlastTaskDefaults *defaults_p);
 
-static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p);
+static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p, const uint32 def_reward, const int32 def_penalty);
 
 static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
@@ -171,7 +159,7 @@ static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p)
 }
 
 
-static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *resource_p, UserDetails * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("Nucleotide Blast service parameters", "A service to run nucleotide Blast searches");
 
@@ -180,13 +168,18 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource * 
 			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_NUCLEOTIDE, NULL, NULL))
 				{
 				  BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
-				  uint32 word_size = 11;
+				  BlastTask *default_task_p = GetBlastTaskFromResource (resource_p, BS_TASK);
 
-					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters, &word_size))
+				  if (!default_task_p)
+				  	{
+				  		default_task_p = s_tasks_p;
+				  	}
+
+					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters, & (default_task_p -> bt_defaults.btd_word_size)))
 						{
 							if (AddProgramSelectionParameters (blast_data_p, param_set_p, s_tasks_p, S_NUM_TASKS))
 								{
-									if (AddNucleotideBlastParameters (blast_data_p, param_set_p))
+									if (AddNucleotideBlastParameters (blast_data_p, param_set_p, & (default_task_p -> bt_defaults)))
 										{
 											return param_set_p;
 										}
@@ -237,11 +230,12 @@ static bool GetBlastNServiceParameterTypeForNamedParameter (const Service *servi
 
 
 
-static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p)
+static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p, BlastTaskDefaults *defaults_p)
 {
 	bool success_flag = false;
+	uint32 reward = 0;
 
-	if (AddScoringParams (data_p, param_set_p))
+	if (AddScoringParams (data_p, param_set_p, defaults_p -> btd_reward, defaults_p -> btd_penalty))
 		{
 			success_flag = true;
 		}
@@ -250,18 +244,15 @@ static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet
 }
 
 
-static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p)
+static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p, const uint32 def_reward, const int32 def_penalty)
 {
 	bool success_flag = false;
 	Parameter *param_p = NULL;
 	ServiceData *service_data_p = & (data_p -> bsd_base_data);
-	const uint32 def_reward = 2;
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 
 	if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", &def_reward, PL_ADVANCED)) != NULL)
 		{
-			const int def_penalty = -3;
-
 			if ((param_p = EasyCreateAndAddSignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_type, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", &def_penalty, PL_ADVANCED)) != NULL)
 				{
 					success_flag = true;

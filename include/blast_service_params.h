@@ -187,6 +187,16 @@ BLAST_SERVICE_PREFIX NamedParameterType BS_WORD_SIZE BLAST_SERVICE_STRUCT_VAL ("
 
 
 
+typedef struct BlastTaskDefaults
+{
+	uint32 btd_word_size;
+	uint32 btd_gapopen;
+	uint32 btd_gapextend;
+	uint32 btd_reward;
+	int32 btd_penalty;
+} BlastTaskDefaults;
+
+
 /**
  * This datatype is used for describing the algorithms that some
  * of the BLAST tools allow the user to choose to optimise the
@@ -203,9 +213,11 @@ typedef struct BlastTask
   const char *bt_name_s;
 
   /**
-   * A user-friendly descritpion of the algorithm.
+   * A user-friendly description of the algorithm.
    */
   const char *bt_description_s;
+
+  BlastTaskDefaults bt_defaults;
 } BlastTask;
 
 
@@ -356,6 +368,11 @@ BLAST_SERVICE_LOCAL const char *GetLocalDatabaseName (const char *fully_qualifie
 
 BLAST_SERVICE_LOCAL bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
 
+
+BLAST_SERVICE_LOCAL BlastTask *GetBlastTaskFromResource (Resource *resource_p, const NamedParameterType task_param_type);
+
+
+BLAST_SERVICE_LOCAL BlastTask *GetDefaultBlastTaskFromResource (void);
 
 
 #ifdef __cplusplus
