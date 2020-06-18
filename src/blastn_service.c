@@ -7,9 +7,9 @@
 
 #include <string.h>
 
+#include "args_processor.hpp"
 #include "blastn_service.h"
 
-#include "args_processor.hpp"
 #include "blast_service.h"
 #include "blast_service_params.h"
 #include "blast_util.h"
@@ -27,6 +27,115 @@ static NamedParameterType S_MATCH_SCORE = { "reward", PT_UNSIGNED_INT };
 static NamedParameterType S_MISMATCH_SCORE = { "penalty", PT_NEGATIVE_INT };
 
 
+static const size_t S_NUM_TASKS = 4;
+
+
+
+typedef struct BlastNTaskDefaults
+{
+	uint32 btd_word_size;
+	uint32 btd_gapopen;
+	uint32 btd_gapextend;
+	uint32 btd_reward;
+	int32 btd_penalty;
+} BlastNTaskDefaults;
+
+
+
+
+static const BlastNTaskDefaults s_megablast_defaults =
+{
+		/* uint32 btd_word_size; */
+		28,
+
+		/* uint32 btd_gapopen; */
+		0,
+
+		/* uint32 btd_gapextend; */
+		0,
+
+		/* uint32 btd_reward; */
+		1,
+
+		/* int32 btd_penalty; */
+		-2
+};
+
+static const BlastNTaskDefaults s_blastn_defaults =
+{
+		/* uint32 btd_word_size; */
+		11,
+
+		/* uint32 btd_gapopen; */
+		5,
+
+		/* uint32 btd_gapextend; */
+		2,
+
+		/* uint32 btd_reward; */
+		2,
+
+		/* int32 btd_penalty; */
+		-3
+};
+
+
+static const BlastNTaskDefaults s_blastn_short_defaults =
+{
+		/* uint32 btd_word_size; */
+		7,
+
+		/* uint32 btd_gapopen; */
+		5,
+
+		/* uint32 btd_gapextend; */
+		2,
+
+		/* uint32 btd_reward; */
+		1,
+
+		/* int32 btd_penalty; */
+		-3
+};
+
+
+typedef struct BlastNTask
+{
+	BlastTask bnt_task;
+
+	const BlastNTaskDefaults * const bnt_defaults_p;
+} BlastNTask;
+
+
+static const BlastNTaskDefaults s_dc_megablast_defaults =
+{
+		/* uint32 btd_word_size; */
+		11,
+
+		/* uint32 btd_gapopen; */
+		5,
+
+		/* uint32 btd_gapextend; */
+		2,
+
+		/* uint32 btd_reward; */
+		2,
+
+		/* int32 btd_penalty; */
+		-3
+};
+
+
+static const BlastNTask s_tasks_p [S_NUM_TASKS] =
+{
+	{ { "megablast", "megablast: Traditional megablast used to find very similar (e.g., intraspecies or closely related species) sequences" }, &s_megablast_defaults },
+  { { "dc-megablast", "dc-megablast: Discontiguous megablast used to find more distant (e.g., interspecies) sequences" }, &s_dc_megablast_defaults },
+  { { "blastn", "blastn: The traditional program used for inter-species comparison" }, &s_blastn_defaults },
+  { { "blastn-short", "blastn-short: Optimized for sequences shorter than 30 nucelotides" }, &s_blastn_short_defaults }
+};
+
+
+
 
 static const char *GetBlastNServiceName (const Service *service_p);
 
@@ -42,8 +151,7 @@ static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSe
 
 static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p);
 
-
-static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p, BlastTaskDefaults *defaults_p);
+static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p, const BlastNTaskDefaults *defaults_p);
 
 static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p, const uint32 def_reward, const int32 def_penalty);
 
@@ -51,6 +159,11 @@ static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, Para
 
 static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
 
+
+static const BlastNTask *GetBlastNTaskFromResource (Resource *resource_p, const NamedParameterType task_param_type);
+
+
+static const BlastNTask *GetDefaultBlastNTask (void);
 
 
 
@@ -168,18 +281,18 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *r
 			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_NUCLEOTIDE, NULL, NULL))
 				{
 				  BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
-				  BlastTask *default_task_p = GetBlastTaskFromResource (resource_p, BS_TASK);
+				  const BlastNTask *default_task_p = GetBlastNTaskFromResource (resource_p, BS_TASK);
 
 				  if (!default_task_p)
 				  	{
-				  		default_task_p = s_tasks_p;
+				  		default_task_p = GetDefaultBlastNTask ();
 				  	}
 
-					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters, & (default_task_p -> bt_defaults.btd_word_size)))
+					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters, & (default_task_p -> bnt_defaults_p -> btd_word_size)))
 						{
-							if (AddProgramSelectionParameters (blast_data_p, param_set_p, s_tasks_p, S_NUM_TASKS))
+							if (AddProgramSelectionParameters (blast_data_p, param_set_p, & (s_tasks_p -> bnt_task), & (default_task_p -> bnt_task), sizeof (*s_tasks_p), S_NUM_TASKS))
 								{
-									if (AddNucleotideBlastParameters (blast_data_p, param_set_p, & (default_task_p -> bt_defaults)))
+									if (AddNucleotideBlastParameters (blast_data_p, param_set_p, default_task_p -> bnt_defaults_p))
 										{
 											return param_set_p;
 										}
@@ -230,10 +343,9 @@ static bool GetBlastNServiceParameterTypeForNamedParameter (const Service *servi
 
 
 
-static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p, BlastTaskDefaults *defaults_p)
+static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p, const BlastNTaskDefaults *defaults_p)
 {
 	bool success_flag = false;
-	uint32 reward = 0;
 
 	if (AddScoringParams (data_p, param_set_p, defaults_p -> btd_reward, defaults_p -> btd_penalty))
 		{
@@ -335,5 +447,84 @@ static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSe
 
 	return jobs_p;
 }
+
+
+
+static const BlastNTask *GetDefaultBlastNTask (void)
+{
+	return s_tasks_p;
+}
+
+
+static const BlastNTask *GetBlastNTaskFromResource (Resource *resource_p, const NamedParameterType task_param_type)
+{
+	if (resource_p && (resource_p -> re_data_p))
+		{
+			const json_t *param_set_json_p = json_object_get (resource_p -> re_data_p, PARAM_SET_KEY_S);
+
+			if (param_set_json_p)
+				{
+					json_t *params_json_p = json_object_get (param_set_json_p, PARAM_SET_PARAMS_S);
+
+					if (params_json_p)
+						{
+							const size_t num_entries = json_array_size (params_json_p);
+							size_t i;
+
+							for (i = 0; i < num_entries; ++ i)
+								{
+									const json_t *param_json_p = json_array_get (params_json_p, i);
+									const char *name_s = GetJSONString (param_json_p, PARAM_NAME_S);
+
+									if (name_s)
+										{
+											if (strcmp (name_s, task_param_type.npt_name_s) == 0)
+												{
+													const char *task_s = GetJSONString (param_json_p, PARAM_CURRENT_VALUE_S);
+
+													if (task_s)
+														{
+															const BlastNTask *task_p = s_tasks_p;
+															size_t j = S_NUM_TASKS;
+
+															while (j > 0)
+																{
+																	if (strcmp (task_s, task_p -> bnt_task.bt_name_s) == 0)
+																		{
+																			return task_p;
+																		}
+
+																	-- j;
+																	++ task_p;
+																}
+
+														}
+													else
+														{
+															PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, param_json_p, "Failed to get \"%s\" from \"%s\"", PARAM_CURRENT_VALUE_S, task_s);
+														}
+
+													/* force exit from loop */
+													i = num_entries;
+												}
+										}		/* if (name_s) */
+
+								}
+						}
+					else
+						{
+							PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, param_set_json_p, "Failed to get params with key \"%s\"", PARAM_SET_PARAMS_S);
+						}
+				}
+			else
+				{
+					PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, resource_p -> re_data_p, "Failed to get param set with key \"%s\"", PARAM_SET_KEY_S);
+				}
+
+		}		/* if (resource_p && (resource_p -> re_data_p)) */
+
+	return NULL;
+}
+
 
 

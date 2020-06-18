@@ -61,7 +61,7 @@ static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource *r
 static ServiceJobSet *RunBlastXService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
 
-static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
+static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, const void *callback_data_p);
 
 static bool ParseBlastXParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
@@ -186,7 +186,7 @@ static bool GetBlastXServiceParameterTypeForNamedParameter (const Service *servi
 }
 
 
-static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p)
+static bool AddBlastXQuerySequenceParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, const void *callback_data_p)
 {
 	Parameter *param_p = NULL;
 	bool success_flag = false;

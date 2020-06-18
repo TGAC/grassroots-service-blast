@@ -144,7 +144,7 @@ ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, const cha
 						{
 							if (AddProteinBlastParameters (blast_data_p, param_set_p))
 								{
-								  if (AddProgramSelectionParameters (blast_data_p, param_set_p, tasks_p, num_tasks))
+								  if (AddProgramSelectionParameters (blast_data_p, param_set_p, tasks_p, tasks_p, sizeof (*tasks_p), num_tasks))
                     {
                       return param_set_p;
                     }

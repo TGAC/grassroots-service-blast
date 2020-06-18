@@ -180,7 +180,7 @@ typedef struct BLAST_SERVICE_LOCAL BlastServiceData
  * @return <code>true</code> if the callback function's parameters were added successfully, <code>
  * false</code> otherwise.
  */
-typedef bool (*AddAdditionalParamsFn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
+typedef bool (*AddAdditionalParamsFn) (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, const void *callback_data_p);
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

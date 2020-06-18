@@ -186,17 +186,6 @@ BLAST_SERVICE_PREFIX NamedParameterType BS_OUTPUT_FORMAT BLAST_SERVICE_STRUCT_VA
 BLAST_SERVICE_PREFIX NamedParameterType BS_WORD_SIZE BLAST_SERVICE_STRUCT_VAL ("word_size", PT_UNSIGNED_INT);
 
 
-
-typedef struct BlastTaskDefaults
-{
-	uint32 btd_word_size;
-	uint32 btd_gapopen;
-	uint32 btd_gapextend;
-	uint32 btd_reward;
-	int32 btd_penalty;
-} BlastTaskDefaults;
-
-
 /**
  * This datatype is used for describing the algorithms that some
  * of the BLAST tools allow the user to choose to optimise the
@@ -217,7 +206,6 @@ typedef struct BlastTask
    */
   const char *bt_description_s;
 
-  BlastTaskDefaults bt_defaults;
 } BlastTask;
 
 
@@ -254,7 +242,7 @@ BLAST_SERVICE_LOCAL bool AddQuerySequenceParams (BlastServiceData *data_p, Param
  * false</code> otherwise.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn, void *callback_data_p);
+BLAST_SERVICE_LOCAL bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_set_p, AddAdditionalParamsFn callback_fn, const void *callback_data_p);
 
 
 /**
@@ -268,7 +256,7 @@ BLAST_SERVICE_LOCAL bool AddGeneralAlgorithmParams (BlastServiceData *data_p, Pa
  * false</code> otherwise.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet *param_set_p, const BlastTask *tasks_p, const size_t num_tasks);
+BLAST_SERVICE_LOCAL bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet *param_set_p, const BlastTask *tasks_p, const BlastTask *default_task_p, const size_t task_mem_size, const size_t num_tasks);
 
 
 /**
@@ -366,13 +354,9 @@ BLAST_SERVICE_LOCAL char *GetFullyQualifiedDatabaseName (const char *group_s, co
 BLAST_SERVICE_LOCAL const char *GetLocalDatabaseName (const char *fully_qualified_db_s);
 
 
-BLAST_SERVICE_LOCAL bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, void *callback_data_p);
+BLAST_SERVICE_LOCAL bool AddProteinGeneralAlgorithmParameters (BlastServiceData *data_p, ParameterSet *param_set_p, ParameterGroup *group_p, const void *callback_data_p);
 
 
-BLAST_SERVICE_LOCAL BlastTask *GetBlastTaskFromResource (Resource *resource_p, const NamedParameterType task_param_type);
-
-
-BLAST_SERVICE_LOCAL BlastTask *GetDefaultBlastTaskFromResource (void);
 
 
 #ifdef __cplusplus
