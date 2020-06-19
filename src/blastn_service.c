@@ -99,13 +99,6 @@ static const BlastNTaskDefaults s_blastn_short_defaults =
 };
 
 
-typedef struct BlastNTask
-{
-	BlastTask bnt_task;
-
-	const BlastNTaskDefaults * const bnt_defaults_p;
-} BlastNTask;
-
 
 static const BlastNTaskDefaults s_dc_megablast_defaults =
 {
@@ -124,6 +117,15 @@ static const BlastNTaskDefaults s_dc_megablast_defaults =
 		/* int32 btd_penalty; */
 		-3
 };
+
+
+typedef struct BlastNTask
+{
+	BlastTask bnt_task;
+
+	const BlastNTaskDefaults * const bnt_defaults_p;
+} BlastNTask;
+
 
 
 static const BlastNTask s_tasks_p [S_NUM_TASKS] =
@@ -290,7 +292,7 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *r
 
 					if (AddGeneralAlgorithmParams (blast_data_p, param_set_p, AddProteinGeneralAlgorithmParameters, & (default_task_p -> bnt_defaults_p -> btd_word_size)))
 						{
-							if (AddProgramSelectionParameters (blast_data_p, param_set_p, & (s_tasks_p -> bnt_task), & (default_task_p -> bnt_task), sizeof (*s_tasks_p), S_NUM_TASKS))
+							if (AddProgramSelectionParameters (blast_data_p, param_set_p, (const BlastTask *) s_tasks_p, & (default_task_p -> bnt_task), sizeof (BlastNTask), S_NUM_TASKS))
 								{
 									if (AddNucleotideBlastParameters (blast_data_p, param_set_p, default_task_p -> bnt_defaults_p))
 										{

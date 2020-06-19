@@ -414,12 +414,20 @@ bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet
 	if ((param_p = EasyCreateAndAddStringParameterToParameterSet (& (blast_data_p -> bsd_base_data), param_set_p, group_p, BS_TASK.npt_type, BS_TASK.npt_name_s, "Program Selection", "The program to use to run the search.", default_task_p -> bt_name_s, level)) != NULL)
 		{
 		  size_t i;
-
+		  /*
+		   * Since we know the byte size of each task we need to increment
+		   * using this value so we need to cast back and forth so the pointer
+		   * moves by that number of bytes rather than that number of BlastTask-sized
+		   * blocks
+		   */
+		  const char *ptr = (const char *) tasks_p;
 			success_flag = true;
 
-			for (i = 0; i < num_tasks; ++ i, tasks_p += task_mem_size)
+			for (i = 0; i < num_tasks; ++ i, ptr += task_mem_size)
 				{
-					if (!CreateAndAddStringParameterOption ((StringParameter *) param_p, tasks_p -> bt_name_s, tasks_p -> bt_description_s))
+					const BlastTask *task_p = (const BlastTask *) ptr;
+
+					if (!CreateAndAddStringParameterOption ((StringParameter *) param_p, task_p -> bt_name_s, task_p -> bt_description_s))
 						{
 							success_flag = false;
 						}
