@@ -25,6 +25,8 @@
 
 static NamedParameterType S_MATCH_SCORE = { "reward", PT_UNSIGNED_INT };
 static NamedParameterType S_MISMATCH_SCORE = { "penalty", PT_NEGATIVE_INT };
+static NamedParameterType S_GAP_OPEN_SCORE = { "gapopen", PT_UNSIGNED_INT };
+static NamedParameterType S_GAP_EXTEND_SCORE = { "gapextend", PT_UNSIGNED_INT };
 
 
 static const size_t S_NUM_TASKS = 4;
@@ -155,7 +157,7 @@ static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p);
 
 static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet *param_set_p, const BlastNTaskDefaults *defaults_p);
 
-static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p, const uint32 def_reward, const int32 def_penalty);
+static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p, const BlastNTaskDefaults *defaults_p);
 
 static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
@@ -349,7 +351,7 @@ static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet
 {
 	bool success_flag = false;
 
-	if (AddScoringParams (data_p, param_set_p, defaults_p -> btd_reward, defaults_p -> btd_penalty))
+	if (AddScoringParams (data_p, param_set_p, defaults_p))
 		{
 			success_flag = true;
 		}
@@ -358,19 +360,41 @@ static bool AddNucleotideBlastParameters (BlastServiceData *data_p, ParameterSet
 }
 
 
-static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p, const uint32 def_reward, const int32 def_penalty)
+static bool AddScoringParams (BlastServiceData *data_p, ParameterSet *param_set_p, const BlastNTaskDefaults *defaults_p)
 {
 	bool success_flag = false;
 	Parameter *param_p = NULL;
 	ServiceData *service_data_p = & (data_p -> bsd_base_data);
 	ParameterGroup *group_p = CreateAndAddParameterGroupToParameterSet ("Scoring Parameters", false, & (data_p -> bsd_base_data), param_set_p);
 
-	if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", &def_reward, PL_ADVANCED)) != NULL)
+	if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MATCH_SCORE.npt_name_s, "Reward", "The reward for matching bases", & (defaults_p -> btd_reward), PL_ADVANCED)) != NULL)
 		{
-			if ((param_p = EasyCreateAndAddSignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_type, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", &def_penalty, PL_ADVANCED)) != NULL)
+			if ((param_p = EasyCreateAndAddSignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_MISMATCH_SCORE.npt_type, S_MISMATCH_SCORE.npt_name_s, "Penalty", "The penalty for mismatching bases", & (defaults_p -> btd_penalty), PL_ADVANCED)) != NULL)
 				{
-					success_flag = true;
+					if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_GAP_OPEN_SCORE.npt_name_s, "Gap Open", "The cost to open a gap", & (defaults_p -> btd_gapopen), PL_ADVANCED)) != NULL)
+						{
+							if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_data_p, param_set_p, group_p, S_GAP_EXTEND_SCORE.npt_name_s, "Gap Extend", "The cost to extend a gap", & (defaults_p -> btd_gapextend), PL_ADVANCED)) != NULL)
+								{
+									success_flag = true;
+								}
+							else
+								{
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add parameter \"%s\"", S_GAP_EXTEND_SCORE.npt_name_s);
+								}
+						}
+					else
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add parameter \"%s\"", S_GAP_OPEN_SCORE.npt_name_s);
+						}
 				}
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add parameter \"%s\"", S_MISMATCH_SCORE.npt_name_s);
+				}
+		}
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add parameter \"%s\"", S_MATCH_SCORE.npt_name_s);
 		}
 
 
@@ -390,8 +414,16 @@ static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_
 		{
 			*pt_p = S_MISMATCH_SCORE.npt_type;
 		}
-	else
-		{
+	else if (strcmp (param_name_s, S_GAP_EXTEND_SCORE.npt_name_s) == 0)
+			{
+				*pt_p = S_GAP_EXTEND_SCORE.npt_type;
+			}
+		else if (strcmp (param_name_s, S_GAP_OPEN_SCORE.npt_name_s) == 0)
+			{
+				*pt_p = S_GAP_OPEN_SCORE.npt_type;
+			}
+		else
+			{
 			success_flag = false;
 		}
 
@@ -414,7 +446,23 @@ static bool ParseNucleotideBlastParameters (const BlastServiceData * UNUSED_PARA
 					/* Penalty */
 					if (GetAndAddBlastArgs (params_p, S_MISMATCH_SCORE.npt_name_s, false, ap_p))
 						{
-							success_flag = true;
+							/* Gap Open */
+							if (GetAndAddBlastArgs (params_p, S_GAP_OPEN_SCORE.npt_name_s, false, ap_p))
+								{
+									/* Gap extend */
+									if (GetAndAddBlastArgs (params_p, S_GAP_EXTEND_SCORE.npt_name_s, false, ap_p))
+										{
+											success_flag = true;
+										}
+									else
+										{
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add \"%s\"", S_GAP_EXTEND_SCORE.npt_name_s);
+										}
+								}
+							else
+								{
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add \"%s\"", S_GAP_OPEN_SCORE.npt_name_s);
+								}
 						}
 					else
 						{
