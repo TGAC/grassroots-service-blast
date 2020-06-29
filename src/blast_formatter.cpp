@@ -39,14 +39,43 @@ BlastFormatter :: ~BlastFormatter ()
 {}
 
 
-char *BlastFormatter :: GetConvertedOutputFilename (const char * const filename_s, const int output_format_code, char **output_format_code_ss)
+char *BlastFormatter :: GetOutputFromatAsString (const uint32 output_format_code, const char *custom_output_formats_s)
+{
+	char *output_format_code_s = ConvertUnsignedIntegerToString (output_format_code);
+
+	if (output_format_code_s)
+		{
+			if (custom_output_formats_s && IsCustomisableOutputFormat (output_format_code))
+				{
+					char *temp_s = ConcatenateVarargsStrings ("\"", output_format_code_s, " ", custom_output_formats_s, "\"", NULL);
+
+					FreeCopiedString (output_format_code_s);
+					output_format_code_s = temp_s;
+				}
+		}
+
+
+	return output_format_code_s;
+}
+
+
+
+char *BlastFormatter :: GetConvertedOutputFilename (const char * const filename_s, const uint32 output_format_code, const char *custom_output_formats_s, char **output_format_code_ss)
 {
 	char *output_filename_s = NULL;
-	char *output_format_code_s = ConvertIntegerToString (output_format_code);
+	char *output_format_code_s = ConvertUnsignedIntegerToString (output_format_code);
 
 	if (output_format_code_s)
 		{
 			output_filename_s = ConcatenateVarargsStrings (filename_s, ".", output_format_code_s, NULL);
+
+			if (custom_output_formats_s && IsCustomisableOutputFormat (output_format_code))
+				{
+					char *temp_s = ConcatenateVarargsStrings ("\"", output_format_code_s, " ", custom_output_formats_s, "\"", NULL);
+
+					if (temp_s)
+				}
+
 
 			if (output_format_code_ss)
 				{
@@ -59,6 +88,12 @@ char *BlastFormatter :: GetConvertedOutputFilename (const char * const filename_
 		}
 
 	return output_filename_s;
+}
+
+
+bool BlastFormatter :: IsCustomisableOutputFormat (const uint32 output_format_code)
+{
+	return ((output_format_code == BOF_TABULAR) || (output_format_code == BOF_TABULAR_WITH_COMMENTS) || (output_format_code == BOF_CSV));
 }
 
 
@@ -96,7 +131,7 @@ SystemBlastFormatter :: ~SystemBlastFormatter ()
 }
 
 
-char *SystemBlastFormatter :: GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code)
+char *SystemBlastFormatter :: GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code, const char *custom_format_s)
 {
 	char *result_s = NULL;
 
@@ -111,6 +146,9 @@ char *SystemBlastFormatter :: GetConvertedOutput (const char * const input_filen
 
 					if (output_filename_s)
 						{
+
+
+
 							if (AppendStringsToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt ", output_format_code_s, " -out ", output_filename_s, NULL))
 								{
 									const char *command_line_s = GetByteBufferData (buffer_p);

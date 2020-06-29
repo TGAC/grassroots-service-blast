@@ -176,6 +176,14 @@ BLAST_SERVICE_PREFIX NamedParameterType BS_EXPECT_THRESHOLD BLAST_SERVICE_STRUCT
  */
 BLAST_SERVICE_PREFIX NamedParameterType BS_OUTPUT_FORMAT BLAST_SERVICE_STRUCT_VAL ("outfmt", PT_UNSIGNED_INT);
 
+/**
+ * The Blast Service NamedParameterType for specifying any custom output format options to use.
+ *
+ * @ingroup blast_service
+ * @see BlastOutputFormat
+ */
+BLAST_SERVICE_PREFIX NamedParameterType BS_CUSTOM_OUTPUT_FORMAT BLAST_SERVICE_STRUCT_VAL ("custom_outfmt", PT_STRING);
+
 
 /**
  * The Blast Service NamedParameterType for specifying the word size to use.

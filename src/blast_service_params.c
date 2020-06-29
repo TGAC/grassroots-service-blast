@@ -250,6 +250,34 @@ int8 GetOutputFormatCodeForString (const char *output_format_s)
 }
 
 
+
+bool SetUpOutputFormatParameters (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
+{
+	Parameter *param_p = SetUpOutputFormatParameter (formats_ss, num_formats, default_format, service_data_p, param_set_p, group_p);
+
+	if (param_p)
+		{
+			const char * const description_s = "For the \"tabular\", \"tabular with comment lines\" and \"Comma-separated values\" output formats, you can customise the output by specifying space delimited format parameters here.";
+
+			if (param_p = EasyCreateAndAddStringParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, "Custom output options", description_s, NULL, PL_ALL))
+				{
+					return true;
+				}
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add \"%s\" parameter", BS_CUSTOM_OUTPUT_FORMAT.npt_name_s);
+				}
+		}
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "SetUpOutputFormatParameter () failed");
+		}
+
+	return false;
+}
+
+
+
 Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
 {
 	Parameter *param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", &default_format, PL_ADVANCED);

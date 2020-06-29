@@ -59,7 +59,7 @@ public:
 	 * @return The full path to the output filename for the given output format code
 	 * or 0 upon error.
 	 */
-	static char *GetConvertedOutputFilename (const char * const filename_s, const int output_format_code, char **output_format_code_ss);
+	static char *GetConvertedOutputFilename (const char * const filename_s, const uint32 output_format_code, char **output_format_code_ss);
 
 	/**
 	 * The function to get the converted output as a c-style string.
@@ -69,7 +69,10 @@ public:
 	 * @return The converted output or <code>NULL</code> upon error.
 	 * @see BlastOutputFormat
 	 */
-	virtual char *GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code) = 0;
+	virtual char *GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code, const char *custom_format_s) = 0;
+
+
+	bool IsCustomisableOutputFormat (const uint32 output_format_code);
 };
 
 
