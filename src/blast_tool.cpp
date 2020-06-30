@@ -84,7 +84,7 @@ OperationStatus GetBlastStatus (BlastTool *tool_p)
 
 
 
-BlastTool :: BlastTool (BlastServiceJob *service_job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const uint32 output_format)
+BlastTool :: BlastTool (BlastServiceJob *service_job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const uint32 output_format, const char *custom_output_s)
 {
 	bt_job_p = service_job_p;
 

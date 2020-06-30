@@ -54,7 +54,7 @@ public:
 	 * @param output_format The output format that this BlastTool will produce its results in.
 	 * @see BlastServiceJob
 	 */
-	BlastTool (BlastServiceJob *job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const uint32 output_format);
+	BlastTool (BlastServiceJob *job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const uint32 output_format, const char *custom_output_s);
 
 
 	/**
@@ -228,6 +228,11 @@ protected:
 	uint32 bt_output_format;
 
 
+	/**
+	 * Any custom columns for
+	 * tabular output formats
+	 */
+	const char *bt_custom_output_columns_s;
 
 
 	/**

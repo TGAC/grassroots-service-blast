@@ -118,7 +118,7 @@ char *ExternalBlastTool :: GetJobFilename (const char * const prefix_s, const ch
 
 
 ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const char *name_s, const char *factory_s, const BlastServiceData *data_p, const char * const blast_program_name_s, const bool async_flag)
-: BlastTool (job_p, name_s, factory_s, data_p, BS_DEFAULT_OUTPUT_FORMAT)
+: BlastTool (job_p, name_s, factory_s, data_p, BS_DEFAULT_OUTPUT_FORMAT, NULL)
 {
 	ebt_blast_s = EasyCopyToNewString (blast_program_name_s);
 	if (!ebt_blast_s)
@@ -207,7 +207,7 @@ char *ExternalBlastTool :: GetResults (BlastFormatter *formatter_p)
 		{
 			if (formatter_p && (bt_output_format != BS_DEFAULT_OUTPUT_FORMAT))
 				{
-					results_s = formatter_p -> GetConvertedOutput (ebt_results_filename_s, bt_output_format);
+					results_s = formatter_p -> GetConvertedOutput (ebt_results_filename_s, bt_output_format, bt_custom_output_columns_s);
 
 					if (!results_s)
 						{

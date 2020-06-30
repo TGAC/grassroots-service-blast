@@ -72,6 +72,8 @@ const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES] =
 
 
 
+static Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
+
 
 
 /**************************************************/
@@ -251,17 +253,18 @@ int8 GetOutputFormatCodeForString (const char *output_format_s)
 
 
 
-bool SetUpOutputFormatParameters (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
+Parameter *SetUpOutputFormatParameters (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
 {
-	Parameter *param_p = SetUpOutputFormatParameter (formats_ss, num_formats, default_format, service_data_p, param_set_p, group_p);
+	Parameter *format_param_p = SetUpOutputFormatParameter (formats_ss, num_formats, default_format, service_data_p, param_set_p, group_p);
 
-	if (param_p)
+	if (format_param_p)
 		{
 			const char * const description_s = "For the \"tabular\", \"tabular with comment lines\" and \"Comma-separated values\" output formats, you can customise the output by specifying space delimited format parameters here.";
+			Parameter *param_p = EasyCreateAndAddStringParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_CUSTOM_OUTPUT_FORMAT.npt_type, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, "Custom output options", description_s, NULL, PL_ALL);
 
-			if (param_p = EasyCreateAndAddStringParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, "Custom output options", description_s, NULL, PL_ALL))
+			if (param_p)
 				{
-					return true;
+					return format_param_p;
 				}
 			else
 				{
@@ -273,12 +276,12 @@ bool SetUpOutputFormatParameters (const char **formats_ss, const uint32 num_form
 			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "SetUpOutputFormatParameter () failed");
 		}
 
-	return false;
+	return NULL;
 }
 
 
 
-Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
+static Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p)
 {
 	Parameter *param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_OUTPUT_FORMAT.npt_name_s, "Output format", "The output format for the results", &default_format, PL_ADVANCED);
 
@@ -388,7 +391,7 @@ bool AddGeneralAlgorithmParams (BlastServiceData *data_p, ParameterSet *param_se
 
 			if ((param_p = EasyCreateAndAddDoubleParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_EXPECT_THRESHOLD.npt_type, S_EXPECT_THRESHOLD.npt_name_s, "Expect threshold", "Expected number of chance matches in a random model", &def_threshold, level)) != NULL)
 				{
-					if ((param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, BOF_GRASSROOTS, data_p, param_set_p, group_p)) != NULL)
+					if ((param_p = SetUpOutputFormatParameters (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, BOF_GRASSROOTS, data_p, param_set_p, group_p)) != NULL)
 						{
 							if (callback_fn)
 								{
@@ -421,6 +424,10 @@ bool GetGeneralAlgorithmParameterTypeForNamedParameter (const char *param_name_s
 	else if (strcmp (param_name_s, BS_OUTPUT_FORMAT.npt_name_s) == 0)
 		{
 			*pt_p = BS_OUTPUT_FORMAT.npt_type;
+		}
+	else if (strcmp (param_name_s, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s) == 0)
+		{
+			*pt_p = BS_CUSTOM_OUTPUT_FORMAT.npt_type;
 		}
 	else
 		{

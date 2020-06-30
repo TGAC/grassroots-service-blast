@@ -29,6 +29,7 @@
 #include "string_utils.h"
 #include "streams.h"
 #include "math_utils.h"
+#include "blast_service_params.h"
 
 
 BlastFormatter :: BlastFormatter ()
@@ -39,28 +40,8 @@ BlastFormatter :: ~BlastFormatter ()
 {}
 
 
-char *BlastFormatter :: GetOutputFromatAsString (const uint32 output_format_code, const char *custom_output_formats_s)
-{
-	char *output_format_code_s = ConvertUnsignedIntegerToString (output_format_code);
 
-	if (output_format_code_s)
-		{
-			if (custom_output_formats_s && IsCustomisableOutputFormat (output_format_code))
-				{
-					char *temp_s = ConcatenateVarargsStrings ("\"", output_format_code_s, " ", custom_output_formats_s, "\"", NULL);
-
-					FreeCopiedString (output_format_code_s);
-					output_format_code_s = temp_s;
-				}
-		}
-
-
-	return output_format_code_s;
-}
-
-
-
-char *BlastFormatter :: GetConvertedOutputFilename (const char * const filename_s, const uint32 output_format_code, const char *custom_output_formats_s, char **output_format_code_ss)
+char *BlastFormatter :: GetConvertedOutputFilename (const char * const filename_s, const uint32 output_format_code)
 {
 	char *output_filename_s = NULL;
 	char *output_format_code_s = ConvertUnsignedIntegerToString (output_format_code);
@@ -68,23 +49,6 @@ char *BlastFormatter :: GetConvertedOutputFilename (const char * const filename_
 	if (output_format_code_s)
 		{
 			output_filename_s = ConcatenateVarargsStrings (filename_s, ".", output_format_code_s, NULL);
-
-			if (custom_output_formats_s && IsCustomisableOutputFormat (output_format_code))
-				{
-					char *temp_s = ConcatenateVarargsStrings ("\"", output_format_code_s, " ", custom_output_formats_s, "\"", NULL);
-
-					if (temp_s)
-				}
-
-
-			if (output_format_code_ss)
-				{
-					*output_format_code_ss = output_format_code_s;
-				}
-			else
-				{
-					FreeCopiedString (output_format_code_s);
-				}
 		}
 
 	return output_filename_s;
@@ -131,6 +95,29 @@ SystemBlastFormatter :: ~SystemBlastFormatter ()
 }
 
 
+
+char *SystemBlastFormatter :: GetOutputFormatAsString (const uint32 output_format_code, const char *custom_output_formats_s)
+{
+	char *output_format_code_s = ConvertUnsignedIntegerToString (output_format_code);
+
+	if (output_format_code_s)
+		{
+			if (custom_output_formats_s && IsCustomisableOutputFormat (output_format_code))
+				{
+					char *temp_s = ConcatenateVarargsStrings ("\"", output_format_code_s, " ", custom_output_formats_s, "\"", NULL);
+
+					FreeCopiedString (output_format_code_s);
+					output_format_code_s = temp_s;
+				}
+		}
+
+
+	return output_format_code_s;
+}
+
+
+
+
 char *SystemBlastFormatter :: GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code, const char *custom_format_s)
 {
 	char *result_s = NULL;
@@ -141,56 +128,58 @@ char *SystemBlastFormatter :: GetConvertedOutput (const char * const input_filen
 
 			if (buffer_p)
 				{
-					char *output_format_code_s = NULL;
-					char *output_filename_s = BlastFormatter :: GetConvertedOutputFilename (input_filename_s, output_format_code, &output_format_code_s);
+					char *output_filename_s = BlastFormatter :: GetConvertedOutputFilename (input_filename_s, output_format_code);
 
 					if (output_filename_s)
 						{
+							char *output_format_params_s = GetOutputFormatAsString (output_format_code, custom_format_s);
 
-
-
-							if (AppendStringsToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt ", output_format_code_s, " -out ", output_filename_s, NULL))
+							if (output_format_params_s)
 								{
-									const char *command_line_s = GetByteBufferData (buffer_p);
-									int res = system (command_line_s);
-
-									if (res == 0)
+									if (AppendStringsToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt \"", output_format_params_s, "\" -out ", output_filename_s, NULL))
 										{
-											FILE *converted_output_f = fopen (output_filename_s, "r");
+											const char *command_line_s = GetByteBufferData (buffer_p);
+											int res = system (command_line_s);
 
-											if (converted_output_f)
+											if (res == 0)
 												{
-													result_s = GetFileContentsAsString (converted_output_f);
+													FILE *converted_output_f = fopen (output_filename_s, "r");
 
-													if (!result_s)
+													if (converted_output_f)
 														{
-															PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get contents of \"%s\"", output_filename_s);
-														}		/* if (!result_s) */
+															result_s = GetFileContentsAsString (converted_output_f);
 
-													if (fclose (converted_output_f) != 0)
+															if (!result_s)
+																{
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get contents of \"%s\"", output_filename_s);
+																}		/* if (!result_s) */
+
+															if (fclose (converted_output_f) != 0)
+																{
+																	PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to close \"%s\"", output_filename_s);
+																}
+
+														}		/* if (converted_output_f) */
+													else
 														{
-															PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to close \"%s\"", output_filename_s);
+															PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to open \"%s\"", output_filename_s);
 														}
 
-												}		/* if (converted_output_f) */
+												}		/* if (res == 0) */
 											else
 												{
-													PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to open \"%s\"", output_filename_s);
+													PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to run \"%s\" with code %d", command_line_s, res);
 												}
 
-										}		/* if (res == 0) */
+										}		/* if (AppendStringToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt ", output_format_code_s, " -out ", output_filename_s, NULL)) */
 									else
 										{
-											PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to run \"%s\" with code %d", command_line_s, res);
+											PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to build command line buffer for \"%s\"", input_filename_s);
 										}
 
-								}		/* if (AppendStringToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt ", output_format_code_s, " -out ", output_filename_s, NULL)) */
-							else
-								{
-									PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to build command line buffer for \"%s\"", input_filename_s);
-								}
+									FreeCopiedString (output_format_params_s);
+								}		/* if (output_format_params_s) */
 
-							FreeCopiedString (output_format_code_s);
 							FreeCopiedString (output_filename_s);
 						}		/* if (output_filename_s) */
 					else

@@ -158,7 +158,7 @@ static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resourc
 
 	if ((param_p = EasyCreateAndAddBooleanParameterToParameterSet (& (data_p -> bsd_base_data), param_set_p, group_p, S_PAIRED.npt_name_s, "Paired query seqeunces", "Are the input query sequences paired?", &def, PL_ALL)) != NULL)
 		{
-			if ((param_p = SetUpOutputFormatParameter (S_OUTPUT_FORMATS_SS, MBOF_NUM_TYPES, MBOF_SAM, data_p, param_set_p, group_p)) != NULL)
+			if ((param_p = SetUpOutputFormatParameters (S_OUTPUT_FORMATS_SS, MBOF_NUM_TYPES, MBOF_SAM, data_p, param_set_p, group_p)) != NULL)
 				{
 					return param_set_p;
 				}

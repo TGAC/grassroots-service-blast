@@ -277,7 +277,7 @@ char *GetPreviousRemoteBlastServiceJob (const char *local_job_id_s, const uint32
 												{
 													if (SetStringParameterCurrentValue ((StringParameter *) param_p, remote_job_id_s))
 														{
-															param_p = SetUpOutputFormatParameter (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, BOF_GRASSROOTS, blast_data_p, param_set_p, group_p);
+															param_p = SetUpOutputFormatParameters (BSP_OUTPUT_FORMATS_SS, BOF_NUM_TYPES, BOF_GRASSROOTS, blast_data_p, param_set_p, group_p);
 
 															if (param_p)
 																{

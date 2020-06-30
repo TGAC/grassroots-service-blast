@@ -59,7 +59,7 @@ public:
 	 * @return The full path to the output filename for the given output format code
 	 * or 0 upon error.
 	 */
-	static char *GetConvertedOutputFilename (const char * const filename_s, const uint32 output_format_code, char **output_format_code_ss);
+	static char *GetConvertedOutputFilename (const char * const filename_s, const uint32 output_format_code);
 
 	/**
 	 * The function to get the converted output as a c-style string.
@@ -113,7 +113,12 @@ public:
 	 * @see BlastFormatter::GetConvertedOutput
 	 * @see BlastOutputFormat
 	 */
-	virtual char *GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code);
+	virtual char *GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code, const char *custom_format_s);
+
+
+	char *GetOutputFormatAsString (const uint32 output_format_code, const char *custom_output_formats_s);
+
+
 
 protected:
 	/** The command line executable used to convert between the different formats */

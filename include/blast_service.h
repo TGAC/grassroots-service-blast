@@ -419,7 +419,7 @@ BLAST_SERVICE_LOCAL TempFile *GetInputTempFile (const ParameterSet *params_p, co
  * @see GetBlastResultByUUIDString
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL char *GetBlastResultByUUID (const BlastServiceData *data_p, const uuid_t job_id, const uint32 output_format_code);
+BLAST_SERVICE_LOCAL char *GetBlastResultByUUID (const BlastServiceData *data_p, const uuid_t job_id, const uint32 output_format_code, const char *output_format_params_s);
 
 
 /**
@@ -433,7 +433,7 @@ BLAST_SERVICE_LOCAL char *GetBlastResultByUUID (const BlastServiceData *data_p, 
  * @see GetBlastResultByUUID
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *job_id_s, const uint32 output_format_code);
+BLAST_SERVICE_LOCAL char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *job_id_s, const uint32 output_format_code, const char *output_format_params_s);
 
 
 /**
@@ -449,7 +449,7 @@ BLAST_SERVICE_LOCAL char *GetBlastResultByUUIDString (const BlastServiceData *da
  * @see CreateJobsForPreviousResults
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast_data_p, const uint32 output_format_code);
+BLAST_SERVICE_LOCAL ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast_data_p, const uint32 output_format_code, const char *output_format_params_s);
 
 
 /**

@@ -1718,7 +1718,7 @@ static json_t *GetBlastResult (BlastServiceJob *job_p, BlastServiceData *data_p)
 	 * Get the result. Ideally we'd like to get this in a format that we can parse, so to begin with we'll use the single json format
 	 * available in blast 2.3+
 	 */
-	char *raw_result_s = GetBlastResultByUUID (data_p, job_p -> bsj_job.sj_id, BOF_SINGLE_FILE_JSON_BLAST);
+	char *raw_result_s = GetBlastResultByUUID (data_p, job_p -> bsj_job.sj_id, BOF_SINGLE_FILE_JSON_BLAST, NULL);
 
 	if (raw_result_s)
 		{

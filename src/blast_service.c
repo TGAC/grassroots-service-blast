@@ -305,6 +305,9 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 		{
 			const uint32 *fmt_code_p = NULL;
 			uint32 output_format_code = BS_DEFAULT_OUTPUT_FORMAT;
+			const char *output_format_param_s = NULL;
+
+			GetCurrentStringParameterValueFromParameterSet (params_p, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, &output_format_param_s);
 
 			if (GetCurrentUnsignedIntParameterValueFromParameterSet (params_p, BS_OUTPUT_FORMAT.npt_name_s, &fmt_code_p))
 				{
@@ -319,7 +322,7 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 				}
 
 
-			jobs_p = GetPreviousJobResults (ids_p, blast_data_p, output_format_code);
+			jobs_p = GetPreviousJobResults (ids_p, blast_data_p, output_format_code, output_format_param_s);
 
 			if (jobs_p)
 				{
@@ -508,7 +511,7 @@ TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_di
 }
 
 
-ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast_data_p, const uint32 output_format_code)
+ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast_data_p, const uint32 output_format_code, const char *output_format_params_s)
 {
 	char *error_s = NULL;
 	Service *service_p = blast_data_p -> bsd_base_data.sd_service_p;
@@ -535,7 +538,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 									if (uuid_parse (job_id_s, job_id) == 0)
 										{
-											char *result_s = GetBlastResultByUUIDString (blast_data_p, job_id_s, (output_format_code != BOF_GRASSROOTS) ? output_format_code : (uint32) BOF_SINGLE_FILE_JSON_BLAST);
+											char *result_s = GetBlastResultByUUIDString (blast_data_p, job_id_s, (output_format_code != BOF_GRASSROOTS) ? output_format_code : (uint32) BOF_SINGLE_FILE_JSON_BLAST, output_format_params_s);
 											SetServiceJobStatus (job_p, OS_FAILED);
 
 											if (result_s)
@@ -940,21 +943,21 @@ bool DetermineBlastResult (BlastServiceJob *job_p)
 }
 
 
-char *GetBlastResultByUUID (const BlastServiceData *data_p, const uuid_t job_id, const uint32 output_format_code)
+char *GetBlastResultByUUID (const BlastServiceData *data_p, const uuid_t job_id, const uint32 output_format_code, const char *output_format_params_s)
 {
 	char job_id_s [UUID_STRING_BUFFER_SIZE];
 	char *result_s = NULL;
 
 	ConvertUUIDToString (job_id, job_id_s);
 
-	result_s = GetBlastResultByUUIDString (data_p, job_id_s, output_format_code);
+	result_s = GetBlastResultByUUIDString (data_p, job_id_s, output_format_code, output_format_params_s);
 
 	return result_s;
 }
 
 
 
-char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *job_id_s, const uint32 output_format_code)
+char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *job_id_s, const uint32 output_format_code, const char *output_format_params_s)
 {
 	char *result_s = NULL;
 	char *job_output_filename_s = GetPreviousJobFilename (data_p, job_id_s, BS_OUTPUT_SUFFIX_S);
@@ -962,7 +965,7 @@ char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *jo
 	if (job_output_filename_s)
 		{
 			/* Does the file already exist? */
-			char *converted_filename_s = BlastFormatter :: GetConvertedOutputFilename (job_output_filename_s, output_format_code, NULL);
+			char *converted_filename_s = BlastFormatter :: GetConvertedOutputFilename (job_output_filename_s, output_format_code);
 
 			if (converted_filename_s)
 				{
@@ -997,7 +1000,7 @@ char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *jo
 						{
 							if (data_p -> bsd_formatter_p)
 								{
-									result_s = data_p -> bsd_formatter_p -> GetConvertedOutput (job_output_filename_s, output_format_code);
+									result_s = data_p -> bsd_formatter_p -> GetConvertedOutput (job_output_filename_s, output_format_code, output_format_params_s);
 								}		/* if (data_p -> bsd_formatter_p) */
 							else
 								{
