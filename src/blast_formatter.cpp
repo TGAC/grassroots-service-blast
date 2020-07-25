@@ -30,6 +30,12 @@
 #include "streams.h"
 #include "math_utils.h"
 #include "blast_service_params.h"
+#include "blast_util.h"
+#include "blast_service.h"
+
+
+
+const char * const SystemBlastFormatter :: SBF_LOG_SUFFIX_S = ".formatter.log";
 
 
 BlastFormatter :: BlastFormatter ()
@@ -49,6 +55,7 @@ char *BlastFormatter :: GetConvertedOutputFilename (const char * const filename_
 	if (output_format_code_s)
 		{
 			output_filename_s = ConcatenateVarargsStrings (filename_s, ".", output_format_code_s, NULL);
+			FreeCopiedString (output_format_code_s);
 		}
 
 	return output_filename_s;
@@ -102,9 +109,9 @@ char *SystemBlastFormatter :: GetOutputFormatAsString (const uint32 output_forma
 
 	if (output_format_code_s)
 		{
-			if (custom_output_formats_s && IsCustomisableOutputFormat (output_format_code))
+			if (custom_output_formats_s && (BlastFormatter :: IsCustomisableOutputFormat (output_format_code)))
 				{
-					char *temp_s = ConcatenateVarargsStrings ("\"", output_format_code_s, " ", custom_output_formats_s, "\"", NULL);
+					char *temp_s = ConcatenateVarargsStrings (output_format_code_s, " ", custom_output_formats_s, NULL);
 
 					FreeCopiedString (output_format_code_s);
 					output_format_code_s = temp_s;
@@ -118,7 +125,28 @@ char *SystemBlastFormatter :: GetOutputFormatAsString (const uint32 output_forma
 
 
 
-char *SystemBlastFormatter :: GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code, const char *custom_format_s)
+bool SystemBlastFormatter :: SaveCommandLine (const char *filename_s, const char *command_line_s)
+{
+	bool success_flag = false;
+	char *formatter_command_s = ConcatenateStrings (filename_s, ".formatter");
+
+	if (formatter_command_s)
+		{
+			success_flag = WriteCommandLineToFile (command_line_s, formatter_command_s);
+
+			FreeCopiedString (formatter_command_s);
+		}
+	else
+		{
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to create formatter filename for ", filename_s);
+		}
+
+	return success_flag;
+}
+
+
+
+char *SystemBlastFormatter :: GetConvertedOutput (const char *job_id_s, const uint32 output_format_code, const char *custom_format_s, const BlastServiceData *data_p)
 {
 	char *result_s = NULL;
 
@@ -128,64 +156,102 @@ char *SystemBlastFormatter :: GetConvertedOutput (const char * const input_filen
 
 			if (buffer_p)
 				{
-					char *output_filename_s = BlastFormatter :: GetConvertedOutputFilename (input_filename_s, output_format_code);
+					char *input_filename_s = GetBlastJobFilename (data_p -> bsd_working_dir_s, job_id_s, BS_OUTPUT_SUFFIX_S);
 
-					if (output_filename_s)
+					if (input_filename_s)
 						{
-							char *output_format_params_s = GetOutputFormatAsString (output_format_code, custom_format_s);
+							char *output_filename_s = BlastFormatter :: GetConvertedOutputFilename (input_filename_s, output_format_code);
 
-							if (output_format_params_s)
+							if (output_filename_s)
 								{
-									if (AppendStringsToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt \"", output_format_params_s, "\" -out ", output_filename_s, NULL))
+									char *output_format_params_s = GetOutputFormatAsString (output_format_code, custom_format_s);
+
+									if (output_format_params_s)
 										{
-											const char *command_line_s = GetByteBufferData (buffer_p);
-											int res = system (command_line_s);
+											char *logfile_s = GetBlastJobFilename (data_p -> bsd_working_dir_s, job_id_s, SystemBlastFormatter :: SBF_LOG_SUFFIX_S);
 
-											if (res == 0)
+											if (logfile_s)
 												{
-													FILE *converted_output_f = fopen (output_filename_s, "r");
-
-													if (converted_output_f)
+													if (AppendStringsToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt \"", output_format_params_s, "\" -out ", output_filename_s, " >> ", logfile_s, " 2>&1", NULL))
 														{
-															result_s = GetFileContentsAsString (converted_output_f);
+															const char *command_line_s = GetByteBufferData (buffer_p);
+															int res;
 
-															if (!result_s)
+															if (!SaveCommandLine (input_filename_s, command_line_s))
 																{
-																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get contents of \"%s\"", output_filename_s);
-																}		/* if (!result_s) */
+																	PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "SaveCommandLine failed for \"%s\" to file \"%s\"", command_line_s, input_filename_s);
 
-															if (fclose (converted_output_f) != 0)
-																{
-																	PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to close \"%s\"", output_filename_s);
 																}
 
-														}		/* if (converted_output_f) */
+															res = system (command_line_s);
+
+															if (res == 0)
+																{
+																	FILE *converted_output_f = fopen (output_filename_s, "r");
+
+																	if (converted_output_f)
+																		{
+																			result_s = GetFileContentsAsString (converted_output_f);
+
+																			if (!result_s)
+																				{
+																					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get contents of \"%s\"", output_filename_s);
+																				}		/* if (!result_s) */
+
+																			if (fclose (converted_output_f) != 0)
+																				{
+																					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to close \"%s\"", output_filename_s);
+																				}
+
+																		}		/* if (converted_output_f) */
+																	else
+																		{
+																			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to open \"%s\"", output_filename_s);
+																		}
+
+																}		/* if (res == 0) */
+															else
+																{
+																	PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to run \"%s\" with code %d", command_line_s, res);
+																}
+
+														}		/* if (AppendStringToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt ", output_format_code_s, " -out ", output_filename_s, NULL)) */
 													else
 														{
-															PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to open \"%s\"", output_filename_s);
+															PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to build command line buffer for \"%s\"", input_filename_s);
 														}
 
-												}		/* if (res == 0) */
+
+													FreeCopiedString (logfile_s);
+												}
 											else
 												{
-													PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to run \"%s\" with code %d", command_line_s, res);
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get create logfile filename for job \"%s\"", job_id_s);
 												}
 
-										}		/* if (AppendStringToByteBuffer (buffer_p, sbf_blast_formatter_command_s, " -archive ", input_filename_s, " -outfmt ", output_format_code_s, " -out ", output_filename_s, NULL)) */
+
+											FreeCopiedString (output_format_params_s);
+										}		/* if (output_format_params_s) */
 									else
 										{
-											PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to build command line buffer for \"%s\"", input_filename_s);
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetOutputFormatAsString () failed  for " UINT32_FMT " and \"%s\"", output_format_code, custom_format_s ? custom_format_s : "null");
 										}
 
-									FreeCopiedString (output_format_params_s);
-								}		/* if (output_format_params_s) */
+									FreeCopiedString (output_filename_s);
+								}		/* if (output_filename_s) */
+							else
+								{
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get create output filename for \"%s\" with format code %d", input_filename_s, output_format_code);
+								}
 
-							FreeCopiedString (output_filename_s);
-						}		/* if (output_filename_s) */
+							FreeCopiedString (input_filename_s);
+						}		/* if (input_filename_s) */
 					else
 						{
-							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get create output filename for \"%s\" with format code %d", input_filename_s, output_format_code);
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get create input filename for job \"%s\"", job_id_s);
 						}
+
+
 
 					FreeByteBuffer (buffer_p);
 				}		/* if (buffer_p) */

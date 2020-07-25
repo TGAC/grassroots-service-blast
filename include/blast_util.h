@@ -145,6 +145,17 @@ BLAST_SERVICE_LOCAL bool AddArgsPairFromIntegerParameter (const ParameterSet *pa
 BLAST_SERVICE_LOCAL bool AddArgsPairFromStringParameter (const ParameterSet *params_p, const char * const param_name_s, const char *key_s, ArgsProcessor *ap_p,  const bool required_flag);
 
 
+
+
+BLAST_SERVICE_LOCAL bool WriteCommandLineToFile (const char *command_line_s, const char *filename_s);
+
+
+BLAST_SERVICE_LOCAL char *GetBlastJobFilename (const char * const prefix_s, const char *job_id_s, const char * const suffix_s);
+
+
+BLAST_SERVICE_LOCAL char *GetBlastJobFilenameByUuid (const char * const prefix_s, const uuid_t id, const char * const suffix_s);
+
+
 #ifdef __cplusplus
 }
 #endif

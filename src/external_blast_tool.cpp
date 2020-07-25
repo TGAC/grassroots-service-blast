@@ -37,7 +37,7 @@
 #include "string_parameter.h"
 
 const char * const ExternalBlastTool :: EBT_INPUT_SUFFIX_S = ".input";
-const char * const ExternalBlastTool :: EBT_LOG_SUFFIX_S = ".log";
+//const char * const ExternalBlastTool :: EBT_LOG_SUFFIX_S = ".log";
 
 
 const char * const ExternalBlastTool :: EBT_COMMAND_LINE_EXECUTABLE_S = "cli";
@@ -50,70 +50,11 @@ const char * const ExternalBlastTool :: EBT_ASYNC_S = "async";
 
 char *ExternalBlastTool :: GetJobFilename (const char * const prefix_s, const char * const suffix_s)
 {
-	char *job_filename_s = NULL;
-	char *job_id_s = GetUUIDAsString (bt_job_p -> bsj_job.sj_id);
+	char id_s [UUID_STRING_BUFFER_SIZE];
 
-	if (job_id_s)
-		{
-			char *file_stem_s = NULL;
+	ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, id_s);
 
-			if (ebt_working_directory_s)
-				{
-					file_stem_s = MakeFilename (ebt_working_directory_s, job_id_s);
-				}
-			else
-				{
-					file_stem_s = job_id_s;
-				}
-
-			if (file_stem_s)
-				{
-					ByteBuffer *buffer_p = AllocateByteBuffer (1024);
-
-					if (buffer_p)
-						{
-							bool success_flag = false;
-
-							if (prefix_s)
-								{
-									success_flag = AppendStringsToByteBuffer (buffer_p, prefix_s, file_stem_s, NULL);
-								}
-							else
-								{
-									success_flag = AppendStringToByteBuffer (buffer_p, file_stem_s);
-								}
-
-							if (success_flag && suffix_s)
-								{
-									success_flag = AppendStringToByteBuffer (buffer_p, suffix_s);
-								}
-
-							if (success_flag)
-								{
-									job_filename_s = DetachByteBufferData (buffer_p);
-								}
-							else
-								{
-									FreeByteBuffer (buffer_p);
-								}
-
-						}		/* if (buffer_p) */
-
-					FreeCopiedString (file_stem_s);
-				}		/* if (file_stem_s) */
-			else
-				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get file stem for \"%s\"", job_id_s);
-				}
-
-			FreeUUIDString (job_id_s);
-		}		/* if (job_id_s) */
-	else
-		{
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get uuid string for %s", bt_job_p -> bsj_job.sj_name_s);
-		}
-
-	return job_filename_s;
+	return GetBlastJobFilename (prefix_s, id_s, suffix_s);
 }
 
 
@@ -126,7 +67,7 @@ ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const char *name
 			throw std :: invalid_argument ("blast executable name not set");
 		}
 
-	ebt_results_filename_s = 0;
+	ebt_results_filename_s = nullptr;
 	ebt_working_directory_s = EasyCopyToNewString (data_p -> bsd_working_dir_s);
 	if (!ebt_working_directory_s)
 		{
@@ -161,7 +102,7 @@ ExternalBlastTool :: ExternalBlastTool (BlastServiceJob *job_p, const BlastServi
 			throw std :: invalid_argument ("working directory not set");
 		}
 
-	ebt_results_filename_s = 0;
+	ebt_results_filename_s = nullptr;
 	const char *result_s = GetJSONString (root_p, EBT_RESULTS_FILE_S);
 	if (result_s)
 		{
@@ -207,7 +148,11 @@ char *ExternalBlastTool :: GetResults (BlastFormatter *formatter_p)
 		{
 			if (formatter_p && (bt_output_format != BS_DEFAULT_OUTPUT_FORMAT))
 				{
-					results_s = formatter_p -> GetConvertedOutput (ebt_results_filename_s, bt_output_format, bt_custom_output_columns_s);
+					char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+					ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
+
+					results_s = formatter_p -> GetConvertedOutput (uuid_s, bt_output_format, bt_custom_output_columns_s, bt_service_data_p);
 
 					if (!results_s)
 						{
@@ -285,6 +230,29 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 																			bt_output_format = BS_DEFAULT_OUTPUT_FORMAT;
 																		}
 
+																	if (BlastFormatter :: IsCustomisableOutputFormat (*out_fmt_p))
+																		{
+																			const char *custom_format_s = NULL;
+
+																			GetCurrentStringParameterValueFromParameterSet (params_p, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, &custom_format_s);
+
+																			if (custom_format_s)
+																				{
+																					char *copied_format_s = EasyCopyToNewString (custom_format_s);
+
+																					if (copied_format_s)
+																						{
+																							if (bt_custom_output_columns_s)
+																								{
+																									FreeCopiedString (bt_custom_output_columns_s);
+																								}
+
+																							bt_custom_output_columns_s = copied_format_s;
+																						}
+																				}
+																		}
+
+
 																	if (bt_service_data_p -> bsd_formatter_p)
 																		{
 																			success_flag = AddBlastArgsPair (BS_OUTPUT_FORMAT.npt_name_s, BS_DEFAULT_OUTPUT_FORMAT_S);
@@ -303,7 +271,37 @@ bool ExternalBlastTool :: ParseParameters (ParameterSet *params_p, BlastAppParam
 																					bt_output_format = BOF_SINGLE_FILE_JSON_BLAST;
 																				}
 
-																			value_s = ConvertIntegerToString (bt_output_format);
+																			if (BlastFormatter :: IsCustomisableOutputFormat (*out_fmt_p))
+																				{
+																					const char *custom_format_s = NULL;
+
+																					GetCurrentStringParameterValueFromParameterSet (params_p, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, &custom_format_s);
+
+																					if (custom_format_s)
+																						{
+																							char *temp_s = ConvertIntegerToString (*out_fmt_p);
+
+																							if (temp_s)
+																								{
+																									value_s = ConcatenateVarargsStrings ("\"", temp_s, " ", custom_format_s, NULL);
+
+																									if (!value_s)
+																										{
+																											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to create custom output format with \"%s\" and \"%s\"", temp_s, custom_format_s);
+																										}
+
+																									FreeCopiedString (temp_s);
+																								}
+																							else
+																								{
+																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to convert output format \"" UINT32_FMT "\" to string", *out_fmt_p);
+																								}
+																						}
+																				}
+																			else
+																				{
+																					value_s = ConvertIntegerToString (bt_output_format);
+																				}
 
 																			if (value_s)
 																				{

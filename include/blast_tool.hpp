@@ -203,6 +203,10 @@ public:
 	const char *GetFactoryName () const;
 
 
+	bool SetCustomOutputColumns (const char *custom_columns_s);
+
+
+
 protected:
 
 
@@ -232,7 +236,7 @@ protected:
 	 * Any custom columns for
 	 * tabular output formats
 	 */
-	const char *bt_custom_output_columns_s;
+	char *bt_custom_output_columns_s;
 
 
 	/**
@@ -267,7 +271,7 @@ private:
 	static const char * const BT_NAME_S;
 	static const char * const BT_FACTORY_NAME_S;
 	static const char * const BT_OUTPUT_FORMAT_S;
-
+	static const char * const BT_CUSTOM_OUTPUT_COLUMNS_S;
 
 };
 

@@ -146,7 +146,7 @@ typedef struct BLAST_SERVICE_LOCAL BlastServiceData
 	 * The directory where the Blast input, output and log files
 	 * will be stored.
 	 */
-	const char *bsd_working_dir_s;
+	char *bsd_working_dir_s;
 
 	/**
 	 * The BlastFormatter used to convert the Blast output

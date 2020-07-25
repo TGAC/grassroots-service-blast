@@ -52,7 +52,7 @@ public:
 	 * This is the string that will get appended to each
 	 * log file created when an ExternalBlastTool is ran.
 	 */
-	static const char * const EBT_LOG_SUFFIX_S;
+//	static const char * const EBT_LOG_SUFFIX_S;
 
 	/**
 	 * This is the string identifier to use to set whether

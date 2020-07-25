@@ -33,6 +33,10 @@
 #include "jansson.h"
 
 
+// forward declarations
+struct BlastServiceData;
+
+
 /**
  * This class is for converting the output of a blast
  * job between the available different formats. The
@@ -69,10 +73,10 @@ public:
 	 * @return The converted output or <code>NULL</code> upon error.
 	 * @see BlastOutputFormat
 	 */
-	virtual char *GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code, const char *custom_format_s) = 0;
+	virtual char *GetConvertedOutput (const char *job_id_s, const uint32 output_format_code, const char *custom_format_s, const struct BlastServiceData *data_p) = 0;
 
 
-	bool IsCustomisableOutputFormat (const uint32 output_format_code);
+	static bool IsCustomisableOutputFormat (const uint32 output_format_code);
 };
 
 
@@ -98,6 +102,8 @@ public:
 	 */
 	static SystemBlastFormatter *Create (const json_t *config_p);
 
+	static const char * const SBF_LOG_SUFFIX_S;
+
 	/**
 	 * The SystemBlastFormatter destructor.
 	 */
@@ -113,16 +119,19 @@ public:
 	 * @see BlastFormatter::GetConvertedOutput
 	 * @see BlastOutputFormat
 	 */
-	virtual char *GetConvertedOutput (const char * const input_filename_s, const uint32 output_format_code, const char *custom_format_s);
+	virtual char *GetConvertedOutput (const char *job_id_s, const uint32 output_format_code, const char *custom_format_s, const BlastServiceData *data_p);
 
 
-	char *GetOutputFormatAsString (const uint32 output_format_code, const char *custom_output_formats_s);
+	static char *GetOutputFormatAsString (const uint32 output_format_code, const char *custom_output_formats_s);
 
 
 
 protected:
 	/** The command line executable used to convert between the different formats */
 	const char *sbf_blast_formatter_command_s;
+
+	bool SaveCommandLine (const char *filename_s, const char *command_line_s);
+
 
 private:
 	/**

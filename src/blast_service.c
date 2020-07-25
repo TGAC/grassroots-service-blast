@@ -68,6 +68,8 @@ static bool CleanupAsyncBlastService (void *data_p);
 
 static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p);
 
+static char *ConfigureWorkingDirectoryPath (const json_t *blast_config_p);
+
 
 /*
  * API FUNCTIONS
@@ -1000,7 +1002,7 @@ char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *jo
 						{
 							if (data_p -> bsd_formatter_p)
 								{
-									result_s = data_p -> bsd_formatter_p -> GetConvertedOutput (job_output_filename_s, output_format_code, output_format_params_s);
+									result_s = data_p -> bsd_formatter_p -> GetConvertedOutput (job_output_filename_s, output_format_code, output_format_params_s, data_p);
 								}		/* if (data_p -> bsd_formatter_p) */
 							else
 								{
@@ -1161,9 +1163,7 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 	if (blast_config_p)
 		{
-			data_p -> bsd_working_dir_s = GetJSONString (blast_config_p, "working_directory");
-
-			if (data_p -> bsd_working_dir_s)
+			if ((data_p -> bsd_working_dir_s = ConfigureWorkingDirectoryPath (blast_config_p)) != NULL)
 				{
 					json_t *value_p = json_object_get (blast_config_p, BS_DATABASES_S);
 
@@ -1290,7 +1290,7 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 						}		/* if (value_p) */
 
-				}		/* if (value_s) */
+				}		/* 				if ((data_p -> bsd_working_dir_s = ConfigureWorkingDirectoryPath (blast_config_p)) != NULL) */
 
 			if (success_flag)
 				{
@@ -1338,6 +1338,12 @@ void FreeBlastServiceData (BlastServiceData *data_p)
 		{
 			delete (data_p -> bsd_tool_factory_p);
 		}
+
+	if (data_p -> bsd_working_dir_s)
+		{
+			FreeCopiedString (data_p -> bsd_working_dir_s);
+		}
+
 
 	if (data_p -> bsd_task_manager_p)
 		{
@@ -1784,4 +1790,45 @@ static bool CleanupAsyncBlastService (void *data_p)
 	return success_flag;
 }
 
+
+
+
+static char *ConfigureWorkingDirectoryPath (const json_t *blast_config_p)
+{
+	char *dir_s = NULL;
+	const char *working_dir_config_s = GetJSONString (blast_config_p, "working_directory");
+
+	if (working_dir_config_s)
+		{
+			char sep_s [2];
+
+			*sep_s = GetFileSeparatorChar ();
+			* (sep_s + 1) = '\0';
+
+			if (DoesStringEndWith (working_dir_config_s, sep_s))
+				{
+					dir_s = EasyCopyToNewString (working_dir_config_s);
+
+					if (!dir_s)
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "EasyCopyToNewString failed for working directory \"%s\"", working_dir_config_s);
+						}
+				}
+			else
+				{
+					dir_s = ConcatenateStrings (working_dir_config_s, sep_s);
+
+					if (!dir_s)
+						{
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "ConcatenateStrings failed for working directory \"%s\" and \"%s\"", working_dir_config_s, sep_s);
+						}
+				}
+		}
+	else
+		{
+			PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, blast_config_p, "No working directory configured");
+		}
+
+	return dir_s;
+}
 

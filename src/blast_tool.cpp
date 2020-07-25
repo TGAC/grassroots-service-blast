@@ -37,6 +37,7 @@ const char * const BlastTool :: BT_FACTORY_NAME_S = "factory";
 
 const char * const BlastTool :: BT_OUTPUT_FORMAT_S = "output_format";
 
+const char * const BlastTool :: BT_CUSTOM_OUTPUT_COLUMNS_S = "custom_output_format_columns";
 
 
 
@@ -91,17 +92,29 @@ BlastTool :: BlastTool (BlastServiceJob *service_job_p, const char *name_s, cons
 	bt_service_data_p = data_p;
 	bt_output_format = output_format;
 
-
-	bt_factory_name_s = CopyToNewString (factory_s, 0, false);
+	bt_factory_name_s = EasyCopyToNewString (factory_s);
 	if (!bt_factory_name_s)
 		{
 			throw std :: invalid_argument ("factory name not set");
 		}
 
-	bt_name_s = CopyToNewString (name_s, 0, false);
+	bt_name_s = EasyCopyToNewString (name_s);
 	if (!bt_name_s)
 		{
 			throw std :: invalid_argument ("name not set");
+		}
+
+	if (custom_output_s)
+		{
+			bt_custom_output_columns_s = EasyCopyToNewString (custom_output_s);
+			if (!bt_custom_output_columns_s)
+				{
+					throw std :: invalid_argument ("bt_custom_output_columns_s not set");
+				}
+		}
+	else
+		{
+			bt_custom_output_columns_s = nullptr;
 		}
 
 /*
@@ -135,12 +148,29 @@ BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, 
 			throw std :: invalid_argument ("name not set");
 		}
 
+	const char *custom_columns_s = GetJSONString (root_p, BT_CUSTOM_OUTPUT_COLUMNS_S);
+
+	if (custom_columns_s)
+		{
+			bt_custom_output_columns_s = EasyCopyToNewString (custom_columns_s);
+			if (!bt_custom_output_columns_s)
+				{
+					throw std :: invalid_argument ("bt_custom_output_columns_s not set");
+				}
+		}
+	else
+		{
+			bt_custom_output_columns_s = nullptr;
+		}
+
 	GetJSONInteger (root_p, BT_OUTPUT_FORMAT_S, (int *) &output_format);
 	bt_output_format = output_format;
 
 
 	bt_job_p = job_p;
 	bt_service_data_p = data_p;
+
+
 
 
 	#if BLAST_TOOL_DEBUG >= STM_LEVEL_FINEST
@@ -200,6 +230,11 @@ BlastTool :: ~BlastTool ()
 		{
 			FreeCopiedString (bt_name_s);
 		}
+
+	if (bt_custom_output_columns_s)
+		{
+			FreeCopiedString (bt_custom_output_columns_s);
+		}
 }
 
 
@@ -252,7 +287,20 @@ bool BlastTool :: AddToJSON (json_t *root_p)
 				{
 					if (json_object_set_new (root_p, BT_OUTPUT_FORMAT_S, json_integer (bt_output_format)) == 0)
 						{
-							success_flag = true;
+							if (bt_custom_output_columns_s)
+								{
+									success_flag = SetJSONString (root_p, BT_CUSTOM_OUTPUT_COLUMNS_S, bt_custom_output_columns_s);
+								}
+							else
+								{
+									success_flag = SetJSONNull (root_p, BT_CUSTOM_OUTPUT_COLUMNS_S);
+								}
+
+							if (!success_flag)
+								{
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add %s:%s to BlastTool json", BT_CUSTOM_OUTPUT_COLUMNS_S, bt_custom_output_columns_s ? bt_custom_output_columns_s : "null");
+								}
+
 						}		/* if (json_object_set_new (root_p, BT_OUTPUT_FORMAT_S, json_integer (bt_output_format)) == 0) */
 					else
 						{
@@ -301,6 +349,40 @@ bool BlastTool :: AddErrorDetails ()
 			ConvertUUIDToString (bt_job_p -> bsj_job.sj_id, uuid_s);
 
 			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "GetLog () failed for \"%s\"", uuid_s);
+		}
+
+	return success_flag;
+}
+
+
+bool BlastTool :: SetCustomOutputColumns (const char *custom_columns_s)
+{
+	bool success_flag = false;
+
+	if (custom_columns_s)
+		{
+			char *temp_s = EasyCopyToNewString (custom_columns_s);
+
+			if (temp_s)
+				{
+					if (bt_custom_output_columns_s)
+						{
+							FreeCopiedString (bt_custom_output_columns_s);
+						}
+
+					bt_custom_output_columns_s = temp_s;
+					success_flag = true;
+				}
+		}
+	else
+		{
+			if (bt_custom_output_columns_s)
+				{
+					FreeCopiedString (bt_custom_output_columns_s);
+				}
+
+			bt_custom_output_columns_s = nullptr;
+			success_flag = true;
 		}
 
 	return success_flag;

@@ -163,3 +163,108 @@ bool AddArgsPairFromStringParameter (const ParameterSet *params_p, const char * 
 	return success_flag;
 }
 
+
+
+bool WriteCommandLineToFile (const char *command_line_s, const char *filename_s)
+{
+	bool success_flag = false;
+	FILE *command_f = fopen (filename_s, "w");
+
+	if (command_f)
+		{
+			if (fprintf (command_f, "%s\n", command_line_s) > 0)
+				{
+					success_flag = true;
+				}
+			else
+				{
+					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to write \%s\" to  command file \"%s\"", command_line_s, filename_s);
+				}
+
+			if (fclose (command_f) != 0)
+				{
+					PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to close command file \"%s\"", filename_s);
+				}
+		}
+	else
+		{
+			PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to open command file \"%s\"", filename_s);
+		}
+
+	return success_flag;
+}
+
+
+char *GetBlastJobFilenameByUuid (const char * const prefix_s, const uuid_t id, const char * const suffix_s)
+{
+	char uuid_s [UUID_STRING_BUFFER_SIZE];
+
+	ConvertUUIDToString (id, uuid_s);
+
+	return GetBlastJobFilename (prefix_s, uuid_s, suffix_s);
+}
+
+
+char *GetBlastJobFilename (const char * const prefix_s, const char *job_id_s, const char * const suffix_s)
+{
+	char *job_filename_s = NULL;
+	char *file_stem_s = NULL;
+	char *ebt_working_directory_s = NULL;
+
+	if (ebt_working_directory_s)
+		{
+			file_stem_s = MakeFilename (ebt_working_directory_s, job_id_s);
+		}
+	else
+		{
+			file_stem_s = (char *) job_id_s;
+		}
+
+	if (file_stem_s)
+		{
+			ByteBuffer *buffer_p = AllocateByteBuffer (1024);
+
+			if (buffer_p)
+				{
+					bool success_flag = false;
+
+					if (prefix_s)
+						{
+							success_flag = AppendStringsToByteBuffer (buffer_p, prefix_s, file_stem_s, NULL);
+						}
+					else
+						{
+							success_flag = AppendStringToByteBuffer (buffer_p, file_stem_s);
+						}
+
+					if (success_flag && suffix_s)
+						{
+							success_flag = AppendStringToByteBuffer (buffer_p, suffix_s);
+						}
+
+					if (success_flag)
+						{
+							job_filename_s = DetachByteBufferData (buffer_p);
+						}
+					else
+						{
+							FreeByteBuffer (buffer_p);
+						}
+
+				}		/* if (buffer_p) */
+
+			if (file_stem_s != job_id_s)
+				{
+					FreeCopiedString (file_stem_s);
+				}
+
+		}		/* if (file_stem_s) */
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get file stem for \"%s\"", job_id_s);
+		}
+
+
+	return job_filename_s;
+}
+
