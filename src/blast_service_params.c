@@ -260,7 +260,7 @@ Parameter *SetUpOutputFormatParameters (const char **formats_ss, const uint32 nu
 	if (format_param_p)
 		{
 			const char * const description_s = "For the \"tabular\", \"tabular with comment lines\" and \"Comma-separated values\" output formats, you can customise the output by specifying space delimited format parameters here.";
-			Parameter *param_p = EasyCreateAndAddStringParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_CUSTOM_OUTPUT_FORMAT.npt_type, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, "Custom output options", description_s, NULL, PL_ALL);
+			Parameter *param_p = EasyCreateAndAddStringParameterToParameterSet (& (service_data_p -> bsd_base_data), param_set_p, group_p, BS_CUSTOM_OUTPUT_FORMAT.npt_type, BS_CUSTOM_OUTPUT_FORMAT.npt_name_s, "Custom output options", description_s, NULL, PL_ADVANCED);
 
 			if (param_p)
 				{
