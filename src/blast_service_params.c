@@ -74,6 +74,9 @@ const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES] =
 
 static Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
+static json_t *GetParametersFromResource (Resource *resource_p);
+
+static int GetDatabaseActiveFlagFromJSON (const json_t *params_json_p, const char *db_param_name_s, bool *value_p);
 
 
 /**************************************************/
@@ -127,7 +130,7 @@ char *CreateGroupName (const char *server_s)
 /*
  * The list of databases that can be searched
  */
-uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, const DatabaseType db_type)
+uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, Resource *resource_p,  const DatabaseType db_type)
 {
 	uint16 num_added_databases = 0;
 	size_t num_group_params = GetNumberOfDatabases (data_p, db_type);
@@ -144,6 +147,7 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 			if (db_p)
 				{
 					const ServiceData *service_data_p = & (data_p -> bsd_base_data);
+					const json_t *params_json_array_p = GetParametersFromResource (resource_p);
 
 					while (db_p -> di_name_s)
 						{
@@ -153,7 +157,18 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, c
 
 									if (db_s)
 										{
-											if (!EasyCreateAndAddBooleanParameterToParameterSet (service_data_p, param_set_p, group_p, db_s, db_p -> di_name_s, db_p -> di_description_s, & (db_p -> di_active_flag), PL_ALL))
+											bool active_flag;
+
+											if (params_json_array_p)
+												{
+													GetDatabaseActiveFlagFromJSON (params_json_array_p, db_s, &active_flag);
+												}
+											else
+												{
+													active_flag = db_p -> di_active_flag;
+												}
+
+											if (!EasyCreateAndAddBooleanParameterToParameterSet (service_data_p, param_set_p, group_p, db_s, db_p -> di_name_s, db_p -> di_description_s, &active_flag, PL_ALL))
 												{
 													PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Failed to add database \"%s\"", db_p -> di_name_s);
 												}
@@ -577,6 +592,73 @@ const char *GetLocalDatabaseName (const char *fully_qualified_db_s)
 
 	return db_s;
 }
+
+
+
+static json_t *GetParametersFromResource (Resource *resource_p)
+{
+	json_t *params_json_p = NULL;
+
+	/*
+	 * Have we been set some parameter values to refresh from?
+	 */
+	if (resource_p && (resource_p -> re_data_p))
+		{
+			const json_t *param_set_json_p = json_object_get (resource_p -> re_data_p, PARAM_SET_KEY_S);
+
+			if (param_set_json_p)
+				{
+					params_json_p = json_object_get (param_set_json_p, PARAM_SET_PARAMS_S);
+				}
+			else
+				{
+					PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, resource_p -> re_data_p, "Failed to get param set with key \"%s\"", PARAM_SET_KEY_S);
+				}
+
+		}		/* if (resource_p && (resource_p -> re_data_p)) */
+
+	return params_json_p;
+}
+
+
+static int GetDatabaseActiveFlagFromJSON (const json_t *params_json_p, const char *db_param_name_s, bool *value_p)
+{
+	int res = 0;
+	const size_t num_params = json_array_size (params_json_p);
+	size_t i;
+
+	for (i = 0; i < num_params; ++ i)
+		{
+			const json_t *param_json_p = json_array_get (params_json_p, i);
+			const char *name_s = GetJSONString (param_json_p, PARAM_NAME_S);
+
+			if (name_s)
+				{
+					if (strcmp (name_s, db_param_name_s) == 0)
+						{
+							bool b;
+
+							if (GetJSONBoolean (param_json_p, PARAM_CURRENT_VALUE_S, &b))
+								{
+									*value_p = b;
+									res = 1;
+
+									/* force exit from loop */
+									i = num_params;
+								}
+							else
+								{
+									res = -1;
+									PrintJSONToErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, param_json_p, "Failed to get current_value with key \"%s\"", PARAM_CURRENT_VALUE_S);
+								}
+						}
+				}
+		}
+
+
+	return res;
+}
+
 
 
 

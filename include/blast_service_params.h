@@ -272,11 +272,12 @@ BLAST_SERVICE_LOCAL bool AddProgramSelectionParameters (BlastServiceData *blast_
  *
  * @param data_p The configuration data for the Blast Service.
  * @param param_set_p The ParameterSet that the general algorithm parameters will be added to.
+ * @param resource_p The Resource detailing any data sent by the user's request.
  * @param db_type The type of databases to add.
  * @return The number of database parameters added.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, const DatabaseType db_type);
+BLAST_SERVICE_LOCAL uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, Resource *resource_p, const DatabaseType db_type);
 
 
 /**

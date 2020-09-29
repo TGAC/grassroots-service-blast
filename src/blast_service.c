@@ -50,9 +50,9 @@
 
 
 #ifdef _DEBUG
-	#define BLAST_SERVICE_DEBUG (STM_LEVEL_FINEST)
+#define BLAST_SERVICE_DEBUG (STM_LEVEL_FINEST)
 #else
-	#define BLAST_SERVICE_DEBUG (STM_LEVEL_NONE)
+#define BLAST_SERVICE_DEBUG (STM_LEVEL_NONE)
 #endif
 
 
@@ -70,6 +70,7 @@ static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p);
 
 static char *ConfigureWorkingDirectoryPath (const json_t *blast_config_p);
 
+static json_t *GetIndexingDataPayload (GrassrootsServer *server_p, const char *service_s, const DatabaseInfo *db_p);
 
 /*
  * API FUNCTIONS
@@ -172,9 +173,9 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 	BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
 	const char *input_value_s = NULL;
 
-	#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
+#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
 	PrintErrors (STM_LEVEL_FINEST, __FILE__, __LINE__,  "Running the blast service with data at %.16X", blast_data_p);
-	#endif
+#endif
 
 
 	/*
@@ -230,7 +231,7 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 
 									if (input_p)
 										{
-											const char *input_filename_s = input_p -> GetFilename ();
+											const char *input_filename_s = input_p -> GetFilename();
 
 											if (input_filename_s)
 												{
@@ -267,7 +268,7 @@ ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, U
 
 											SetServiceJobStatus (& (job_p -> bsj_job), OS_FAILED_TO_START);
 
-											while ((job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator)) != NULL)
+											while ( (job_p = (BlastServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator)) != NULL)
 												{
 													if (!AddGeneralErrorMessageToServiceJob (& (job_p -> bsj_job), error_s))
 														{
@@ -335,7 +336,7 @@ ServiceJobSet *CreateJobsForPreviousResults (ParameterSet *params_p, const char 
 							while (job_node_p)
 								{
 									ServiceJob *job_p = job_node_p -> sjn_job_p;
-									json_t *results_p = MarkUpBlastResult ((BlastServiceJob *) job_p);
+									json_t *results_p = MarkUpBlastResult ( (BlastServiceJob *) job_p);
 
 									if (!ReplaceServiceJobResults (job_p, results_p))
 										{
@@ -417,14 +418,14 @@ bool CloseBlastService (Service *service_p)
 }
 
 
-bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, AddAdditionalParamsFn add_additional_params_fn, void *callback_data_p)
+bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, Resource *resource_p, const DatabaseType db_type, AddAdditionalParamsFn add_additional_params_fn, void *callback_data_p)
 {
 	bool success_flag = false;
 	BlastServiceData *blast_data_p = (BlastServiceData *) (blast_service_p -> se_data_p);
 
 	if (AddQuerySequenceParams (blast_data_p, param_set_p, add_additional_params_fn, callback_data_p))
 		{
-			uint16 num_dbs = AddDatabaseParams (blast_data_p, param_set_p, db_type);
+			uint16 num_dbs = AddDatabaseParams (blast_data_p, param_set_p, resource_p, db_type);
 
 			success_flag = AddPairedServiceParameters (blast_service_p, param_set_p);
 		}
@@ -475,7 +476,7 @@ TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_di
 						{
 							bool success_flag = true;
 
-							if (!input_file_p -> IsOpen ())
+							if (!input_file_p -> IsOpen())
 								{
 									success_flag = input_file_p -> Open ("w");
 								}
@@ -483,12 +484,12 @@ TempFile *GetInputTempFile (const ParameterSet *params_p, const char *working_di
 							if (success_flag)
 								{
 									success_flag = input_file_p -> Print (sequence_s);
-									input_file_p -> Close ();
+									input_file_p -> Close();
 								}
 
 							if (!success_flag)
 								{
-									PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Blast service failed to write to temp file \"%s\" for query \"%s\"", input_file_p -> GetFilename (), sequence_s);
+									PrintErrors (STM_LEVEL_WARNING, __FILE__, __LINE__, "Blast service failed to write to temp file \"%s\" for query \"%s\"", input_file_p -> GetFilename(), sequence_s);
 									delete input_file_p;
 									input_file_p = NULL;
 								}
@@ -628,7 +629,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 								}		/* while (node_p) */
 
 #if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINE
-					PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Num input jobs " UINT32_FMT " num successful json results " UINT32_FMT, ids_p -> ll_size, num_successful_jobs);
+							PrintLog (STM_LEVEL_FINE, __FILE__, __LINE__, "Num input jobs " UINT32_FMT " num successful json results " UINT32_FMT, ids_p -> ll_size, num_successful_jobs);
 #endif
 
 							if (num_successful_jobs == ids_p -> ll_size)
@@ -680,7 +681,7 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 							if (GetCurrentBooleanParameterValueFromParameterSet (param_set_p, full_db_name_s, &db_flag_p))
 								{
 									/* Is the database selected to search against? */
-									if ((db_flag_p != NULL) && (*db_flag_p == true))
+									if ( (db_flag_p != NULL) && (*db_flag_p == true))
 										{
 											BlastServiceJob *job_p = AllocateBlastServiceJobForDatabase (service_p, db_p, data_p);
 
@@ -780,14 +781,14 @@ ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_
 															/* Set the matching databases to active */
 															bool active_flag = false;
 
-															if ((Stristr (db_p -> di_name_s, resource_p -> re_value_s)) ||
-																	(Stristr (db_p -> di_description_s, resource_p -> re_value_s)))
+															if ( (Stristr (db_p -> di_name_s, resource_p -> re_value_s)) ||
+															     (Stristr (db_p -> di_description_s, resource_p -> re_value_s)))
 																{
 																	active_flag = true;
 																	matched_db_flag = true;
 																}
 
-															if (!SetBooleanParameterCurrentValue ((BooleanParameter *) param_p, &active_flag))
+															if (!SetBooleanParameterCurrentValue ( (BooleanParameter *) param_p, &active_flag))
 																{
 																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to set Parameter \"%s\" to true", param_p -> pa_name_s);
 																}
@@ -893,7 +894,7 @@ bool DetermineBlastResult (BlastServiceJob *job_p)
 
 	if (status == OS_SUCCEEDED)
 		{
-			uint32 out_fmt = tool_p -> GetOutputFormat ();
+			uint32 out_fmt = tool_p -> GetOutputFormat();
 
 			if (out_fmt == BOF_GRASSROOTS)
 				{
@@ -1033,11 +1034,11 @@ json_t *BuildBlastServiceJobJSON (Service * UNUSED_PARAM (service_p), ServiceJob
 
 	if (strcmp (service_job_p -> sj_type_s, BSJ_TYPE_S) == 0)
 		{
-			res_p = ConvertBlastServiceJobToJSON ((BlastServiceJob *) service_job_p, omit_results_flag);
+			res_p = ConvertBlastServiceJobToJSON ( (BlastServiceJob *) service_job_p, omit_results_flag);
 		}
 	else if (strcmp (service_job_p -> sj_type_s, RSJ_TYPE_S) == 0)
 		{
-			res_p = GetRemoteServiceJobAsJSON ((RemoteServiceJob *) service_job_p, omit_results_flag);
+			res_p = GetRemoteServiceJobAsJSON ( (RemoteServiceJob *) service_job_p, omit_results_flag);
 		}
 	else
 		{
@@ -1069,9 +1070,9 @@ BlastServiceData *AllocateBlastServiceData (Service * UNUSED_PARAM (blast_servic
 		}
 
 
-	#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
+#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
 	PrintErrors (STM_LEVEL_FINEST, __FILE__, __LINE__,  "Allocating the blast service data at %.16X", data_p);
-	#endif
+#endif
 
 	return data_p;
 }
@@ -1103,14 +1104,14 @@ ServiceJob *BuildBlastServiceJob (struct Service *service_p, const json_t *servi
 					BlastTool *tool_p = blast_job_p -> bsj_tool_p;
 
 					OperationStatus old_status = GetCachedServiceJobStatus (& (blast_job_p -> bsj_job));
-					OperationStatus current_status = tool_p -> GetStatus ();
+					OperationStatus current_status = tool_p -> GetStatus();
 
 					if (old_status != current_status)
 						{
 							switch (current_status)
-							{
-								case OS_SUCCEEDED:
-								case OS_PARTIALLY_SUCCEEDED:
+								{
+									case OS_SUCCEEDED:
+									case OS_PARTIALLY_SUCCEEDED:
 									{
 										if (! (blast_job_p -> bsj_job.sj_result_p))
 											{
@@ -1125,16 +1126,16 @@ ServiceJob *BuildBlastServiceJob (struct Service *service_p, const json_t *servi
 									}
 									break;
 
-								case OS_FAILED:
-								case OS_FAILED_TO_START:
+									case OS_FAILED:
+									case OS_FAILED_TO_START:
 									{
 										AddErrorToBlastServiceJob (blast_job_p);
 									}
 									break;
 
-								default:
-									break;
-							}
+									default:
+										break;
+								}
 						}
 
 					job_p = & (blast_job_p -> bsj_job);
@@ -1163,7 +1164,7 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 	if (blast_config_p)
 		{
-			if ((data_p -> bsd_working_dir_s = ConfigureWorkingDirectoryPath (blast_config_p)) != NULL)
+			if ( (data_p -> bsd_working_dir_s = ConfigureWorkingDirectoryPath (blast_config_p)) != NULL)
 				{
 					json_t *value_p = json_object_get (blast_config_p, BS_DATABASES_S);
 
@@ -1198,10 +1199,12 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 																		const char *info_uri_s = GetJSONString (db_json_p, "info_uri");
 																		const char *scaffold_regex_s = GetJSONString (db_json_p, "scaffold_regex");
 																		const char *scaffold_key_s = GetJSONString (db_json_p, "scaffold_key");
+																		const char *search_description_s = GetJSONString (db_json_p, "search_description");
 
 																		db_p -> di_name_s = name_s;
 																		db_p -> di_filename_s = filename_s;
 																		db_p -> di_description_s = description_s;
+																		db_p -> di_search_description_s = search_description_s;
 																		db_p -> di_download_uri_s = download_uri_s;
 																		db_p -> di_info_uri_s = info_uri_s;
 																		db_p -> di_active_flag = true;
@@ -1320,9 +1323,9 @@ bool GetBlastServiceConfig (BlastServiceData *data_p)
 
 void FreeBlastServiceData (BlastServiceData *data_p)
 {
-	#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
+#if BLAST_SERVICE_DEBUG >= STM_LEVEL_FINEST
 	PrintErrors (STM_LEVEL_FINEST, __FILE__, __LINE__,  "Freeing the blast service data at %.16X", data_p);
-	#endif
+#endif
 
 	if (data_p -> bsd_databases_p)
 		{
@@ -1417,13 +1420,13 @@ void ReleaseBlastService (Service *service_p)
 
 
 /*
- * STATIC FUNCTIONS 
+ * STATIC FUNCTIONS
  */
 
 
 static void InitBlastService (Service *blast_service_p)
 {
-	blast_service_p -> se_synchronous = GetBlastToolFactorySynchronicity (((BlastServiceData *) (blast_service_p -> se_data_p)) -> bsd_tool_factory_p);
+	blast_service_p -> se_synchronous = GetBlastToolFactorySynchronicity ( ( (BlastServiceData *) (blast_service_p -> se_data_p)) -> bsd_tool_factory_p);
 
 	blast_service_p -> se_deserialise_job_json_fn = BuildBlastServiceJob;
 	blast_service_p -> se_serialise_job_json_fn = BuildBlastServiceJobJSON;
@@ -1492,59 +1495,285 @@ const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_
 }
 
 
-json_t *GetBlastIndexingData (struct Service *service_p)
+/*
 {
-	json_t *res_p = GetBaseServiceDataAsJSON (service_p, NULL);
+  "@type": "Grassroots:Service",
+  "service": "BlastN",
+  "id": "http://localhost:8080/grassroots/public/service/blast/blastn/paragon",
+  "so:image": "http://localhost:8080/grassroots/images/BlastN%20service",
+  "internal_url": "http://localhost:8080/grassroots/public",
+  "payload": {
+    "services": [{
+      "so:name": "BlastN",
+      "refresh_service": true,
+      "parameter_set": {
+        "level": "simple",
+        "parameters": [{
+          "param": "Available Databases provided by billy public -> Paragon",
+          "current_value": true
+        }]
+      }
+    }]
+  },
+  "so:name": "Paragon",
+  "so:description": "Version 1.1 assembly of Triticum aestivum generated from filtering v1.0 assemblies to remove non-wheat sequences and scaffolds below 1 kb"
+}
+*/
 
-	if (res_p)
+
+static json_t *GetIndexingDataPayload (GrassrootsServer *grassroots_p, const char *service_s, const DatabaseInfo *db_p)
+{
+	char *group_s = GetLocalDatabaseGroupName (grassroots_p);
+	char *full_db_name_s = GetFullyQualifiedDatabaseName (group_s, db_p -> di_name_s);
+
+	if (full_db_name_s)
 		{
-			json_t *databases_json_p = json_array ();
+			json_t *payload_p = json_object ();
 
-			if (databases_json_p)
+			if (payload_p)
 				{
-					if (json_object_set_new (res_p, BS_DATABASES_S, databases_json_p) == 0)
-						{
-							BlastServiceData *data_p = (BlastServiceData *) (service_p -> se_data_p);
-							DatabaseInfo *database_p = data_p -> bsd_databases_p;
-							bool success_flag = true;
+					json_t *services_p = json_array ();
 
-							while (database_p && success_flag)
+					if (services_p)
+						{
+							if (json_object_set_new (payload_p, SERVICES_NAME_S, services_p) == 0)
 								{
-									if (database_p -> di_name_s)
+									json_t *service_p  = json_object ();
+
+									if (service_p)
 										{
-											if (AddDatabaseForIndexing (database_p, databases_json_p))
+											if (json_array_append_new (services_p, service_p) == 0)
 												{
-													++ database_p;
-												}
+													if (SetJSONString (service_p, SERVICE_NAME_S, service_s))
+														{
+															if (SetJSONBoolean (service_p, SERVICE_REFRESH_S, true))
+																{
+																	json_t *param_set_p = json_object ();
+
+																	if (param_set_p)
+																		{
+																			if (json_object_set_new (service_p, PARAM_SET_KEY_S, param_set_p) == 0)
+																				{
+																					if (SetJSONString (param_set_p, PARAM_LEVEL_S, PARAM_LEVEL_TEXT_SIMPLE_S))
+																						{
+																							json_t *params_p = json_array ();
+
+																							if (params_p)
+																								{
+																									if (json_object_set_new (param_set_p, PARAM_SET_PARAMS_S, params_p) == 0)
+																										{
+																											json_t *param_p = json_pack ("{s:s, s:b}", PARAM_NAME_S, full_db_name_s, PARAM_CURRENT_VALUE_S, true);
+
+																											if (param_p)
+																												{
+																													if (json_array_append_new (params_p, param_p) == 0)
+																														{
+																															return payload_p;
+																														}		/* if (json_array_append_new (params_p, param_p) == 0) */
+																													else
+																														{
+																															PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add param to array \"%s\"", full_db_name_s);
+																															json_decref (param_p);
+																														}
+
+																												}		/* if (param_p) */
+
+																										}		/* if (json_object_set_new (param_set_p, PARAM_SET_PARAMS_S, params_p) == 0) */
+																									else
+																										{
+																											json_decref (params_p);
+																											PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add params array to param set \"%s\"", full_db_name_s);
+																										}
+
+																								}		/* if (params_p) */
+																							else
+																								{
+																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate params array for \"%s\"", full_db_name_s);
+																								}
+
+																						}		/* if (SetJSONString (param_set_p, PARAM_LEVEL_S, PARAM_LEVEL_TEXT_SIMPLE_S)) */
+																					else
+																						{
+																							PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, param_set_p, "Failed to add \"%s\": \"%s\"", PARAM_LEVEL_S, PARAM_LEVEL_TEXT_SIMPLE_S);
+																						}
+
+																				}		/* if (json_object_set_new (service_p, PARAM_SET_KEY_S, param_set_p) == 0) */
+																			else
+																				{
+																					PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add parameter set to service \"%s\"", full_db_name_s);
+																				}
+
+																		}		/* if (param_set_p) */
+																	else
+																		{
+																			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate param set  for \"%s\"", full_db_name_s);
+																		}
+
+																}		/* if (SetJSONBoolean (services_p, SERVICE_REFRESH_S, true)) */
+															else
+																{
+																	PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, services_p, "Failed to add \"%s\": true", SERVICE_REFRESH_S);
+																}
+
+														}		/* if (SetJSONString (services_p, SERVICE_NAME_S, service_s)) */
+													else
+														{
+															PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, services_p, "Failed to add \"%s\": \"%s\"", SERVICE_NAME_S, service_s);
+														}
+
+												}		/* if (json_array_append_new (services_p, service_p)) == 0) */
 											else
 												{
-													success_flag = false;
+													PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add service to services array \"%s\"", full_db_name_s);
 												}
 
-										}
+										}		/* if (service_p) */
 									else
 										{
-											database_p = NULL;
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate service for \"%s\"", full_db_name_s);
 										}
 
-
-								}		/* while (database_p && success_flag) */
-
-							if (success_flag)
+								}		/* if (json_object_set_new (payload_p, SERVICES_NAME_S, services_p) == 0) */
+							else
 								{
-									return res_p;
+									json_decref (services_p);
+									PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add services to payload \"%s\"", full_db_name_s);
 								}
 
-						}		/* if (json_object_set_new (res_p, BS_DATABASES_S, databases_json_p) == 0) */
+						}		/* if (services_p) */
 					else
 						{
-							json_decref (databases_json_p);
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate services for \"%s\"", full_db_name_s);
 						}
 
-				}		/* if (databases_json_p) */
+					json_decref (payload_p);
+				}		/* if (payload_p) */
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate payload for \"%s\"", full_db_name_s);
+				}
 
-			json_decref (res_p);
-		}		/* if (res_p) */
+			FreeCopiedString (full_db_name_s);
+		}		/* if (full_db_name_s) */
+
+	return NULL;
+}
+
+
+json_t *GetBlastIndexingData (const Service *service_p)
+{
+	json_t *indexing_docs_p = json_array ();
+
+	if (indexing_docs_p)
+		{
+			BlastServiceData *data_p = (BlastServiceData *) (service_p -> se_data_p);
+			const DatabaseInfo *db_p = data_p -> bsd_databases_p;
+
+			while (db_p)
+				{
+					json_t *doc_p = GetIndexingDataForDatabase (service_p, db_p);
+
+					if (doc_p)
+						{
+							if (json_array_append_new (indexing_docs_p, doc_p) != 0)
+								{
+
+								}
+						}		/* if (doc_p) */
+					else
+						{
+
+						}
+
+					++ db_p;
+				}		/* while (db_p) */
+
+			return indexing_docs_p;
+		}
+
+	return NULL;
+}
+
+
+static json_t *GetIndexingDataForDatabase (const Service *service_p, const DatabaseInfo *db_p)
+{
+	json_t *index_data_p = json_object();
+
+	if (index_data_p)
+		{
+			const char *name_s = GetServiceName (service_p);
+
+			if (SetJSONString (index_data_p, INDEXING_SERVICE_S, name_s))
+				{
+					if (SetJSONString (index_data_p, INDEXING_NAME_S, db_p -> di_name_s))
+						{
+							GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+							const json_t *hostname_p = GetGlobalConfigValue (grassroots_p, "so:url");
+
+							if (hostname_p)
+								{
+									if (json_is_string (hostname_p))
+										{
+											const char *url_s = json_string_value (hostname_p);
+
+											if (SetJSONString (index_data_p, INDEXING_PAYLOAD_URL_S, url_s))
+												{
+													size_t l = strlen (url_s);
+													const char *alias_s = GetServiceAlias (service_p);
+													const char *path_s = (* (url_s - 1) == '/') ? "service" : "/service";
+													char *id_s = ConcatenateVarargsStrings (url_s, path_s, alias_s, NULL);
+
+													if (id_s)
+														{
+															if (SetJSONString (index_data_p, INDEXING_ID_S, id_s))
+																{
+																	if (SetJSONString (index_data_p, INDEXING_TYPE_S, INDEXING_TYPE_SERVICE_GRASSROOTS_S))
+																		{
+																			const char *description_s = db_p -> di_search_description_s ? db_p -> di_search_description_s : db_p -> di_description_s;
+
+																			if (description_s)
+																				{
+																					if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s))
+																						{
+																							json_t *payload_p = GetIndexingDataPayload (grassroots_p, name_s, db_p);
+
+																							if (payload_p)
+																								{
+																									if (json_object_set_new (index_data_p, INDEXING_PAYLOAD_DATA_S, payload_p) == 0)
+																										{
+																											return index_data_p;
+																										}		/* if (json_object_set_new (index_data_p, "payload", payload_p) == 0) */
+																									else
+																										{
+																											json_decref (payload_p);
+																										}
+																								}		/* if (payload_p) */
+																							else
+																								{
+
+																								}
+																						}
+																				}
+																		}
+
+																}		/* if (SetJSONString (index_data_p, "id", id_s)) */
+
+														}		/* if (id_s) */
+
+												}		/* if (SetJSONString (index_data_p, "internal_url", url_s)) */
+
+										}
+								}
+
+
+
+
+						}		/* if (SetJSONString (index_data_p, "so:name", database_p -> di_name_s)) */
+
+				}		/* if (SetJSONString (index_data_p, SERVICE_NAME_S, name_s)) */
+
+			json_decref (index_data_p);
+		}		/* if (index_data_p) */
 
 	return NULL;
 }
@@ -1552,7 +1781,7 @@ json_t *GetBlastIndexingData (struct Service *service_p)
 
 static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p)
 {
-	json_t *db_json_p = json_object ();
+	json_t *db_json_p = json_object();
 
 	if (db_json_p)
 		{
@@ -1633,16 +1862,16 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 								{
 									if (tool_p -> SetInputFilename (input_filename_s))
 										{
-											if (tool_p -> SetUpOutputFile ())
+											if (tool_p -> SetUpOutputFile())
 												{
 													if (tool_p -> ParseParameters (param_set_p, app_params_p))
 														{
 															if (RunBlast (tool_p))
 																{
 																	/* If the status needs updating, refresh it */
-																	if ((job_p -> bsj_job.sj_status == OS_PENDING) || (job_p -> bsj_job.sj_status == OS_STARTED))
+																	if ( (job_p -> bsj_job.sj_status == OS_PENDING) || (job_p -> bsj_job.sj_status == OS_STARTED))
 																		{
-																			SetServiceJobStatus (base_job_p, tool_p -> GetStatus ());
+																			SetServiceJobStatus (base_job_p, tool_p -> GetStatus());
 																		}
 
 																	LogServiceJob (base_job_p);
@@ -1688,40 +1917,41 @@ static void RunJobs (Service *service_p, ParameterSet *param_set_p, const char *
 					if (job_ran_flag)
 						{
 							switch (base_job_p -> sj_status)
-									{
-										case OS_SUCCEEDED:
-										case OS_PARTIALLY_SUCCEEDED:
-											if (base_job_p -> sj_result_p)
-												{
-													char job_id_s [UUID_STRING_BUFFER_SIZE];
-
-													ConvertUUIDToString (base_job_p -> sj_id, job_id_s);
-													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
-												}
-											break;
-
-										case OS_PENDING:
-										case OS_STARTED:
+								{
+									case OS_SUCCEEDED:
+									case OS_PARTIALLY_SUCCEEDED:
+										if (base_job_p -> sj_result_p)
 											{
-												GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
-												JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
+												char job_id_s [UUID_STRING_BUFFER_SIZE];
 
-												if (jobs_manager_p)
+												ConvertUUIDToString (base_job_p -> sj_id, job_id_s);
+												PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get results for %s", job_id_s);
+											}
+
+										break;
+
+									case OS_PENDING:
+									case OS_STARTED:
+									{
+										GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+										JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
+
+										if (jobs_manager_p)
+											{
+												if (!AddServiceJobToJobsManager (jobs_manager_p, base_job_p -> sj_id, base_job_p))
 													{
-														if (!AddServiceJobToJobsManager (jobs_manager_p, base_job_p -> sj_id, base_job_p))
-															{
-																char job_id_s [UUID_STRING_BUFFER_SIZE];
+														char job_id_s [UUID_STRING_BUFFER_SIZE];
 
-																ConvertUUIDToString (base_job_p -> sj_id, job_id_s);
-																PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
-															}
+														ConvertUUIDToString (base_job_p -> sj_id, job_id_s);
+														PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
 													}
 											}
-											break;
+									}
+									break;
 
-										default:
-											break;
-									}		/* switch (job_p -> bsj_job.sj_status) */
+									default:
+										break;
+								}		/* switch (job_p -> bsj_job.sj_status) */
 
 						}		/* if (job_ran_flag) */
 
@@ -1802,7 +2032,7 @@ static char *ConfigureWorkingDirectoryPath (const json_t *blast_config_p)
 		{
 			char sep_s [2];
 
-			*sep_s = GetFileSeparatorChar ();
+			*sep_s = GetFileSeparatorChar();
 			* (sep_s + 1) = '\0';
 
 			if (DoesStringEndWith (working_dir_config_s, sep_s))
@@ -1831,4 +2061,3 @@ static char *ConfigureWorkingDirectoryPath (const json_t *blast_config_p)
 
 	return dir_s;
 }
-

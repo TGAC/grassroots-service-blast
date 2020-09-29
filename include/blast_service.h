@@ -91,6 +91,9 @@ typedef struct BLAST_SERVICE_LOCAL DatabaseInfo
 	/** The description of the database to display to the user. */
 	const char *di_description_s;
 
+	/** The description to use for indexing in the Grassroots search service */
+	const char *di_search_description_s;
+
 	/** The URI to download any associated resources for this database. */
 	const char *di_download_uri_s;
 
@@ -350,6 +353,7 @@ BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p,
  *
  * @param blast_service_p The Blast Service to add the Parameters for.
  * @param param_set_p The ParameterSet to add the common Parameters to.
+ * @param resource_p Any data passed by the user's request.
  * @param db_type The type of databases that the given Blast Service will run against.
  * @param add_additional_params_fn If a Blast Service wishes to add additional parameters
  * this optional callback function can be used.
@@ -357,7 +361,7 @@ BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p,
  * otherwise.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, const DatabaseType db_type, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p);
+BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, Resource *resource_p, const DatabaseType db_type, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p);
 
 
 BLAST_SERVICE_LOCAL bool GetBaseBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);

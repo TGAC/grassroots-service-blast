@@ -282,7 +282,7 @@ static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *r
 
 	if (param_set_p)
 		{
-			if (AddBaseBlastServiceParameters (service_p, param_set_p, DT_NUCLEOTIDE, NULL, NULL))
+			if (AddBaseBlastServiceParameters (service_p, param_set_p, resource_p, DT_NUCLEOTIDE, NULL, NULL))
 				{
 				  BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
 				  const BlastNTask *default_task_p = GetBlastNTaskFromResource (resource_p, BS_TASK);

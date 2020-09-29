@@ -137,9 +137,9 @@ static const char *GetBlastXServiceAlias (const Service * UNUSED_PARAM (service_
 }
 
 
-static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource *resource_p, UserDetails * UNUSED_PARAM (user_p))
 {
-	ParameterSet *param_set_p = CreateProteinBlastServiceParameters (service_p, "Protein BlastX service parameters", "A service to search protein databases with nucleotide queries", AddBlastXQuerySequenceParameters, NULL, s_tasks_p, S_NUM_TASKS);
+	ParameterSet *param_set_p = CreateProteinBlastServiceParameters (service_p, resource_p, "Protein BlastX service parameters", "A service to search protein databases with nucleotide queries", AddBlastXQuerySequenceParameters, NULL, s_tasks_p, S_NUM_TASKS);
 
 	return param_set_p;
 }
