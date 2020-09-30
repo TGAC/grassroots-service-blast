@@ -560,7 +560,7 @@ BLAST_SERVICE_LOCAL const DatabaseInfo *GetMatchingDatabaseByFilename (const Bla
 BLAST_SERVICE_LOCAL void ReleaseBlastService (Service *service_p);
 
 
-BLAST_SERVICE_LOCAL json_t *GetBlastIndexingData (struct Service *service_p);
+BLAST_SERVICE_LOCAL json_t *GetBlastIndexingData (Service *service_p);
 
 
 #ifdef __cplusplus

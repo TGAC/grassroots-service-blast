@@ -72,6 +72,11 @@ static char *ConfigureWorkingDirectoryPath (const json_t *blast_config_p);
 
 static json_t *GetIndexingDataPayload (GrassrootsServer *server_p, const char *service_s, const DatabaseInfo *db_p);
 
+static json_t *GetIndexingDataForDatabase (const Service *service_p, const DatabaseInfo *db_p);
+
+
+
+
 /*
  * API FUNCTIONS
  */
@@ -1660,7 +1665,7 @@ static json_t *GetIndexingDataPayload (GrassrootsServer *grassroots_p, const cha
 }
 
 
-json_t *GetBlastIndexingData (const Service *service_p)
+json_t *GetBlastIndexingData (Service *service_p)
 {
 	json_t *indexing_docs_p = json_array ();
 
@@ -1669,24 +1674,28 @@ json_t *GetBlastIndexingData (const Service *service_p)
 			BlastServiceData *data_p = (BlastServiceData *) (service_p -> se_data_p);
 			const DatabaseInfo *db_p = data_p -> bsd_databases_p;
 
-			while (db_p)
+			if (db_p)
 				{
-					json_t *doc_p = GetIndexingDataForDatabase (service_p, db_p);
-
-					if (doc_p)
+					while (db_p -> di_name_s)
 						{
-							if (json_array_append_new (indexing_docs_p, doc_p) != 0)
+							json_t *doc_p = GetIndexingDataForDatabase (service_p, db_p);
+
+							if (doc_p)
+								{
+									if (json_array_append_new (indexing_docs_p, doc_p) != 0)
+										{
+
+										}
+								}		/* if (doc_p) */
+							else
 								{
 
 								}
-						}		/* if (doc_p) */
-					else
-						{
 
-						}
+							++ db_p;
+						}		/* while (db_p) */
 
-					++ db_p;
-				}		/* while (db_p) */
+				}
 
 			return indexing_docs_p;
 		}
@@ -1720,7 +1729,7 @@ static json_t *GetIndexingDataForDatabase (const Service *service_p, const Datab
 												{
 													size_t l = strlen (url_s);
 													const char *alias_s = GetServiceAlias (service_p);
-													const char *path_s = (* (url_s - 1) == '/') ? "service" : "/service";
+													const char *path_s = (* (url_s + l - 1) == '/') ? "service/" : "/service/";
 													char *id_s = ConcatenateVarargsStrings (url_s, path_s, alias_s, NULL);
 
 													if (id_s)
