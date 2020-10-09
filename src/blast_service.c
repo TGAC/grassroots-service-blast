@@ -1008,7 +1008,7 @@ char *GetBlastResultByUUIDString (const BlastServiceData *data_p, const char *jo
 						{
 							if (data_p -> bsd_formatter_p)
 								{
-									result_s = data_p -> bsd_formatter_p -> GetConvertedOutput (job_output_filename_s, output_format_code, output_format_params_s, data_p);
+									result_s = data_p -> bsd_formatter_p -> GetConvertedOutput (job_id_s, output_format_code, output_format_params_s, data_p);
 								}		/* if (data_p -> bsd_formatter_p) */
 							else
 								{
