@@ -157,7 +157,7 @@ uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, R
 
 									if (db_s)
 										{
-											bool active_flag;
+											bool active_flag = false;
 
 											if (params_json_array_p)
 												{
