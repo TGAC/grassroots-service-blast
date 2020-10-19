@@ -1741,7 +1741,7 @@ static json_t *GetIndexingDataForDatabase (const Service *service_p, const Datab
 														{
 															size_t l = strlen (url_s);
 															const char *path_s = (* (url_s + l - 1) == '/') ? "service/" : "/service/";
-															char *id_s = ConcatenateVarargsStrings (url_s, path_s, alias_s, NULL);
+															char *id_s = ConcatenateVarargsStrings (url_s, path_s, alias_s, "/", db_p -> di_name_s, NULL);
 
 															if (id_s)
 																{
