@@ -1684,20 +1684,29 @@ json_t *GetBlastIndexingData (Service *service_p)
 								{
 									if (json_array_append_new (indexing_docs_p, doc_p) != 0)
 										{
-
+											json_decref (doc_p);
+											PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, doc_p, "Failed to add db data to array for \"%s\" in service \"%s\"", db_p-> di_name_s, GetServiceName (service_p));
 										}
 								}		/* if (doc_p) */
 							else
 								{
-
+									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get indexing data for \"%s\" in service \"%s\"", db_p-> di_name_s, GetServiceName (service_p));
 								}
 
 							++ db_p;
 						}		/* while (db_p) */
 
 				}
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "No databases for \"%s\"", GetServiceName (service_p));
+				}
 
 			return indexing_docs_p;
+		}
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate indexing_docs_p for \"%s\"", GetServiceName (service_p));
 		}
 
 	return NULL;
@@ -1706,119 +1715,140 @@ json_t *GetBlastIndexingData (Service *service_p)
 
 static json_t *GetIndexingDataForDatabase (const Service *service_p, const DatabaseInfo *db_p)
 {
+	const char *name_s = GetServiceName (service_p);
 	json_t *index_data_p = json_object();
 
 	if (index_data_p)
 		{
-			const char *name_s = GetServiceName (service_p);
-
-			if (SetJSONString (index_data_p, INDEXING_SERVICE_S, name_s))
+			if (SetJSONString (index_data_p, INDEXING_SERVICE_NAME_S, name_s))
 				{
-					if (SetJSONString (index_data_p, INDEXING_NAME_S, db_p -> di_name_s))
+					const char *alias_s = GetServiceAlias (service_p);
+
+					if (SetJSONString (index_data_p, INDEXING_SERVICE_ALIAS_S, alias_s))
 						{
-							GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
-							const json_t *hostname_p = GetGlobalConfigValue (grassroots_p, "so:url");
-
-							if (hostname_p)
+							if (SetJSONString (index_data_p, INDEXING_NAME_S, db_p -> di_name_s))
 								{
-									if (json_is_string (hostname_p))
+									GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+									const json_t *hostname_p = GetGlobalConfigValue (grassroots_p, "so:url");
+
+									if (hostname_p)
 										{
-											const char *url_s = json_string_value (hostname_p);
-
-											if (SetJSONString (index_data_p, INDEXING_PAYLOAD_URL_S, url_s))
+											if (json_is_string (hostname_p))
 												{
-													size_t l = strlen (url_s);
-													const char *alias_s = GetServiceAlias (service_p);
-													const char *path_s = (* (url_s + l - 1) == '/') ? "service/" : "/service/";
-													char *id_s = ConcatenateVarargsStrings (url_s, path_s, alias_s, NULL);
+													const char *url_s = json_string_value (hostname_p);
 
-													if (id_s)
+													if (SetJSONString (index_data_p, INDEXING_PAYLOAD_URL_S, url_s))
 														{
-															if (SetJSONString (index_data_p, INDEXING_ID_S, id_s))
+															size_t l = strlen (url_s);
+															const char *path_s = (* (url_s + l - 1) == '/') ? "service/" : "/service/";
+															char *id_s = ConcatenateVarargsStrings (url_s, path_s, alias_s, NULL);
+
+															if (id_s)
 																{
-																	if (SetJSONString (index_data_p, INDEXING_TYPE_S, INDEXING_TYPE_SERVICE_GRASSROOTS_S))
+																	if (SetJSONString (index_data_p, INDEXING_ID_S, id_s))
 																		{
-																			const char *description_s = db_p -> di_search_description_s ? db_p -> di_search_description_s : db_p -> di_description_s;
-
-																			if (description_s)
+																			if (SetJSONString (index_data_p, INDEXING_TYPE_S, INDEXING_TYPE_SERVICE_GRASSROOTS_S))
 																				{
-																					if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s))
-																						{
-																							json_t *payload_p = GetIndexingDataPayload (grassroots_p, name_s, db_p);
+																					const char *description_s = db_p -> di_search_description_s ? db_p -> di_search_description_s : db_p -> di_description_s;
 
-																							if (payload_p)
+																					if (description_s)
+																						{
+																							if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s))
 																								{
-																									if (json_object_set_new (index_data_p, INDEXING_PAYLOAD_DATA_S, payload_p) == 0)
+																									json_t *payload_p = GetIndexingDataPayload (grassroots_p, name_s, db_p);
+
+																									if (payload_p)
 																										{
-																											return index_data_p;
-																										}		/* if (json_object_set_new (index_data_p, "payload", payload_p) == 0) */
+																											if (json_object_set_new (index_data_p, INDEXING_PAYLOAD_DATA_S, payload_p) == 0)
+																												{
+																													return index_data_p;
+																												}		/* if (json_object_set_new (index_data_p, "payload", payload_p) == 0) */
+																											else
+																												{
+																													json_decref (payload_p);
+																													PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to append data to array for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
+																												}
+																										}		/* if (payload_p) */
 																									else
 																										{
-																											json_decref (payload_p);
+																											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetIndexingDataPayload failed for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
 																										}
-																								}		/* if (payload_p) */
+
+																								}		/* if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s)) */
 																							else
 																								{
-
+																									PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_DESCRIPTION_S, description_s, db_p -> di_name_s, name_s);
 																								}
+
+																						}		/* if (description_s) */
+																					else
+																						{
+																							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "No description for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
 																						}
+
+																				}		/* if (SetJSONString (index_data_p, INDEXING_TYPE_S, INDEXING_TYPE_SERVICE_GRASSROOTS_S)) */
+																			else
+																				{
+																					PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_TYPE_S, INDEXING_TYPE_SERVICE_GRASSROOTS_S, db_p -> di_name_s, name_s);
 																				}
+
+																		}		/* if (SetJSONString (index_data_p, "id", id_s)) */
+																	else
+																		{
+																			PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"id\": \"%s\" for \"%s\" in \"%s\"", id_s, db_p -> di_name_s, name_s);
 																		}
 
-																}		/* if (SetJSONString (index_data_p, "id", id_s)) */
+																}		/* if (id_s) */
+															else
+																{
+																	PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get id from \"%s\", \"%s\", \"%s\"", url_s, path_s, alias_s);
+																}
 
-														}		/* if (id_s) */
+														}		/* if (SetJSONString (index_data_p, "internal_url", url_s)) */
+													else
+														{
+															PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"internal_url\": \"%s\" for \"%s\" in \"%s\"", url_s, db_p -> di_name_s, name_s);
+														}
 
-												}		/* if (SetJSONString (index_data_p, "internal_url", url_s)) */
+												}		/* if (json_is_string (hostname_p)) */
+											else
+												{
+													PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, hostname_p, "Hostname is not a string");
+												}
 
+										}		/* if (hostname_p) */
+									else
+										{
+											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to get hostname from global config");
 										}
+
+								}		/* if (SetJSONString (index_data_p, INDEXING_NAME_S, database_p -> di_name_s)) */
+							else
+								{
+									PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_NAME_S, db_p -> di_name_s, db_p -> di_name_s, name_s);
 								}
 
+						}		/* if (SetJSONString (index_data_p, INDEXING_SERVICE_ALIAS_S, name_s)) */
+					else
+						{
+							PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_SERVICE_ALIAS_S, name_s, db_p -> di_name_s, name_s);
+						}
 
-
-
-						}		/* if (SetJSONString (index_data_p, "so:name", database_p -> di_name_s)) */
 
 				}		/* if (SetJSONString (index_data_p, SERVICE_NAME_S, name_s)) */
+			else
+				{
+					PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", SERVICE_NAME_S, name_s, db_p -> di_name_s, name_s);
+				}
 
 			json_decref (index_data_p);
 		}		/* if (index_data_p) */
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate index data for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
+		}
 
 	return NULL;
-}
-
-
-static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p)
-{
-	json_t *db_json_p = json_object();
-
-	if (db_json_p)
-		{
-			if (SetJSONString (db_json_p, CONTEXT_PREFIX_SCHEMA_ORG_S "name", db_p -> di_name_s))
-				{
-					bool success_flag = true;
-
-					if (db_p -> di_description_s)
-						{
-							if (!SetJSONString (db_json_p, CONTEXT_PREFIX_SCHEMA_ORG_S "description", db_p -> di_description_s))
-								{
-									success_flag = false;
-								}
-						}
-
-					if (success_flag)
-						{
-							if (json_array_append_new (json_p, db_json_p) == 0)
-								{
-									return true;
-								}
-						}
-				}
-
-			json_decref (db_json_p);
-		}		/* if (db_json_p) */
-
-	return false;
 }
 
 
