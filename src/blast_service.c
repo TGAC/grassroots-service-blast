@@ -1730,6 +1730,16 @@ static json_t *GetIndexingDataForDatabase (const Service *service_p, const Datab
 								{
 									GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
 									const json_t *hostname_p = GetGlobalConfigValue (grassroots_p, "so:url");
+									const char *icon_s = GetJSONString (service_p -> se_data_p -> sd_config_p, OPERATION_ICON_URI_S);
+
+									if (icon_s)
+										{
+											if (!SetJSONString (index_data_p, INDEXING_ICON_URI_S, icon_s))
+												{
+													PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_ICON_URI_S, icon_s, name_s);
+												}		/* if (SetJSONString (index_data_p, INDEXING_ICON_URI_S, icon_s)) */
+
+										}		/* if (icon_s) */
 
 									if (hostname_p)
 										{
@@ -1749,42 +1759,52 @@ static json_t *GetIndexingDataForDatabase (const Service *service_p, const Datab
 																		{
 																			if (SetJSONString (index_data_p, INDEXING_TYPE_S, INDEXING_TYPE_SERVICE_GRASSROOTS_S))
 																				{
-																					const char *description_s = db_p -> di_search_description_s ? db_p -> di_search_description_s : db_p -> di_description_s;
-
-																					if (description_s)
+																					if (SetJSONString (index_data_p, INDEXING_TYPE_DESCRIPTION_S, INDEXING_TYPE_DESCRIPTION_SERVICE_GRASSROOTS_S))
 																						{
-																							if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s))
-																								{
-																									json_t *payload_p = GetIndexingDataPayload (grassroots_p, name_s, db_p);
+																							const char *description_s = db_p -> di_search_description_s ? db_p -> di_search_description_s : db_p -> di_description_s;
 
-																									if (payload_p)
+																							if (description_s)
+																								{
+																									if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s))
 																										{
-																											if (json_object_set_new (index_data_p, INDEXING_PAYLOAD_DATA_S, payload_p) == 0)
+																											json_t *payload_p = GetIndexingDataPayload (grassroots_p, name_s, db_p);
+
+																											if (payload_p)
 																												{
-																													return index_data_p;
-																												}		/* if (json_object_set_new (index_data_p, "payload", payload_p) == 0) */
+																													if (json_object_set_new (index_data_p, INDEXING_PAYLOAD_DATA_S, payload_p) == 0)
+																														{
+																															return index_data_p;
+																														}		/* if (json_object_set_new (index_data_p, "payload", payload_p) == 0) */
+																													else
+																														{
+																															json_decref (payload_p);
+																															PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to append data to array for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
+																														}
+																												}		/* if (payload_p) */
 																											else
 																												{
-																													json_decref (payload_p);
-																													PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to append data to array for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
+																													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetIndexingDataPayload failed for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
 																												}
-																										}		/* if (payload_p) */
+
+																										}		/* if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s)) */
 																									else
 																										{
-																											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetIndexingDataPayload failed for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
+																											PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_DESCRIPTION_S, description_s, db_p -> di_name_s, name_s);
 																										}
 
-																								}		/* if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s)) */
+																								}		/* if (description_s) */
 																							else
 																								{
-																									PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_DESCRIPTION_S, description_s, db_p -> di_name_s, name_s);
+																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "No description for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
 																								}
 
-																						}		/* if (description_s) */
+																						}
 																					else
 																						{
-																							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "No description for \"%s\" in \"%s\"", db_p -> di_name_s, name_s);
+
+																							PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, index_data_p, "Failed to add \"%s\": \"%s\" for \"%s\" in \"%s\"", INDEXING_TYPE_DESCRIPTION_S, INDEXING_TYPE_DESCRIPTION_SERVICE_GRASSROOTS_S, db_p -> di_name_s, name_s);
 																						}
+
 
 																				}		/* if (SetJSONString (index_data_p, INDEXING_TYPE_S, INDEXING_TYPE_SERVICE_GRASSROOTS_S)) */
 																			else
