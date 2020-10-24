@@ -1683,7 +1683,7 @@ static json_t *GetIndexingDataForDatabase (const Service *service_p, const Datab
 																								{
 																									if (SetJSONString (index_data_p, INDEXING_DESCRIPTION_S, description_s))
 																										{
-																											json_t *payload_p = GetIndexingDataPayload (grassroots_p, name_s, db_p);
+																											json_t *payload_p = GetBlastIndexingDataPayload (grassroots_p, name_s, db_p);
 
 																											if (payload_p)
 																												{
