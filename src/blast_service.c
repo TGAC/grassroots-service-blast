@@ -70,7 +70,7 @@ static bool AddDatabaseForIndexing (const DatabaseInfo *db_p, json_t *json_p);
 
 static char *ConfigureWorkingDirectoryPath (const json_t *blast_config_p);
 
-static json_t *GetIndexingDataPayload (GrassrootsServer *server_p, const char *service_s, const DatabaseInfo *db_p);
+static json_t *GetBlastIndexingDataPayload (GrassrootsServer *server_p, const char *service_s, const DatabaseInfo *db_p);
 
 static json_t *GetIndexingDataForDatabase (const Service *service_p, const DatabaseInfo *db_p);
 
@@ -1526,140 +1526,56 @@ const DatabaseInfo *GetMatchingDatabaseByFilename (const BlastServiceData *data_
 */
 
 
-static json_t *GetIndexingDataPayload (GrassrootsServer *grassroots_p, const char *service_s, const DatabaseInfo *db_p)
+static json_t *GetBlastIndexingDataPayload (GrassrootsServer *grassroots_p, const char *service_s, const DatabaseInfo *db_p)
 {
+	json_t *payload_p = NULL;
 	char *group_s = GetLocalDatabaseGroupName (grassroots_p);
 	char *full_db_name_s = GetFullyQualifiedDatabaseName (group_s, db_p -> di_name_s);
 
 	if (full_db_name_s)
 		{
-			json_t *payload_p = json_object ();
+			json_t *params_p = json_array ();
 
-			if (payload_p)
+			if (params_p)
 				{
-					json_t *services_p = json_array ();
+					json_t *param_p = json_pack ("{s:s, s:b}", PARAM_NAME_S, full_db_name_s, PARAM_CURRENT_VALUE_S, true);
 
-					if (services_p)
+					if (param_p)
 						{
-							if (json_object_set_new (payload_p, SERVICES_NAME_S, services_p) == 0)
+							if (json_array_append_new (params_p, param_p) == 0)
 								{
-									json_t *service_p  = json_object ();
-
-									if (service_p)
-										{
-											if (json_array_append_new (services_p, service_p) == 0)
-												{
-													if (SetJSONString (service_p, SERVICE_NAME_S, service_s))
-														{
-															if (SetJSONBoolean (service_p, SERVICE_REFRESH_S, true))
-																{
-																	json_t *param_set_p = json_object ();
-
-																	if (param_set_p)
-																		{
-																			if (json_object_set_new (service_p, PARAM_SET_KEY_S, param_set_p) == 0)
-																				{
-																					if (SetJSONString (param_set_p, PARAM_LEVEL_S, PARAM_LEVEL_TEXT_SIMPLE_S))
-																						{
-																							json_t *params_p = json_array ();
-
-																							if (params_p)
-																								{
-																									if (json_object_set_new (param_set_p, PARAM_SET_PARAMS_S, params_p) == 0)
-																										{
-																											json_t *param_p = json_pack ("{s:s, s:b}", PARAM_NAME_S, full_db_name_s, PARAM_CURRENT_VALUE_S, true);
-
-																											if (param_p)
-																												{
-																													if (json_array_append_new (params_p, param_p) == 0)
-																														{
-																															return payload_p;
-																														}		/* if (json_array_append_new (params_p, param_p) == 0) */
-																													else
-																														{
-																															PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add param to array \"%s\"", full_db_name_s);
-																															json_decref (param_p);
-																														}
-
-																												}		/* if (param_p) */
-
-																										}		/* if (json_object_set_new (param_set_p, PARAM_SET_PARAMS_S, params_p) == 0) */
-																									else
-																										{
-																											json_decref (params_p);
-																											PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add params array to param set \"%s\"", full_db_name_s);
-																										}
-
-																								}		/* if (params_p) */
-																							else
-																								{
-																									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate params array for \"%s\"", full_db_name_s);
-																								}
-
-																						}		/* if (SetJSONString (param_set_p, PARAM_LEVEL_S, PARAM_LEVEL_TEXT_SIMPLE_S)) */
-																					else
-																						{
-																							PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, param_set_p, "Failed to add \"%s\": \"%s\"", PARAM_LEVEL_S, PARAM_LEVEL_TEXT_SIMPLE_S);
-																						}
-
-																				}		/* if (json_object_set_new (service_p, PARAM_SET_KEY_S, param_set_p) == 0) */
-																			else
-																				{
-																					PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add parameter set to service \"%s\"", full_db_name_s);
-																				}
-
-																		}		/* if (param_set_p) */
-																	else
-																		{
-																			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate param set  for \"%s\"", full_db_name_s);
-																		}
-
-																}		/* if (SetJSONBoolean (services_p, SERVICE_REFRESH_S, true)) */
-															else
-																{
-																	PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, services_p, "Failed to add \"%s\": true", SERVICE_REFRESH_S);
-																}
-
-														}		/* if (SetJSONString (services_p, SERVICE_NAME_S, service_s)) */
-													else
-														{
-															PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, services_p, "Failed to add \"%s\": \"%s\"", SERVICE_NAME_S, service_s);
-														}
-
-												}		/* if (json_array_append_new (services_p, service_p)) == 0) */
-											else
-												{
-													PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add service to services array \"%s\"", full_db_name_s);
-												}
-
-										}		/* if (service_p) */
-									else
-										{
-											PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate service for \"%s\"", full_db_name_s);
-										}
-
-								}		/* if (json_object_set_new (payload_p, SERVICES_NAME_S, services_p) == 0) */
+									payload_p = GetIndexingDataPayload (grassroots_p, service_s, params_p);
+								}		/* if (json_array_append_new (params_p, param_p) == 0) */
 							else
 								{
-									json_decref (services_p);
-									PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add services to payload \"%s\"", full_db_name_s);
+									PrintJSONToErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, payload_p, "Failed to add params to  \"%s\"", full_db_name_s);
+									json_decref (param_p);
 								}
 
-						}		/* if (services_p) */
+						}		/* if (param_p) */
 					else
 						{
-							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate services for \"%s\"", full_db_name_s);
+							PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate params array for \"%s\"", full_db_name_s);
 						}
 
-					json_decref (payload_p);
-				}		/* if (payload_p) */
+					if (!payload_p)
+						{
+							json_decref (params_p);
+						}
+
+				}		/* if (params_p) */
 			else
 				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate payload for \"%s\"", full_db_name_s);
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate params array for \"%s\"", full_db_name_s);
 				}
 
 			FreeCopiedString (full_db_name_s);
 		}		/* if (full_db_name_s) */
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetFullyQualifiedDatabaseName failed for \"%s\" and \"%s\"", group_s, db_p -> di_name_s);
+		}
+
 
 	return NULL;
 }
