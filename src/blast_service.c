@@ -1576,8 +1576,7 @@ static json_t *GetBlastIndexingDataPayload (GrassrootsServer *grassroots_p, cons
 			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetFullyQualifiedDatabaseName failed for \"%s\" and \"%s\"", group_s, db_p -> di_name_s);
 		}
 
-
-	return NULL;
+	return payload_p;
 }
 
 
