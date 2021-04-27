@@ -91,7 +91,7 @@ BlastTool *DrmaaBlastToolFactory :: CreateBlastTool (BlastServiceJob *job_p, con
 
 					if (drmaa_tool_p)
 						{
-							int i = 0;
+							json_int_t i = 0;
 							const char *value_s = NULL;
 
 							/* Set the number of cores per job */
