@@ -134,7 +134,7 @@ BlastTool :: BlastTool (BlastServiceJob *service_job_p, const char *name_s, cons
 
 BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, const json_t *root_p)
 {
-	uint32 output_format = BS_DEFAULT_OUTPUT_FORMAT;
+	json_int_t output_format = BS_DEFAULT_OUTPUT_FORMAT;
 
 	bt_factory_name_s = GetCopiedJSONString (root_p, BT_FACTORY_NAME_S);
 	if (!bt_factory_name_s)
@@ -163,8 +163,8 @@ BlastTool :: BlastTool (BlastServiceJob *job_p, const BlastServiceData *data_p, 
 			bt_custom_output_columns_s = nullptr;
 		}
 
-	GetJSONInteger (root_p, BT_OUTPUT_FORMAT_S, (int *) &output_format);
-	bt_output_format = output_format;
+	GetJSONInteger (root_p, BT_OUTPUT_FORMAT_S, &output_format);
+	bt_output_format = (uint32) output_format;
 
 
 	bt_job_p = job_p;

@@ -276,14 +276,14 @@ static bool ProcessPolymorphism (LinkedService *linked_service_p, json_t *polymo
 
 static uint32 GetPolymarkerMinSequenceLength (const LinkedService *linked_service_p)
 {
-	uint32 length = 0;
+	json_int_t length = 0;
 
 	if (linked_service_p -> ls_config_p)
 		{
-			GetJSONInteger (linked_service_p -> ls_config_p, "primer3_min_sequence_length", (int *) &length);
+			GetJSONInteger (linked_service_p -> ls_config_p, "primer3_min_sequence_length",  &length);
 		}
 
-	return length;
+	return ((uint32) length);
 }
 
 
@@ -449,7 +449,7 @@ static bool GetSNPBases (const json_t *polymorphism_p, char *query_base_p, char 
 
 static int32 GetSNPIndex (const json_t *polymorphism_p)
 {
-	int32 index = -1;
+	json_int_t index = -1;
 	char *key_s = ConcatenateVarargsStrings (BSJMK_LOCUS_S, ".", BSJMK_FALDO_BEGIN_S, NULL);
 
 	if (key_s)

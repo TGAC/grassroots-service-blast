@@ -324,11 +324,11 @@ bool AddHitLocation (json_t *parent_p, const char *child_key_s, const int32 from
 bool GetAndAddHitLocation (json_t *marked_up_result_p, const json_t *hsps_p, const char *hsp_from_key_s, const char *hsp_to_key_s, const char *strand_key_s, const char *child_key_s)
 {
 	bool success_flag = false;
-	int32 from;
+	json_int_t from;
 
 	if (GetJSONInteger (hsps_p, hsp_from_key_s, &from))
 		{
-			int32 to;
+			json_int_t to;
 
 			if (GetJSONInteger (hsps_p, hsp_to_key_s, &to))
 				{
@@ -502,7 +502,7 @@ bool GetAndAddDoubleScoreValue (json_t *marked_up_result_p, const json_t *hsps_p
 bool GetAndAddIntScoreValue (json_t *marked_up_result_p, const json_t *hsps_p, const char *hsp_key_s, const char *marked_up_key_s)
 {
 	bool success_flag = false;
-	int32 value;
+	json_int_t value;
 
 	if (GetJSONInteger (hsps_p, hsp_key_s, &value))
 		{
@@ -1826,7 +1826,7 @@ json_t *GetMarkupReports (json_t *markup_p)
 static bool PopulateMarkedUpHit (json_t *marked_up_hit_p, const json_t *blast_hit_p, const DatabaseInfo *db_p)
 {
 	bool success_flag = false;
-	int hit_num;
+	json_int_t hit_num;
 	const char *hit_type_s = NULL;
 
 	if (db_p -> di_type == DT_NUCLEOTIDE)
@@ -1899,11 +1899,11 @@ static bool AddQueryMasks (const json_t *blast_search_p, json_t *mark_up_p)
 							for (i = 0; i < size; ++ i)
 								{
 									const json_t *blast_mask_p = json_array_get (blast_query_masking_p, i);
-									int32 from;
+									json_int_t from;
 
 									if (GetJSONInteger (blast_mask_p, "from", &from))
 										{
-											int32 to;
+											json_int_t to;
 
 											if (GetJSONInteger (blast_mask_p, "to", &to))
 												{
