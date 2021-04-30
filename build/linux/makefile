@@ -56,7 +56,8 @@ SRCS 	:= \
 	polymarker_linked_service.c \
 	strings_args_processor.cpp \
 	system_blast_tool.cpp \
-	system_blast_tool_factory.cpp 
+	system_blast_tool_factory.cpp \
+	temp_file.cpp
 	
 
 CPPFLAGS += -DBLAST_LIBRARY_EXPORTS
