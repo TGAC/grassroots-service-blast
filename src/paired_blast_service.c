@@ -39,6 +39,7 @@
 #include "string_parameter.h"
 #include "unsigned_int_parameter.h"
 
+#include "uuid_util.h"
 
 #ifdef _DEBUG
 	#define PAIRED_BLAST_SERVICE_DEBUG	(STM_LEVEL_FINER)

@@ -30,6 +30,8 @@
 #include "jansson.h"
 #include "json_util.h"
 
+#include "uuid_util.h"
+
 
 const char * const BlastTool :: BT_NAME_S = "name";
 

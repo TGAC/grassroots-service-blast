@@ -32,6 +32,7 @@
 #include "temp_file.hpp"
 #include "math_utils.h"
 
+#include "uuid_util.h"
 
 #include "unsigned_int_parameter.h"
 #include "string_parameter.h"

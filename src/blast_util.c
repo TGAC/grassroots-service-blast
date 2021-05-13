@@ -33,6 +33,9 @@
 #include "string_parameter.h"
 #include "unsigned_int_parameter.h"
 
+#include "uuid_util.h"
+
+
 
 bool AddArgsPair (const char *key_s, const char *value_s, ArgsProcessor *ap_p)
 {

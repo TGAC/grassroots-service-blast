@@ -31,7 +31,7 @@
 #include <fstream>
 #include <cstdio>
 
-#include "uuid/uuid.h"
+#include "uuid_defs.h"
 
 #include "blast_service_api.h"
 #include "memory_allocations.h"

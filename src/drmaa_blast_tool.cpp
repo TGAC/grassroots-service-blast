@@ -33,6 +33,9 @@
 #include "jobs_manager.h"
 #include "alloc_failure.hpp"
 
+#include "uuid_util.h"
+
+
 #ifdef _DEBUG
 	#define DRMAA_BLAST_TOOL_DEBUG	(STM_LEVEL_FINEST)
 #else

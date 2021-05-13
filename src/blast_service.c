@@ -49,6 +49,8 @@
 #include "unsigned_int_parameter.h"
 
 
+#include "uuid_util.h"
+
 #ifdef _DEBUG
 #define BLAST_SERVICE_DEBUG (STM_LEVEL_FINEST)
 #else

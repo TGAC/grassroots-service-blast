@@ -27,6 +27,7 @@
 #include "string_utils.h"
 #include "blast_util.h"
 
+#include "uuid_util.h"
 
 #ifdef _DEBUG
 	#define SYSTEM_BLAST_TOOL_DEBUG	(STM_LEVEL_FINER)

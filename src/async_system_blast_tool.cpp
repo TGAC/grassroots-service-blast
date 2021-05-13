@@ -32,6 +32,8 @@
 
 #include "system_async_task.h"
 
+#include "uuid_util.h"
+
 
 #ifdef _DEBUG
 	#define ASYNC_SYSTEM_BLAST_TOOL_DEBUG (STM_LEVEL_FINER)

@@ -32,6 +32,8 @@
 #include "string_utils.h"
 #include "regular_expressions.h"
 
+#include "uuid_util.h"
+
 
 
 
