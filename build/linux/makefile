@@ -35,6 +35,7 @@ INCLUDES := \
 	-I$(DIR_PCRE_INC)
 	
 SRCS 	:= \
+	alloc_failure.cpp \
 	args_processor.cpp \
 	async_system_blast_tool.cpp \
 	blast_app_parameters.c \
