@@ -2,9 +2,9 @@
 
 The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Services module allows BLAST queries to be submitted against a number of databases.  This Grassroots service module contains three Services: 
 
- * **BlastN Service** for searching nucleotide databases using nucleotide queries 
- * **BlastP Service** for searching protein databases using protein queries 
- * **BlastX Service** for searching protein databases using translated nucleotide queries 
+ * **BlastN** for searching nucleotide databases using nucleotide queries 
+ * **BlastP** for searching protein databases using protein queries 
+ * **BlastX** for searching protein databases using translated nucleotide queries 
 
 ## Installation
 
@@ -36,7 +36,7 @@ to install the service into the Grassroots system where it will be available for
 
 ## Server Configuration
 
-Each of the three services listed above can be configured by files with the same names in the ```config``` directory in the Grassroots application directory, *e.g.* ```config/BlastN service```
+Each of the three services listed above can be configured by files with the same names in the ```config``` directory in the Grassroots application directory, *e.g.* ```config/BlastN```
 
  * **working_directory**: This is the directory where are any input, output and log files created by the BLAST Services. This directory must be writeable by the user running the Grassroots Server. For instance, the httpd server is often run as the daemon user.
  * **databases**: This is an array of objects giving the details of the available databases. The objects in this array have the following keys:
@@ -57,7 +57,7 @@ Each of the three services listed above can be configured by files with the same
     * **system**: This will be run using the executable specified by *blast_command* to the ANSI-specified *system()* function. This is the default *blast_tool* option.
     * **drmaa**: This will be run by submitting a job to a DRMAA environment.
 
-An example configuration file for the BlastN service which would be saved as the ```<Grassroots directory>/config/BlastN service``` is:
+An example configuration file for the BlastN service which would be saved as the ```<Grassroots directory>/config/BlastN``` is:
 
 ~~~{.json}
 {
@@ -93,11 +93,11 @@ An example configuration file for the BlastN service which would be saved as the
 		}
 	}, 
 	"linked_services": {
-		"service_name": "SamTools service",
+		"so:name": "SamTools",
 		"parameters": {
 			"mappings": [{
 				"input": "database",
-				"output": "Blast database"
+				"output": "input_file"
 			}, {
 				"input": "scaffold",
 				"output": "Scaffold"
