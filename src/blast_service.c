@@ -425,7 +425,7 @@ bool CloseBlastService (Service *service_p)
 }
 
 
-bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, Resource *resource_p, const DatabaseType db_type, AddAdditionalParamsFn add_additional_params_fn, void *callback_data_p)
+bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, DataResource *resource_p, const DatabaseType db_type, AddAdditionalParamsFn add_additional_params_fn, void *callback_data_p)
 {
 	bool success_flag = false;
 	BlastServiceData *blast_data_p = (BlastServiceData *) (blast_service_p -> se_data_p);
@@ -579,7 +579,7 @@ ServiceJobSet *GetPreviousJobResults (LinkedList *ids_p, BlastServiceData *blast
 
 													if (result_json_p)
 														{
-															json_t *blast_result_json_p = GetResourceAsJSONByParts (PROTOCOL_INLINE_S, NULL, job_id_s, result_json_p);
+															json_t *blast_result_json_p = GetDataResourceAsJSONByParts (PROTOCOL_INLINE_S, NULL, job_id_s, result_json_p);
 
 															if (blast_result_json_p)
 																{
@@ -716,7 +716,7 @@ void PrepareBlastServiceJobs (const DatabaseInfo *db_p, const ParameterSet * con
 }
 
 
-ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_p, Handler * UNUSED_PARAM (handler_p))
+ParameterSet *IsResourceForBlastService (Service *service_p, DataResource *resource_p, Handler * UNUSED_PARAM (handler_p))
 {
 	ParameterSet *params_p = NULL;
 
@@ -920,7 +920,7 @@ bool DetermineBlastResult (BlastServiceJob *job_p)
 
 			if (result_json_p)
 				{
-					json_t *blast_result_json_p = GetResourceAsJSONByParts (PROTOCOL_INLINE_S, NULL, uuid_s, result_json_p);
+					json_t *blast_result_json_p = GetDataResourceAsJSONByParts (PROTOCOL_INLINE_S, NULL, uuid_s, result_json_p);
 
 					if (blast_result_json_p)
 						{

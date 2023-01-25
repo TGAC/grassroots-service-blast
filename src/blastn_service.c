@@ -147,7 +147,7 @@ static const char *GetBlastNServiceDescription (const Service *service_p);
 
 static const char *GetBlastNServiceAlias (const Service *service_p);
 
-static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
+static ParameterSet *GetBlastNServiceParameters (Service *service_p, DataResource *resource_p, UserDetails *user_p);
 
 static bool GetBlastNServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
@@ -164,7 +164,7 @@ static bool ParseNucleotideBlastParameters (const BlastServiceData *data_p, Para
 static bool GetNucleotideBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);
 
 
-static const BlastNTask *GetBlastNTaskFromResource (Resource *resource_p, const NamedParameterType task_param_type);
+static const BlastNTask *GetBlastNTaskFromResource (DataResource *resource_p, const NamedParameterType task_param_type);
 
 
 static const BlastNTask *GetDefaultBlastNTask (void);
@@ -276,7 +276,7 @@ static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p)
 }
 
 
-static ParameterSet *GetBlastNServiceParameters (Service *service_p, Resource *resource_p, UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetBlastNServiceParameters (Service *service_p, DataResource *resource_p, UserDetails * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("Nucleotide Blast service parameters", "A service to run nucleotide Blast searches");
 
@@ -506,7 +506,7 @@ static const BlastNTask *GetDefaultBlastNTask (void)
 }
 
 
-static const BlastNTask *GetBlastNTaskFromResource (Resource *resource_p, const NamedParameterType task_param_type)
+static const BlastNTask *GetBlastNTaskFromResource (DataResource *resource_p, const NamedParameterType task_param_type)
 {
 	if (resource_p && (resource_p -> re_data_p))
 		{

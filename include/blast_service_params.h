@@ -277,7 +277,7 @@ BLAST_SERVICE_LOCAL bool AddProgramSelectionParameters (BlastServiceData *blast_
  * @return The number of database parameters added.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, Resource *resource_p, const DatabaseType db_type);
+BLAST_SERVICE_LOCAL uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, DataResource *resource_p, const DatabaseType db_type);
 
 
 /**

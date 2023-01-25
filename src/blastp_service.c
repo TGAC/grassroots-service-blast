@@ -66,7 +66,7 @@ static const char *GetProteinBlastServiceAlias (const Service *service_p);
 
 static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
-static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
+static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, UserDetails *user_p);
 
 
 static bool AddScoringParameters (BlastServiceData *data_p, ParameterSet *param_set_p);
@@ -129,7 +129,7 @@ Service *GetBlastPService (GrassrootsServer *grassroots_p)
 }
 
 
-ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, Resource *resource_p, const char *param_set_name_s, const char *param_set_description_s, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p, const BlastTask *tasks_p, const uint32 num_tasks)
+ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, const char *param_set_name_s, const char *param_set_description_s, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p, const BlastTask *tasks_p, const uint32 num_tasks)
 {
 	ParameterSet *param_set_p = AllocateParameterSet (param_set_name_s, param_set_description_s);
 
@@ -272,7 +272,7 @@ static const char *GetProteinBlastServiceAlias (const Service * UNUSED_PARAM (se
 }
 
 
-static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, Resource *resource_p, UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, UserDetails * UNUSED_PARAM (user_p))
 {
 	return CreateProteinBlastServiceParameters (service_p, resource_p, "Protein Blast service parameters", "A service to run Protein Blast searches", NULL, NULL, s_tasks_p, S_NUM_TASKS);
 }

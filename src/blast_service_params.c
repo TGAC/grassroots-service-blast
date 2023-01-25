@@ -74,7 +74,7 @@ const char *BSP_OUTPUT_FORMATS_SS [BOF_NUM_TYPES] =
 
 static Parameter *SetUpOutputFormatParameter (const char **formats_ss, const uint32 num_formats, const uint32 default_format, const BlastServiceData *service_data_p, ParameterSet *param_set_p, ParameterGroup *group_p);
 
-static json_t *GetParametersFromResource (Resource *resource_p);
+static json_t *GetParametersFromResource (DataResource *resource_p);
 
 static int GetDatabaseActiveFlagFromJSON (const json_t *params_json_p, const char *db_param_name_s, bool *value_p);
 
@@ -130,7 +130,7 @@ char *CreateGroupName (const char *server_s)
 /*
  * The list of databases that can be searched
  */
-uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, Resource *resource_p,  const DatabaseType db_type)
+uint16 AddDatabaseParams (BlastServiceData *data_p, ParameterSet *param_set_p, DataResource *resource_p,  const DatabaseType db_type)
 {
 	uint16 num_added_databases = 0;
 	size_t num_group_params = GetNumberOfDatabases (data_p, db_type);
@@ -595,7 +595,7 @@ const char *GetLocalDatabaseName (const char *fully_qualified_db_s)
 
 
 
-static json_t *GetParametersFromResource (Resource *resource_p)
+static json_t *GetParametersFromResource (DataResource *resource_p)
 {
 	json_t *params_json_p = NULL;
 

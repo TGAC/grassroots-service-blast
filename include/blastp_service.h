@@ -38,7 +38,7 @@ BLAST_SERVICE_LOCAL bool AddProteinBlastParameters (BlastServiceData *data_p, Pa
 BLAST_SERVICE_LOCAL bool ParseBlastPParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
 
-BLAST_SERVICE_LOCAL ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, Resource *resource_p, const char *param_set_name_s, const char *param_set_description_s, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p, const BlastTask *tasks_p, const uint32 num_tasks);
+BLAST_SERVICE_LOCAL ParameterSet *CreateProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, const char *param_set_name_s, const char *param_set_description_s, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p, const BlastTask *tasks_p, const uint32 num_tasks);
 
 
 BLAST_SERVICE_LOCAL bool GetProteinBlastParameterTypeForNamedParameter (const char *param_name_s, ParameterType *pt_p);

@@ -76,7 +76,7 @@ static ServiceMetadata *GetMagicBlastServiceMetadata (Service *service_p);
 
 static bool ParseMagicBlastParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
-static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p));
+static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p));
 
 
 static bool GetMagicBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
@@ -148,7 +148,7 @@ static const char *GetMagicBlastServiceAlias (const Service * UNUSED_PARAM (serv
 }
 
 
-static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("Magic Blast service parameters", "A service to run Magic Blast searches");
 	BlastServiceData *data_p = (BlastServiceData *) service_p -> se_data_p;

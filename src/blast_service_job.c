@@ -494,7 +494,7 @@ bool ProcessLinkedServiceForBlastServiceJobOutput (Service *service_p, ServiceJo
 	if (results_p && (out_fmt == BOF_GRASSROOTS))
 		{
 			UserDetails *user_p = NULL;
-			Resource *resource_p = NULL;
+			DataResource *resource_p = NULL;
 			GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
 			Service *output_service_p = GetServiceByName (grassroots_p, linked_service_p -> ls_output_service_s, NULL);
 

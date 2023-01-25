@@ -345,7 +345,7 @@ BLAST_SERVICE_LOCAL bool CloseBlastService (Service *service_p);
  * or <code>NULL</code> if it is not valid for running a Blast search against.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p, Resource *resource_p, Handler *handler_p);
+BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p, DataResource *resource_p, Handler *handler_p);
 
 
 /**
@@ -361,7 +361,7 @@ BLAST_SERVICE_LOCAL ParameterSet *IsResourceForBlastService (Service *service_p,
  * otherwise.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, Resource *resource_p, const DatabaseType db_type, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p);
+BLAST_SERVICE_LOCAL bool AddBaseBlastServiceParameters (Service *blast_service_p, ParameterSet *param_set_p, DataResource *resource_p, const DatabaseType db_type, AddAdditionalParamsFn query_sequence_callback_fn, void *callback_data_p);
 
 
 BLAST_SERVICE_LOCAL bool GetBaseBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);

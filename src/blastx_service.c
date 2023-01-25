@@ -56,7 +56,7 @@ static const char *GetBlastXServiceDescription (const Service *service_p);
 
 static const char *GetBlastXServiceAlias (const Service *service_p);
 
-static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
+static ParameterSet *GetBlastXServiceParameters (Service *service_p, DataResource *resource_p, UserDetails *user_p);
 
 static ServiceJobSet *RunBlastXService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
@@ -137,7 +137,7 @@ static const char *GetBlastXServiceAlias (const Service * UNUSED_PARAM (service_
 }
 
 
-static ParameterSet *GetBlastXServiceParameters (Service *service_p, Resource *resource_p, UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetBlastXServiceParameters (Service *service_p, DataResource *resource_p, UserDetails * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = CreateProteinBlastServiceParameters (service_p, resource_p, "Protein BlastX service parameters", "A service to search protein databases with nucleotide queries", AddBlastXQuerySequenceParameters, NULL, s_tasks_p, S_NUM_TASKS);
 
