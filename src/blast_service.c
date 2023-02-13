@@ -43,6 +43,7 @@
 #include "servers_manager.h"
 #include "remote_parameter_details.h"
 #include "audit.h"
+#include "service_util.h"
 
 #include "string_parameter.h"
 #include "boolean_parameter.h"
