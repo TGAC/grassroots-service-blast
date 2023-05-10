@@ -39,24 +39,24 @@ SRCS 	:= \
 	alloc_failure.cpp \
 	args_processor.cpp \
 	async_system_blast_tool.cpp \
-	blast_app_parameters.c \
+	blast_app_parameters.cpp \
 	blast_service.c \
-	blastn_service.c \
-	blastp_service.c \
-	blastx_service.c \
-	blast_service_job.c \
-	blast_service_job_markup.c \
-	blast_service_params.c \
+	blastn_service.cpp \
+	blastp_service.cpp \
+	blastx_service.cpp \
+	blast_service_job.cpp \
+	blast_service_job_markup.cpp \
+	blast_service_params.cpp \
 	blast_formatter.cpp \
 	blast_tool.cpp \
 	blast_tool_factory.cpp \
-	blast_util.c \
+	blast_util.cpp \
 	byte_buffer_args_processor.cpp \
 	external_blast_tool.cpp \
 	external_blast_tool_factory.cpp \
-	magic_blast_service.c \
-	paired_blast_service.c \
-	polymarker_linked_service.c \
+	magic_blast_service.cpp \
+	paired_blast_service.cpp \
+	polymarker_linked_service.cpp \
 	strings_args_processor.cpp \
 	system_blast_tool.cpp \
 	system_blast_tool_factory.cpp \
@@ -69,11 +69,10 @@ CXXFLAGS +=
 LDFLAGS += -L$(DIR_JANSSON_LIB) -ljansson \
 	-L$(DIR_GRASSROOTS_UTIL_LIB) -l$(GRASSROOTS_UTIL_LIB_NAME) \
 	-L$(DIR_GRASSROOTS_UUID_LIB) -l$(GRASSROOTS_UUID_LIB_NAME) \
-	-L$(DIR_GRASSROOTS_SERVICE_LIB) -l$(GRASSROOTS_SERVICE_LIB_NAME) \
+	-L$(DIR_GRASSROOTS_SERVICES_LIB) -l$(GRASSROOTS_SERVICES_LIB_NAME) \
 	-L$(DIR_GRASSROOTS_SERVER_LIB) -l$(GRASSROOTS_SERVER_LIB_NAME) \
-	-L$(DIR_GRASSROOTS_PARAMS_LIB) -l$(GRASSROOTS_PARAMS_LIB_NAME) \
 	-L$(DIR_GRASSROOTS_NETWORK_LIB) -l$(GRASSROOTS_NETWORK_LIB_NAME) \
-	-L$(DIR_TASK_SERVICES_LIB) -l$(GRASSROOTS_TASK_LIB_NAME) 
+	-L$(DIR_GRASSROOTS_TASK_LIB) -l$(GRASSROOTS_TASK_LIB_NAME) 
 
 
 add_drmaa = 0
@@ -170,6 +169,6 @@ BLAST_SEARCH_LDFLAGS = \
 	-lm   \
 	-lpthread 	
 
-export CC := g++
+
 include $(DIR_BUILD_CONFIG)/generic_makefiles/shared_library.makefile
 
