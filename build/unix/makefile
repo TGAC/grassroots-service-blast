@@ -40,7 +40,7 @@ SRCS 	:= \
 	args_processor.cpp \
 	async_system_blast_tool.cpp \
 	blast_app_parameters.cpp \
-	blast_service.c \
+	blast_service.cpp \
 	blastn_service.cpp \
 	blastp_service.cpp \
 	blastx_service.cpp \
