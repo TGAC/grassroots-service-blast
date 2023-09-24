@@ -1318,7 +1318,7 @@ bool GetAndAddScaffoldsParameter (LinkedService *linked_service_p, json_t *hit_p
 
 											if (scaffold_s)
 												{
-													if (SetParameterValueFromString (param_p, scaffold_s))
+													if (SetParameterCurrentValueFromString (param_p, scaffold_s))
 														{
 															if (AddLinkedServiceToRequestJSON (hit_p, linked_service_p, output_params_p))
 																{
@@ -1402,7 +1402,7 @@ bool GetAndAddSequencesParameter (LinkedService *linked_service_p, json_t *hit_p
 
 																			if (sequences_value_s)
 																				{
-																					if (SetParameterValueFromString (param_p, sequences_value_s))
+																					if (SetParameterCurrentValueFromString (param_p, sequences_value_s))
 																						{
 																							if (AddLinkedServiceToRequestJSON (hit_p, linked_service_p, output_params_p))
 																								{
