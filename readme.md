@@ -1,4 +1,5 @@
-﻿# BLAST Services {#blast_services_guide}
+
+# BLAST Services
 
 The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Services module allows BLAST queries to be submitted against a number of databases.  This Grassroots service module contains three Services: 
 
@@ -10,33 +11,48 @@ The [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi) Services module allows BLAS
 
 To build this service, you need the [grassroots core](https://github.com/TGAC/grassroots-core) and [grassroots build config](https://github.com/TGAC/grassroots-build-config) installed and configured. 
 
-The files to build the BLAST service are in the ```build/<platform>``` directory. 
+The files to build the BLAST service are in the `build` directory. 
 
-### Linux
+### Linux and Mac
 
-If you enter this directory 
+Enter the build directory for your your given platform which is inside the `build/unix/<platform>` 
 
-~~~
-cd build/linux
-~~~
+For example, under linux:
 
-you can then build the service by typing
+```
+cd build/unix/linux
+```
 
-~~~
+whereas on MacOS:
+
+```
+cd build/unix/mac
+```
+
+then
+
+```
 make all
-~~~
+```
 
 and then 
 
-~~~
+```
 make install
-~~~
+```
 
-to install the service into the Grassroots system where it will be available for use immediately.
+to install the library into the Grassroots system where it will be available for use immediately.
 
-## Server Configuration
 
-Each of the three services listed above can be configured by files with the same names in the ```config``` directory in the Grassroots application directory, *e.g.* ```config/BlastN```
+### Windows
+
+Under Windows, there is a Visual Studio project in the `build/windows` folder that allows you to
+build the BLAST services.
+
+
+## Service Configuration
+
+Each of the three services listed above can be configured by files with the same names in the `config` directory in the Grassroots application directory, *e.g.* ```config/BlastN```
 
  * **working_directory**: This is the directory where are any input, output and log files created by the BLAST Services. This directory must be writeable by the user running the Grassroots Server. For instance, the httpd server is often run as the daemon user.
  * **databases**: This is an array of objects giving the details of the available databases. The objects in this array have the following keys:
@@ -57,7 +73,7 @@ Each of the three services listed above can be configured by files with the same
     * **system**: This will be run using the executable specified by *blast_command* to the ANSI-specified *system()* function. This is the default *blast_tool* option.
     * **drmaa**: This will be run by submitting a job to a DRMAA environment.
 
-An example configuration file for the BlastN service which would be saved as the ```<Grassroots directory>/config/BlastN``` is:
+An example configuration file for the BlastN service which could be used is:
 
 ~~~{.json}
 {
