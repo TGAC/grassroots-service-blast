@@ -83,7 +83,7 @@ static json_t *GetIndexingDataForDatabase (const Service *service_p, const Datab
 /*
  * API FUNCTIONS
  */
-ServicesArray *GetServices (UserDetails * UNUSED_PARAM (user_p), GrassrootsServer *grassroots_p)
+ServicesArray *GetServices (User * UNUSED_PARAM (user_p), GrassrootsServer *grassroots_p)
 {
 	ServicesArray *services_array_p = NULL;
 	const uint32 NUM_SERVICES = 4;
@@ -176,7 +176,7 @@ void ReleaseBlastServiceParameters (Service * UNUSED_PARAM (service_p), Paramete
 
 
 
-ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *  UNUSED_PARAM (user_p), ProvidersStateTable *providers_p, BlastAppParameters *app_params_p)
+ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, User *  UNUSED_PARAM (user_p), ProvidersStateTable *providers_p, BlastAppParameters *app_params_p)
 {
 	BlastServiceData *blast_data_p = (BlastServiceData *) (service_p -> se_data_p);
 	const char *input_value_s = NULL;

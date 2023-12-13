@@ -147,11 +147,11 @@ static const char *GetBlastNServiceDescription (const Service *service_p);
 
 static const char *GetBlastNServiceAlias (const Service *service_p);
 
-static ParameterSet *GetBlastNServiceParameters (Service *service_p, DataResource *resource_p, UserDetails *user_p);
+static ParameterSet *GetBlastNServiceParameters (Service *service_p, DataResource *resource_p, User *user_p);
 
 static bool GetBlastNServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
-static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
+static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p);
 
 static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p);
 
@@ -276,7 +276,7 @@ static ServiceMetadata *GetBlastNServiceMetadata (Service *service_p)
 }
 
 
-static ParameterSet *GetBlastNServiceParameters (Service *service_p, DataResource *resource_p, UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetBlastNServiceParameters (Service *service_p, DataResource *resource_p, User * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("Nucleotide Blast service parameters", "A service to run nucleotide Blast searches");
 
@@ -486,7 +486,7 @@ static bool ParseNucleotideBlastParameters (const BlastServiceData * UNUSED_PARA
 
 
 
-static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p)
+static ServiceJobSet *RunNucleotideBlastService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p)
 {
 	BlastAppParameters app_params;
 	ServiceJobSet *jobs_p = NULL;

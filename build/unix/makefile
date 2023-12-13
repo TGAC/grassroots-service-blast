@@ -19,6 +19,7 @@ VPATH := \
 
 INCLUDES := \
 	-I$(DIR_INCLUDE) \
+	-I$(DIR_GRASSROOTS_USERS_INC) \
 	-I$(DIR_GRASSROOTS_UTIL_INC) \
 	-I$(DIR_GRASSROOTS_UTIL_INC)/containers \
 	-I$(DIR_GRASSROOTS_UTIL_INC)/io \
@@ -33,7 +34,8 @@ INCLUDES := \
 	-I$(DIR_UUID_INC) \
 	-I$(DIR_GRASSROOTS_UUID_INC) \
 	-I$(DIR_BLAST_INC) \
-	-I$(DIR_PCRE_INC)
+	-I$(DIR_PCRE_INC) \
+	-I$(DIR_BSON_INC)
 	
 SRCS 	:= \
 	alloc_failure.cpp \

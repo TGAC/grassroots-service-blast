@@ -64,9 +64,9 @@ static const char *GetProteinBlastServiceDescription (const Service *service_p);
 
 static const char *GetProteinBlastServiceAlias (const Service *service_p);
 
-static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
+static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p);
 
-static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, UserDetails *user_p);
+static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, User *user_p);
 
 
 static bool AddScoringParameters (BlastServiceData *data_p, ParameterSet *param_set_p);
@@ -272,13 +272,13 @@ static const char *GetProteinBlastServiceAlias (const Service * UNUSED_PARAM (se
 }
 
 
-static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetProteinBlastServiceParameters (Service *service_p, DataResource *resource_p, User * UNUSED_PARAM (user_p))
 {
 	return CreateProteinBlastServiceParameters (service_p, resource_p, "Protein Blast service parameters", "A service to run Protein Blast searches", NULL, NULL, s_tasks_p, S_NUM_TASKS);
 }
 
 
-static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p)
+static ServiceJobSet *RunProteinBlastService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p)
 {
 	BlastAppParameters app_params;
 	ServiceJobSet *jobs_p = NULL;

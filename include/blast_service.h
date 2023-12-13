@@ -264,7 +264,7 @@ extern "C"
  * <code>NULL</code> upon error.
  * @ingroup blast_service
  */
-BLAST_SERVICE_API ServicesArray *GetServices (UserDetails * user_p, GrassrootsServer *grassroots_p);
+BLAST_SERVICE_API ServicesArray *GetServices (User * user_p, GrassrootsServer *grassroots_p);
 
 
 /**
@@ -282,13 +282,13 @@ BLAST_SERVICE_API void ReleaseServices (ServicesArray *services_p);
  *
  * @param service_p The Blast Service to run.
  * @param param_set_p The ParameterSet specifying the Parameters to use.
- * @param user_p The UserDetails of the user requesting to run the Service.
+ * @param user_p The User of the user requesting to run the Service.
  * @param providers_p The details of ExternalServers for any paired or external Blast Services.
  * @param app_params_p The parser used for the current type of BlastTool.
  * @return The ServiceJobSet with the BlastServiceJobs or <code>NULL</code> upon error.
  * @ingroup blast_service
  */
-BLAST_SERVICE_LOCAL ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p, BlastAppParameters *app_params_p);
+BLAST_SERVICE_LOCAL ServiceJobSet *RunBlastService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p, BlastAppParameters *app_params_p);
 
 
 /**

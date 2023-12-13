@@ -70,13 +70,13 @@ static const char *GetMagicBlastServiceDescription (const Service *service_p);
 static const char *GetMagicBlastServiceAlias (const Service *service_p);
 
 
-static ServiceJobSet *RunMagicBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
+static ServiceJobSet *RunMagicBlastService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p);
 
 static ServiceMetadata *GetMagicBlastServiceMetadata (Service *service_p);
 
 static bool ParseMagicBlastParameters (const BlastServiceData *data_p, ParameterSet *params_p, ArgsProcessor *ap_p);
 
-static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p));
+static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), User * UNUSED_PARAM (user_p));
 
 
 static bool GetMagicBlastServiceParameterTypeForNamedParameter (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
@@ -148,7 +148,7 @@ static const char *GetMagicBlastServiceAlias (const Service * UNUSED_PARAM (serv
 }
 
 
-static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetMagicBlastServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), User * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("Magic Blast service parameters", "A service to run Magic Blast searches");
 	BlastServiceData *data_p = (BlastServiceData *) service_p -> se_data_p;
@@ -189,7 +189,7 @@ static bool GetMagicBlastServiceParameterTypeForNamedParameter (const Service *s
 }
 
 
-static ServiceJobSet *RunMagicBlastService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p)
+static ServiceJobSet *RunMagicBlastService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p)
 {
 	BlastAppParameters app_params;
 	ServiceJobSet *jobs_p = NULL;
