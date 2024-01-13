@@ -477,7 +477,7 @@ bool AddProgramSelectionParameters (BlastServiceData *blast_data_p, ParameterSet
 				{
 					const BlastTask *task_p = (const BlastTask *) ptr;
 
-					if (!CreateAndAddStringParameterOption ((StringParameter *) param_p, task_p -> bt_name_s, task_p -> bt_description_s))
+					if (!CreateAndAddStringParameterOption (param_p, task_p -> bt_name_s, task_p -> bt_description_s))
 						{
 							success_flag = false;
 						}

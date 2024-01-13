@@ -335,7 +335,7 @@ static bool AddMatrixParameter (BlastServiceData *data_p, ParameterSet *param_se
 
 			for (i = 0; i < S_NUM_MATRICES; ++ i)
 				{
-					if (!CreateAndAddStringParameterOption ((StringParameter *) param_p, * (S_MATRICES_SS + i), * (S_MATRICES_SS + i)))
+					if (!CreateAndAddStringParameterOption (param_p, * (S_MATRICES_SS + i), * (S_MATRICES_SS + i)))
 						{
 							i = S_NUM_MATRICES;
 							success_flag = false;
