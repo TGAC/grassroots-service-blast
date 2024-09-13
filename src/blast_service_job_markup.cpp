@@ -890,7 +890,7 @@ LinkedList *GetScaffoldsFromHit (const json_t *hit_p, const DatabaseInfo *db_p)
 
 													if (reg_ex_p)
 														{
-															if (SetPattern (reg_ex_p, db_p -> di_scaffold_regex_s, 0))
+															if (SetPattern (reg_ex_p, (const unsigned char *) (db_p -> di_scaffold_regex_s), 0))
 																{
 																	if (MatchPattern (reg_ex_p, value_s))
 																		{
